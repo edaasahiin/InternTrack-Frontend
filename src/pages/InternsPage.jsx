@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
+
 import InternForm from "../components/InternForm";
 import InternList from "../components/InternList";
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
+
 import { api } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import { isAdminOrHR } from "../utils/roleUtils";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 function InternsPage() {
     const [interns, setInterns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [message, setMessage] = useState("");
     const [isError, setIsError] = useState(false);
+
+    const { user } = useAuth();
+
+    const canManageInterns =
+        isAdminOrHR(user?.role);
 
     async function loadInterns() {
         setIsLoading(true);
@@ -18,10 +28,11 @@ function InternsPage() {
 
         try {
             const data = await api.get("/interns");
+
             setInterns(data ?? []);
         } catch (error) {
             setIsError(true);
-            setMessage(error.message);
+            setMessage(getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -35,7 +46,11 @@ function InternsPage() {
         <div>
             <h2>Stajyerler</h2>
 
-            <InternForm onInternAdded={loadInterns} />
+            {canManageInterns && (
+                <InternForm
+                    onInternAdded={loadInterns}
+                />
+            )}
 
             <AlertMessage
                 message={message}
@@ -48,6 +63,7 @@ function InternsPage() {
                 <InternList
                     interns={interns}
                     onInternDeleted={loadInterns}
+                    canDelete={canManageInterns}
                 />
             )}
         </div>

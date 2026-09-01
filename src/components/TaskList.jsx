@@ -1,9 +1,14 @@
 import { useState } from "react";
+
 import { api } from "../services/api";
 import AlertMessage from "./AlertMessage";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
-function TaskList({ tasks, onTaskChanged }) {
+function TaskList({
+    tasks,
+    onTaskChanged,
+    canDelete
+}) {
     const [message, setMessage] = useState("");
     const [isError, setIsError] = useState(false);
 
@@ -15,12 +20,16 @@ function TaskList({ tasks, onTaskChanged }) {
             await api.delete(`/tasks/${id}`);
 
             setIsError(false);
-            setMessage("Görev başarıyla silindi.");
+            setMessage(
+                "Görev başarıyla silindi."
+            );
 
             onTaskChanged();
         } catch (error) {
             setIsError(true);
-            setMessage(getErrorMessage(error));
+            setMessage(
+                getErrorMessage(error)
+            );
         }
     }
 
@@ -43,13 +52,16 @@ function TaskList({ tasks, onTaskChanged }) {
 
             setIsError(false);
             setMessage(
-                data?.message || "Görev güncellendi."
+                data?.message ||
+                "Görev güncellendi."
             );
 
             onTaskChanged();
         } catch (error) {
             setIsError(true);
-            setMessage(getErrorMessage(error));
+            setMessage(
+                getErrorMessage(error)
+            );
         }
     }
 
@@ -65,32 +77,40 @@ function TaskList({ tasks, onTaskChanged }) {
             {tasks.length === 0 ? (
                 <p>Henüz görev yok.</p>
             ) : (
-                tasks.map(task => (
+                tasks.map((task) => (
                     <div
                         className="task-card"
                         key={task.id}
                     >
-                        <strong>{task.title}</strong>
+                        <strong>
+                            {task.title}
+                        </strong>
+
                         {" - "}
                         {task.status}
+
                         {" - "}
                         {task.intern?.name}
 
-                        <button
-                            onClick={() =>
-                                completeTask(task)
-                            }
-                        >
-                            Tamamlandı
-                        </button>
+                        {task.status !== "Done" && (
+                            <button
+                                onClick={() =>
+                                    completeTask(task)
+                                }
+                            >
+                                Tamamlandı
+                            </button>
+                        )}
 
-                        <button
-                            onClick={() =>
-                                deleteTask(task.id)
-                            }
-                        >
-                            Sil
-                        </button>
+                        {canDelete && (
+                            <button
+                                onClick={() =>
+                                    deleteTask(task.id)
+                                }
+                            >
+                                Sil
+                            </button>
+                        )}
                     </div>
                 ))
             )}

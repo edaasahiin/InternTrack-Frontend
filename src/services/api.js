@@ -2,12 +2,21 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 async function request(endpoint, options = {}) {
     try {
+        const token = sessionStorage.getItem("token");
+
         const response = await fetch(
             `${API_BASE_URL}${endpoint}`,
             {
                 ...options,
                 headers: {
                     "Content-Type": "application/json",
+
+                    ...(token
+                        ? {
+                            Authorization: `Bearer ${token}`
+                        }
+                        : {}),
+
                     ...options.headers
                 }
             }
@@ -21,6 +30,15 @@ async function request(endpoint, options = {}) {
             } catch {
                 data = null;
             }
+        }
+
+        if (response.status === 401) {
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("user");
+
+            window.location.href = "/login";
+
+            return null;
         }
 
         if (!response.ok) {

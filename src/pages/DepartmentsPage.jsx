@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+
 import { api } from "../services/api";
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
 import { getErrorMessage } from "../utils/getErrorMessage";
+import { useAuth } from "../context/AuthContext";
+import { isAdminOrHR } from "../utils/roleUtils";
 
 function DepartmentsPage() {
     const [departments, setDepartments] = useState([]);
@@ -12,6 +15,11 @@ function DepartmentsPage() {
     const [isError, setIsError] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    const { user } = useAuth();
+
+    const canManageDepartments =
+        isAdminOrHR(user?.role);
 
     async function loadDepartments() {
         setIsLoading(true);
@@ -71,10 +79,14 @@ function DepartmentsPage() {
         setIsError(false);
 
         try {
-            await api.delete(`/departments/${id}`);
+            await api.delete(
+                `/departments/${id}`
+            );
 
             setIsError(false);
-            setMessage("Departman başarıyla silindi.");
+            setMessage(
+                "Departman başarıyla silindi."
+            );
 
             await loadDepartments();
         } catch (error) {
@@ -87,24 +99,28 @@ function DepartmentsPage() {
         <div>
             <h2>Departmanlar</h2>
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Departman Adı"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    required
-                />
+            {canManageDepartments && (
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        placeholder="Departman Adı"
+                        value={name}
+                        onChange={(event) =>
+                            setName(event.target.value)
+                        }
+                        required
+                    />
 
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting
-                        ? "Ekleniyor..."
-                        : "Departman Ekle"}
-                </button>
-            </form>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting
+                            ? "Ekleniyor..."
+                            : "Departman Ekle"}
+                    </button>
+                </form>
+            )}
 
             <AlertMessage
                 message={message}
@@ -118,20 +134,24 @@ function DepartmentsPage() {
             ) : departments.length === 0 ? (
                 <p>Henüz departman yok.</p>
             ) : (
-                departments.map(department => (
+                departments.map((department) => (
                     <div
                         className="department-card"
                         key={department.id}
                     >
                         {department.name}
 
-                        <button
-                            onClick={() =>
-                                deleteDepartment(department.id)
-                            }
-                        >
-                            Sil
-                        </button>
+                        {canManageDepartments && (
+                            <button
+                                onClick={() =>
+                                    deleteDepartment(
+                                        department.id
+                                    )
+                                }
+                            >
+                                Sil
+                            </button>
+                        )}
                     </div>
                 ))
             )}

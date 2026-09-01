@@ -1,9 +1,14 @@
 import { useState } from "react";
+
 import { api } from "../services/api";
 import AlertMessage from "./AlertMessage";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
-function InternList({ interns, onInternDeleted }) {
+function InternList({
+    interns,
+    onInternDeleted,
+    canDelete
+}) {
     const [message, setMessage] = useState("");
     const [isError, setIsError] = useState(false);
 
@@ -15,12 +20,16 @@ function InternList({ interns, onInternDeleted }) {
             await api.delete(`/interns/${id}`);
 
             setIsError(false);
-            setMessage("Stajyer başarıyla silindi.");
+            setMessage(
+                "Stajyer başarıyla silindi."
+            );
 
             onInternDeleted();
         } catch (error) {
             setIsError(true);
-            setMessage(getErrorMessage(error));
+            setMessage(
+                getErrorMessage(error)
+            );
         }
     }
 
@@ -36,24 +45,32 @@ function InternList({ interns, onInternDeleted }) {
             {interns.length === 0 ? (
                 <p>Henüz stajyer yok.</p>
             ) : (
-                interns.map(intern => (
+                interns.map((intern) => (
                     <div
                         className="intern-card"
                         key={intern.id}
                     >
-                        <strong>{intern.name}</strong>
+                        <strong>
+                            {intern.name}
+                        </strong>
+
                         {" - "}
                         {intern.email}
+
                         {" - "}
                         {intern.department?.name}
 
-                        <button
-                            onClick={() =>
-                                deleteIntern(intern.id)
-                            }
-                        >
-                            Sil
-                        </button>
+                        {canDelete && (
+                            <button
+                                onClick={() =>
+                                    deleteIntern(
+                                        intern.id
+                                    )
+                                }
+                            >
+                                Sil
+                            </button>
+                        )}
                     </div>
                 ))
             )}
