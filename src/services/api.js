@@ -1,22 +1,20 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL;
 
-async function request(endpoint, options = {}) {
+async function request(
+    endpoint,
+    options = {},
+    canRetry = true
+) {
     try {
-        const token = sessionStorage.getItem("token");
-
         const response = await fetch(
             `${API_BASE_URL}${endpoint}`,
             {
                 ...options,
+                credentials: "include",
                 headers: {
-                    "Content-Type": "application/json",
-
-                    ...(token
-                        ? {
-                            Authorization: `Bearer ${token}`
-                        }
-                        : {}),
-
+                    "Content-Type":
+                        "application/json",
                     ...options.headers
                 }
             }
@@ -32,18 +30,38 @@ async function request(endpoint, options = {}) {
             }
         }
 
-        if (response.status === 401) {
-            sessionStorage.removeItem("token");
-            sessionStorage.removeItem("user");
+        if (
+            response.status === 401 &&
+            canRetry &&
+            endpoint !== "/auth/login" &&
+            endpoint !== "/auth/refresh"
+        ) {
+            const refreshResponse =
+                await fetch(
+                    `${API_BASE_URL}/auth/refresh`,
+                    {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
 
-            window.location.href = "/login";
-
-            return null;
+            if (refreshResponse.ok) {
+                return request(
+                    endpoint,
+                    options,
+                    false
+                );
+            }
         }
 
         if (!response.ok) {
             const error = new Error(
-                data?.message || "İşlem gerçekleştirilemedi."
+                data?.message ||
+                "İşlem gerçekleştirilemedi."
             );
 
             error.status = response.status;
@@ -58,9 +76,10 @@ async function request(endpoint, options = {}) {
             throw error;
         }
 
-        const connectionError = new Error(
-            "Sunucuya bağlanılamadı."
-        );
+        const connectionError =
+            new Error(
+                "Sunucuya bağlanılamadı."
+            );
 
         connectionError.status = 0;
 
@@ -74,22 +93,34 @@ export const api = {
     },
 
     post(endpoint, body) {
-        return request(endpoint, {
-            method: "POST",
-            body: JSON.stringify(body)
-        });
+        return request(
+            endpoint,
+            {
+                method: "POST",
+                body:
+                    body === undefined
+                        ? undefined
+                        : JSON.stringify(body)
+            }
+        );
     },
 
     put(endpoint, body) {
-        return request(endpoint, {
-            method: "PUT",
-            body: JSON.stringify(body)
-        });
+        return request(
+            endpoint,
+            {
+                method: "PUT",
+                body: JSON.stringify(body)
+            }
+        );
     },
 
     delete(endpoint) {
-        return request(endpoint, {
-            method: "DELETE"
-        });
+        return request(
+            endpoint,
+            {
+                method: "DELETE"
+            }
+        );
     }
 };

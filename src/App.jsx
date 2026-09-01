@@ -23,13 +23,18 @@ function AppContent() {
     const {
         user,
         isAuthenticated,
+        isLoading,
         logout
     } = useAuth();
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
         navigate("/login");
     };
+
+    if (isLoading) {
+        return <p>Yükleniyor...</p>;
+    }
 
     if (!isAuthenticated) {
         return (
@@ -160,6 +165,8 @@ function AppContent() {
                     }
                 />
             </Routes>
+ 
+ 
         </>
     );
 }

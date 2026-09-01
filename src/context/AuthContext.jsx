@@ -1,24 +1,34 @@
 import {
     createContext,
     useContext,
+    useEffect,
     useState
 } from "react";
+
+import { api } from "../services/api";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [token, setToken] = useState(
-        sessionStorage.getItem("token")
-    );
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const [user, setUser] = useState(() => {
-        const storedUser =
-            sessionStorage.getItem("user");
+    useEffect(() => {
+        async function loadCurrentUser() {
+            try {
+                const currentUser =
+                    await api.get("/auth/me");
 
-        return storedUser
-            ? JSON.parse(storedUser)
-            : null;
-    });
+                setUser(currentUser);
+            } catch {
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        loadCurrentUser();
+    }, []);
 
     const login = (loginResponse) => {
         const userData = {
@@ -27,36 +37,25 @@ export function AuthProvider({ children }) {
             role: loginResponse.role
         };
 
-        sessionStorage.setItem(
-            "token",
-            loginResponse.token
-        );
-
-        sessionStorage.setItem(
-            "user",
-            JSON.stringify(userData)
-        );
-
-        setToken(loginResponse.token);
         setUser(userData);
     };
 
-    const logout = () => {
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("user");
-
-        setToken(null);
-        setUser(null);
+    const logout = async () => {
+        try {
+            await api.post("/auth/logout");
+        } finally {
+            setUser(null);
+        }
     };
 
-    const isAuthenticated = Boolean(token);
+    const isAuthenticated = Boolean(user);
 
     return (
         <AuthContext.Provider
             value={{
-                token,
                 user,
                 isAuthenticated,
+                isLoading,
                 login,
                 logout
             }}
