@@ -1,32 +1,49 @@
 import { useState } from "react";
 
-import { api } from "../services/api";
+import { agent } from "../api/agent";
 import AlertMessage from "./AlertMessage";
 import { getErrorMessage } from "../utils/getErrorMessage";
+
+import type { Intern } from "../interfaces/intern";
+
+interface InternListProps {
+    interns: Intern[];
+    onInternDeleted: () => Promise<void> | void;
+    canDelete: boolean;
+}
 
 function InternList({
     interns,
     onInternDeleted,
     canDelete
-}) {
-    const [message, setMessage] = useState("");
-    const [isError, setIsError] = useState(false);
+}: InternListProps) {
+    const [message, setMessage] =
+        useState("");
 
-    async function deleteIntern(id) {
+    const [isError, setIsError] =
+        useState(false);
+
+    async function deleteIntern(
+        id: number
+    ) {
         setMessage("");
         setIsError(false);
 
         try {
-            await api.delete(`/interns/${id}`);
+            await agent.delete<void>(
+                `/interns/${id}`
+            );
 
             setIsError(false);
+
             setMessage(
                 "Stajyer başarıyla silindi."
             );
 
-            onInternDeleted();
+            await onInternDeleted();
         } catch (error) {
             setIsError(true);
+
             setMessage(
                 getErrorMessage(error)
             );

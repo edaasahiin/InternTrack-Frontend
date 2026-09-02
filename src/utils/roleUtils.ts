@@ -1,4 +1,6 @@
-export function isAdminOrHR(role) {
+export function isAdminOrHR(
+    role?: string
+): boolean {
     return (
         role === "Admin" ||
         role === "HR"

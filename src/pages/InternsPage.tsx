@@ -1,20 +1,34 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 
 import InternForm from "../components/InternForm";
 import InternList from "../components/InternList";
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
 
-import { api } from "../services/api";
+import { agent } from "../api/agent";
 import { useAuth } from "../context/AuthContext";
 import { isAdminOrHR } from "../utils/roleUtils";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
+import type {
+    Intern
+} from "../interfaces/intern";
+
 function InternsPage() {
-    const [interns, setInterns] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [message, setMessage] = useState("");
-    const [isError, setIsError] = useState(false);
+    const [interns, setInterns] =
+        useState<Intern[]>([]);
+
+    const [isLoading, setIsLoading] =
+        useState(true);
+
+    const [message, setMessage] =
+        useState("");
+
+    const [isError, setIsError] =
+        useState(false);
 
     const { user } = useAuth();
 
@@ -27,12 +41,17 @@ function InternsPage() {
         setIsError(false);
 
         try {
-            const data = await api.get("/interns");
+            const data =
+                await agent.get<Intern[]>(
+                    "/interns"
+                );
 
             setInterns(data ?? []);
         } catch (error) {
             setIsError(true);
-            setMessage(getErrorMessage(error));
+            setMessage(
+                getErrorMessage(error)
+            );
         } finally {
             setIsLoading(false);
         }
@@ -48,7 +67,9 @@ function InternsPage() {
 
             {canManageInterns && (
                 <InternForm
-                    onInternAdded={loadInterns}
+                    onInternAdded={
+                        loadInterns
+                    }
                 />
             )}
 
@@ -62,8 +83,12 @@ function InternsPage() {
             ) : (
                 <InternList
                     interns={interns}
-                    onInternDeleted={loadInterns}
-                    canDelete={canManageInterns}
+                    onInternDeleted={
+                        loadInterns
+                    }
+                    canDelete={
+                        canManageInterns
+                    }
                 />
             )}
         </div>

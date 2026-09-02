@@ -1,4 +1,12 @@
-function AlertMessage({ message, isError }) {
+interface AlertMessageProps {
+    message: string;
+    isError: boolean;
+}
+
+function AlertMessage({
+    message,
+    isError
+}: AlertMessageProps) {
     if (!message) {
         return null;
     }

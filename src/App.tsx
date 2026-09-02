@@ -165,8 +165,6 @@ function AppContent() {
                     }
                 />
             </Routes>
- 
- 
         </>
     );
 }

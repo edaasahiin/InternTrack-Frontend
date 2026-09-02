@@ -1,11 +1,16 @@
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL;
 
-async function request(
-    endpoint,
-    options = {},
+interface ApiError extends Error {
+    status: number;
+    data: unknown;
+}
+
+async function request<T>(
+    endpoint: string,
+    options: RequestInit = {},
     canRetry = true
-) {
+): Promise<T> {
     try {
         const response = await fetch(
             `${API_BASE_URL}${endpoint}`,
@@ -13,14 +18,13 @@ async function request(
                 ...options,
                 credentials: "include",
                 headers: {
-                    "Content-Type":
-                        "application/json",
+                    "Content-Type": "application/json",
                     ...options.headers
                 }
             }
         );
 
-        let data = null;
+        let data: unknown = null;
 
         if (response.status !== 204) {
             try {
@@ -50,7 +54,7 @@ async function request(
                 );
 
             if (refreshResponse.ok) {
-                return request(
+                return request<T>(
                     endpoint,
                     options,
                     false
@@ -59,10 +63,16 @@ async function request(
         }
 
         if (!response.ok) {
-            const error = new Error(
-                data?.message ||
-                "İşlem gerçekleştirilemedi."
-            );
+            const responseData =
+                data as {
+                    message?: string;
+                } | null;
+
+            const error =
+                new Error(
+                    responseData?.message ||
+                    "İşlem gerçekleştirilemedi."
+                ) as ApiError;
 
             error.status = response.status;
             error.data = data;
@@ -70,30 +80,37 @@ async function request(
             throw error;
         }
 
-        return data;
+        return data as T;
     } catch (error) {
-        if (error.status) {
+        const apiError =
+            error as Partial<ApiError>;
+
+        if (apiError.status) {
             throw error;
         }
 
         const connectionError =
             new Error(
                 "Sunucuya bağlanılamadı."
-            );
+            ) as ApiError;
 
         connectionError.status = 0;
+        connectionError.data = null;
 
         throw connectionError;
     }
 }
 
-export const api = {
-    get(endpoint) {
-        return request(endpoint);
+export const agent = {
+    get<T>(endpoint: string): Promise<T> {
+        return request<T>(endpoint);
     },
 
-    post(endpoint, body) {
-        return request(
+    post<TResponse, TBody = unknown>(
+        endpoint: string,
+        body?: TBody
+    ): Promise<TResponse> {
+        return request<TResponse>(
             endpoint,
             {
                 method: "POST",
@@ -105,8 +122,11 @@ export const api = {
         );
     },
 
-    put(endpoint, body) {
-        return request(
+    put<TResponse, TBody>(
+        endpoint: string,
+        body: TBody
+    ): Promise<TResponse> {
+        return request<TResponse>(
             endpoint,
             {
                 method: "PUT",
@@ -115,8 +135,10 @@ export const api = {
         );
     },
 
-    delete(endpoint) {
-        return request(
+    delete<TResponse>(
+        endpoint: string
+    ): Promise<TResponse> {
+        return request<TResponse>(
             endpoint,
             {
                 method: "DELETE"

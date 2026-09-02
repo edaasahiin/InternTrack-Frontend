@@ -28,6 +28,7 @@ function HomePage() {
                 >
                     <div className="dashboard-card">
                         <h3>Stajyerler</h3>
+
                         <p>
                             Stajyer ekleme, listeleme ve silme işlemleri.
                         </p>
@@ -40,6 +41,7 @@ function HomePage() {
                 >
                     <div className="dashboard-card">
                         <h3>Görevler</h3>
+
                         <p>
                             Görev oluşturma, durum güncelleme ve silme işlemleri.
                         </p>
@@ -52,6 +54,7 @@ function HomePage() {
                 >
                     <div className="dashboard-card">
                         <h3>Departmanlar</h3>
+
                         <p>
                             Departman ekleme, listeleme ve silme işlemleri.
                         </p>

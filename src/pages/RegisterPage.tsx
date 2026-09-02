@@ -1,34 +1,72 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+    useEffect,
+    useState,
+    type FormEvent
+} from "react";
 
-import { api } from "../services/api";
+import {
+    Link,
+    useNavigate
+} from "react-router-dom";
+
+import { agent } from "../api/agent";
+
+import type {
+    RegisterDto
+} from "../interfaces/auth";
+
+import type {
+    Department
+} from "../interfaces/department";
 
 import sankoLogo from "../assets/sanko-logo.png";
 
 import "./LoginPage.css";
 
+interface ApiError extends Error {
+    status?: number;
+    data?: unknown;
+}
+
 function RegisterPage() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [departmentId, setDepartmentId] = useState("");
+    const [name, setName] =
+        useState("");
 
-    const [departments, setDepartments] = useState([]);
+    const [email, setEmail] =
+        useState("");
 
-    const [message, setMessage] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [password, setPassword] =
+        useState("");
+
+    const [departmentId, setDepartmentId] =
+        useState("");
+
+    const [departments, setDepartments] =
+        useState<Department[]>([]);
+
+    const [message, setMessage] =
+        useState("");
+
+    const [isLoading, setIsLoading] =
+        useState(false);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const loadDepartments = async () => {
             try {
-                const data = await api.get("/departments");
+                const data =
+                    await agent.get<Department[]>(
+                        "/departments"
+                    );
 
                 setDepartments(data);
             } catch (error) {
+                const apiError =
+                    error as ApiError;
+
                 setMessage(
-                    error.message ||
+                    apiError.message ||
                     "Departmanlar yüklenemedi."
                 );
             }
@@ -37,27 +75,37 @@ function RegisterPage() {
         loadDepartments();
     }, []);
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (
+        event: FormEvent<HTMLFormElement>
+    ) => {
         event.preventDefault();
 
         setMessage("");
         setIsLoading(true);
 
+        const registerDto: RegisterDto = {
+            name,
+            email,
+            password,
+            departmentId: Number(departmentId)
+        };
+
         try {
-            await api.post(
+            await agent.post<
+                unknown,
+                RegisterDto
+            >(
                 "/auth/register",
-                {
-                    name,
-                    email,
-                    password,
-                    departmentId: Number(departmentId)
-                }
+                registerDto
             );
 
             navigate("/login");
         } catch (error) {
+            const apiError =
+                error as ApiError;
+
             setMessage(
-                error.message ||
+                apiError.message ||
                 "Kayıt işlemi başarısız."
             );
         } finally {
@@ -97,7 +145,9 @@ function RegisterPage() {
                             placeholder="Adınızı girin"
                             value={name}
                             onChange={(event) =>
-                                setName(event.target.value)
+                                setName(
+                                    event.target.value
+                                )
                             }
                             required
                         />
@@ -114,7 +164,9 @@ function RegisterPage() {
                             placeholder="ornek@email.com"
                             value={email}
                             onChange={(event) =>
-                                setEmail(event.target.value)
+                                setEmail(
+                                    event.target.value
+                                )
                             }
                             required
                         />
@@ -131,7 +183,9 @@ function RegisterPage() {
                             placeholder="En az 6 karakter"
                             value={password}
                             onChange={(event) =>
-                                setPassword(event.target.value)
+                                setPassword(
+                                    event.target.value
+                                )
                             }
                             required
                             minLength={6}

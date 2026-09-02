@@ -1,43 +1,69 @@
 import { useState } from "react";
 
-import { api } from "../services/api";
+import { agent } from "../api/agent";
 import AlertMessage from "./AlertMessage";
 import { getErrorMessage } from "../utils/getErrorMessage";
+
+import type {
+    TaskItem,
+    UpdateTaskDto
+} from "../interfaces/task";
+
+interface TaskListProps {
+    tasks: TaskItem[];
+    onTaskChanged: () => Promise<void> | void;
+    canDelete: boolean;
+}
+
+interface MessageResponse {
+    message?: string;
+}
 
 function TaskList({
     tasks,
     onTaskChanged,
     canDelete
-}) {
-    const [message, setMessage] = useState("");
-    const [isError, setIsError] = useState(false);
+}: TaskListProps) {
+    const [message, setMessage] =
+        useState("");
 
-    async function deleteTask(id) {
+    const [isError, setIsError] =
+        useState(false);
+
+    async function deleteTask(
+        id: number
+    ) {
         setMessage("");
         setIsError(false);
 
         try {
-            await api.delete(`/tasks/${id}`);
+            await agent.delete<void>(
+                `/tasks/${id}`
+            );
 
             setIsError(false);
+
             setMessage(
                 "Görev başarıyla silindi."
             );
 
-            onTaskChanged();
+            await onTaskChanged();
         } catch (error) {
             setIsError(true);
+
             setMessage(
                 getErrorMessage(error)
             );
         }
     }
 
-    async function completeTask(task) {
+    async function completeTask(
+        task: TaskItem
+    ) {
         setMessage("");
         setIsError(false);
 
-        const updatedTask = {
+        const updatedTask: UpdateTaskDto = {
             title: task.title,
             description: task.description,
             status: "Done",
@@ -45,20 +71,26 @@ function TaskList({
         };
 
         try {
-            const data = await api.put(
-                `/tasks/${task.id}`,
-                updatedTask
-            );
+            const data =
+                await agent.put<
+                    MessageResponse,
+                    UpdateTaskDto
+                >(
+                    `/tasks/${task.id}`,
+                    updatedTask
+                );
 
             setIsError(false);
+
             setMessage(
                 data?.message ||
                 "Görev güncellendi."
             );
 
-            onTaskChanged();
+            await onTaskChanged();
         } catch (error) {
             setIsError(true);
+
             setMessage(
                 getErrorMessage(error)
             );
@@ -95,7 +127,9 @@ function TaskList({
                         {task.status !== "Done" && (
                             <button
                                 onClick={() =>
-                                    completeTask(task)
+                                    completeTask(
+                                        task
+                                    )
                                 }
                             >
                                 Tamamlandı
@@ -105,7 +139,9 @@ function TaskList({
                         {canDelete && (
                             <button
                                 onClick={() =>
-                                    deleteTask(task.id)
+                                    deleteTask(
+                                        task.id
+                                    )
                                 }
                             >
                                 Sil

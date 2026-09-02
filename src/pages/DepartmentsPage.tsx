@@ -1,20 +1,45 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState,
+    type FormEvent
+} from "react";
 
-import { api } from "../services/api";
+import { agent } from "../api/agent";
+
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
+
 import { getErrorMessage } from "../utils/getErrorMessage";
 import { useAuth } from "../context/AuthContext";
 import { isAdminOrHR } from "../utils/roleUtils";
 
-function DepartmentsPage() {
-    const [departments, setDepartments] = useState([]);
-    const [name, setName] = useState("");
+import type {
+    Department,
+    CreateDepartmentDto
+} from "../interfaces/department";
 
-    const [message, setMessage] = useState("");
-    const [isError, setIsError] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+interface MessageResponse {
+    message?: string;
+}
+
+function DepartmentsPage() {
+    const [departments, setDepartments] =
+        useState<Department[]>([]);
+
+    const [name, setName] =
+        useState("");
+
+    const [message, setMessage] =
+        useState("");
+
+    const [isError, setIsError] =
+        useState(false);
+
+    const [isSubmitting, setIsSubmitting] =
+        useState(false);
+
+    const [isLoading, setIsLoading] =
+        useState(true);
 
     const { user } = useAuth();
 
@@ -27,11 +52,18 @@ function DepartmentsPage() {
         setIsError(false);
 
         try {
-            const data = await api.get("/departments");
+            const data =
+                await agent.get<Department[]>(
+                    "/departments"
+                );
+
             setDepartments(data ?? []);
         } catch (error) {
             setIsError(true);
-            setMessage(getErrorMessage(error));
+
+            setMessage(
+                getErrorMessage(error)
+            );
         } finally {
             setIsLoading(false);
         }
@@ -41,26 +73,35 @@ function DepartmentsPage() {
         loadDepartments();
     }, []);
 
-    async function handleSubmit(event) {
+    async function handleSubmit(
+        event: FormEvent<HTMLFormElement>
+    ) {
         event.preventDefault();
 
         setMessage("");
         setIsError(false);
         setIsSubmitting(true);
 
-        const newDepartment = {
-            name
-        };
+        const newDepartment:
+            CreateDepartmentDto = {
+                name
+            };
 
         try {
-            const data = await api.post(
-                "/departments",
-                newDepartment
-            );
+            const data =
+                await agent.post<
+                    MessageResponse,
+                    CreateDepartmentDto
+                >(
+                    "/departments",
+                    newDepartment
+                );
 
             setIsError(false);
+
             setMessage(
-                data?.message || "Departman oluşturuldu."
+                data?.message ||
+                "Departman oluşturuldu."
             );
 
             setName("");
@@ -68,22 +109,28 @@ function DepartmentsPage() {
             await loadDepartments();
         } catch (error) {
             setIsError(true);
-            setMessage(getErrorMessage(error));
+
+            setMessage(
+                getErrorMessage(error)
+            );
         } finally {
             setIsSubmitting(false);
         }
     }
 
-    async function deleteDepartment(id) {
+    async function deleteDepartment(
+        id: number
+    ) {
         setMessage("");
         setIsError(false);
 
         try {
-            await api.delete(
+            await agent.delete<void>(
                 `/departments/${id}`
             );
 
             setIsError(false);
+
             setMessage(
                 "Departman başarıyla silindi."
             );
@@ -91,7 +138,10 @@ function DepartmentsPage() {
             await loadDepartments();
         } catch (error) {
             setIsError(true);
-            setMessage(getErrorMessage(error));
+
+            setMessage(
+                getErrorMessage(error)
+            );
         }
     }
 
@@ -106,7 +156,9 @@ function DepartmentsPage() {
                         placeholder="Departman Adı"
                         value={name}
                         onChange={(event) =>
-                            setName(event.target.value)
+                            setName(
+                                event.target.value
+                            )
                         }
                         required
                     />
@@ -134,26 +186,28 @@ function DepartmentsPage() {
             ) : departments.length === 0 ? (
                 <p>Henüz departman yok.</p>
             ) : (
-                departments.map((department) => (
-                    <div
-                        className="department-card"
-                        key={department.id}
-                    >
-                        {department.name}
+                departments.map(
+                    (department) => (
+                        <div
+                            className="department-card"
+                            key={department.id}
+                        >
+                            {department.name}
 
-                        {canManageDepartments && (
-                            <button
-                                onClick={() =>
-                                    deleteDepartment(
-                                        department.id
-                                    )
-                                }
-                            >
-                                Sil
-                            </button>
-                        )}
-                    </div>
-                ))
+                            {canManageDepartments && (
+                                <button
+                                    onClick={() =>
+                                        deleteDepartment(
+                                            department.id
+                                        )
+                                    }
+                                >
+                                    Sil
+                                </button>
+                            )}
+                        </div>
+                    )
+                )
             )}
         </div>
     );
