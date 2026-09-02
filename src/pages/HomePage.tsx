@@ -1,7 +1,104 @@
+import {
+    useEffect,
+    useState
+} from "react";
+
 import { Link } from "react-router-dom";
+
+import { agent } from "../api/agent";
+
+import AlertMessage from "../components/AlertMessage";
+import LoadingMessage from "../components/LoadingMessage";
+
+import type {
+    Intern
+} from "../interfaces/intern";
+
+import type {
+    TaskItem
+} from "../interfaces/task";
+
+import type {
+    Department
+} from "../interfaces/department";
+
 import sankoLogo from "../assets/sanko-logo.png";
 
+interface DashboardStats {
+    internCount: number;
+    taskCount: number;
+    completedTaskCount: number;
+    pendingTaskCount: number;
+    departmentCount: number;
+}
+
 function HomePage() {
+    const [stats, setStats] =
+        useState<DashboardStats>({
+            internCount: 0,
+            taskCount: 0,
+            completedTaskCount: 0,
+            pendingTaskCount: 0,
+            departmentCount: 0
+        });
+
+    const [isLoading, setIsLoading] =
+        useState(true);
+
+    const [message, setMessage] =
+        useState("");
+
+    useEffect(() => {
+        async function loadDashboard() {
+            try {
+                const [
+                    interns,
+                    tasks,
+                    departments
+                ] = await Promise.all([
+                    agent.get<Intern[]>(
+                        "/interns"
+                    ),
+                    agent.get<TaskItem[]>(
+                        "/tasks"
+                    ),
+                    agent.get<Department[]>(
+                        "/departments"
+                    )
+                ]);
+
+                const completedTaskCount =
+                    tasks.filter(
+                        (task) =>
+                            task.status === "Done"
+                    ).length;
+
+                const pendingTaskCount =
+                    tasks.filter(
+                        (task) =>
+                            task.status !== "Done"
+                    ).length;
+
+                setStats({
+                    internCount: interns.length,
+                    taskCount: tasks.length,
+                    completedTaskCount,
+                    pendingTaskCount,
+                    departmentCount:
+                        departments.length
+                });
+            } catch {
+                setMessage(
+                    "Dashboard bilgileri yüklenemedi."
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        loadDashboard();
+    }, []);
+
     return (
         <div>
             <div className="hero">
@@ -15,11 +112,72 @@ function HomePage() {
                     <h1>InternTrack</h1>
 
                     <p>
-                        Stajyer, departman ve görev yönetimi için geliştirilen
+                        Stajyer, departman ve görev
+                        yönetimi için geliştirilen
                         takip sistemi.
                     </p>
                 </div>
             </div>
+
+            <h2>Genel Durum</h2>
+
+            <AlertMessage
+                message={message}
+                isError={true}
+            />
+
+            {isLoading ? (
+                <LoadingMessage />
+            ) : (
+                <div className="dashboard">
+                    <div className="dashboard-card">
+                        <h3>
+                            {stats.internCount}
+                        </h3>
+                        <p>Stajyer</p>
+                    </div>
+
+                    <div className="dashboard-card">
+                        <h3>
+                            {stats.taskCount}
+                        </h3>
+                        <p>Toplam Görev</p>
+                    </div>
+
+                    <div className="dashboard-card">
+                        <h3>
+                            {
+                                stats.completedTaskCount
+                            }
+                        </h3>
+                        <p>
+                            Tamamlanan Görev
+                        </p>
+                    </div>
+
+                    <div className="dashboard-card">
+                        <h3>
+                            {
+                                stats.pendingTaskCount
+                            }
+                        </h3>
+                        <p>
+                            Bekleyen Görev
+                        </p>
+                    </div>
+
+                    <div className="dashboard-card">
+                        <h3>
+                            {
+                                stats.departmentCount
+                            }
+                        </h3>
+                        <p>Departman</p>
+                    </div>
+                </div>
+            )}
+
+            <h2>Yönetim</h2>
 
             <div className="dashboard">
                 <Link
@@ -30,7 +188,9 @@ function HomePage() {
                         <h3>Stajyerler</h3>
 
                         <p>
-                            Stajyer ekleme, listeleme ve silme işlemleri.
+                            Stajyer ekleme,
+                            listeleme ve silme
+                            işlemleri.
                         </p>
                     </div>
                 </Link>
@@ -43,7 +203,9 @@ function HomePage() {
                         <h3>Görevler</h3>
 
                         <p>
-                            Görev oluşturma, durum güncelleme ve silme işlemleri.
+                            Görev oluşturma,
+                            durum güncelleme ve
+                            silme işlemleri.
                         </p>
                     </div>
                 </Link>
@@ -56,7 +218,9 @@ function HomePage() {
                         <h3>Departmanlar</h3>
 
                         <p>
-                            Departman ekleme, listeleme ve silme işlemleri.
+                            Departman ekleme,
+                            listeleme ve silme
+                            işlemleri.
                         </p>
                     </div>
                 </Link>
