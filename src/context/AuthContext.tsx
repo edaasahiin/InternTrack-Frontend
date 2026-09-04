@@ -7,7 +7,11 @@ import {
 } from "react";
 
 import { agent } from "../api/agent";
-import type { AuthUser } from "../interfaces/auth";
+
+import type {
+    AuthUser,
+    UpdateAvatarDto
+} from "../interfaces/auth";
 
 interface AuthContextType {
     user: AuthUser | null;
@@ -15,6 +19,9 @@ interface AuthContextType {
     isLoading: boolean;
     login: (loginResponse: AuthUser) => void;
     logout: () => Promise<void>;
+    updateAvatar: (
+        avatar: string | null
+    ) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -57,11 +64,40 @@ export function AuthProvider({
     ) => {
         const userData: AuthUser = {
             name: loginResponse.name,
+            surname: loginResponse.surname,
+            avatar: loginResponse.avatar,
             email: loginResponse.email,
             role: loginResponse.role
         };
 
         setUser(userData);
+    };
+
+    const updateAvatar = async (
+        avatar: string | null
+    ) => {
+        const dto: UpdateAvatarDto = {
+            avatar
+        };
+
+        await agent.put<
+            unknown,
+            UpdateAvatarDto
+        >(
+            "/auth/avatar",
+            dto
+        );
+
+        setUser((currentUser) => {
+            if (!currentUser) {
+                return null;
+            }
+
+            return {
+                ...currentUser,
+                avatar
+            };
+        });
     };
 
     const logout = async () => {
@@ -84,7 +120,8 @@ export function AuthProvider({
                 isAuthenticated,
                 isLoading,
                 login,
-                logout
+                logout,
+                updateAvatar
             }}
         >
             {children}

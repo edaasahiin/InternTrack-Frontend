@@ -17,9 +17,21 @@ import type {
     TaskItem
 } from "../interfaces/task";
 
+type TaskFilter =
+    | "All"
+    | "ToDo"
+    | "InProgress"
+    | "Done";
+
 function TasksPage() {
     const [tasks, setTasks] =
         useState<TaskItem[]>([]);
+
+    const [filter, setFilter] =
+        useState<TaskFilter>("All");
+
+    const [searchText, setSearchText] =
+        useState("");
 
     const [isLoading, setIsLoading] =
         useState(true);
@@ -62,6 +74,27 @@ function TasksPage() {
         loadTasks();
     }, []);
 
+    const filteredTasks =
+        tasks.filter((task) => {
+            const matchesStatus =
+                filter === "All" ||
+                task.status === filter;
+
+            const matchesSearch =
+                task.title
+                    .toLowerCase()
+                    .includes(
+                        searchText
+                            .trim()
+                            .toLowerCase()
+                    );
+
+            return (
+                matchesStatus &&
+                matchesSearch
+            );
+        });
+
     return (
         <div>
             <h2>Görevler</h2>
@@ -74,6 +107,54 @@ function TasksPage() {
                 />
             )}
 
+            <div className="task-filter">
+                <label htmlFor="task-search">
+                    Görev Ara
+                </label>
+
+                <input
+                    id="task-search"
+                    type="text"
+                    placeholder="Görev başlığı yazın"
+                    value={searchText}
+                    onChange={(event) =>
+                        setSearchText(
+                            event.target.value
+                        )
+                    }
+                />
+
+                <label htmlFor="task-filter">
+                    Durum
+                </label>
+
+                <select
+                    id="task-filter"
+                    value={filter}
+                    onChange={(event) => {
+                        setFilter(
+                            event.target.value as TaskFilter
+                        );
+                    }}
+                >
+                    <option value="All">
+                        Tümü
+                    </option>
+
+                    <option value="ToDo">
+                        ToDo
+                    </option>
+
+                    <option value="InProgress">
+                        In Progress
+                    </option>
+
+                    <option value="Done">
+                        Done
+                    </option>
+                </select>
+            </div>
+
             <AlertMessage
                 message={message}
                 isError={isError}
@@ -83,7 +164,7 @@ function TasksPage() {
                 <LoadingMessage />
             ) : (
                 <TaskList
-                    tasks={tasks}
+                    tasks={filteredTasks}
                     onTaskChanged={
                         loadTasks
                     }

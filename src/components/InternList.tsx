@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { agent } from "../api/agent";
 import AlertMessage from "./AlertMessage";
@@ -67,27 +68,38 @@ function InternList({
                         className="intern-card"
                         key={intern.id}
                     >
-                        <strong>
-                            {intern.name}
-                        </strong>
+                        <div>
+                            <strong>
+                                {intern.name} {intern.surname}
+                            </strong>
 
-                        {" - "}
-                        {intern.email}
+                            {" - "}
+                            {intern.email}
 
-                        {" - "}
-                        {intern.department?.name}
+                            {" - "}
+                            {intern.department?.name}
+                        </div>
 
-                        {canDelete && (
-                            <button
-                                onClick={() =>
-                                    deleteIntern(
-                                        intern.id
-                                    )
-                                }
+                        <div className="intern-actions">
+                            <Link
+                                to={`/interns/${intern.id}`}
+                                className="detail-link"
                             >
-                                Sil
-                            </button>
-                        )}
+                                Detay
+                            </Link>
+
+                            {canDelete && (
+                                <button
+                                    onClick={() =>
+                                        deleteIntern(
+                                            intern.id
+                                        )
+                                    }
+                                >
+                                    Sil
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ))
             )}

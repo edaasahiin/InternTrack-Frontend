@@ -32,6 +32,9 @@ function RegisterPage() {
     const [name, setName] =
         useState("");
 
+    const [surname, setSurname] =
+        useState("");
+
     const [email, setEmail] =
         useState("");
 
@@ -85,6 +88,7 @@ function RegisterPage() {
 
         const registerDto: RegisterDto = {
             name,
+            surname,
             email,
             password,
             departmentId: Number(departmentId)
@@ -136,7 +140,7 @@ function RegisterPage() {
                 >
                     <div className="login-field">
                         <label htmlFor="name">
-                            Ad Soyad
+                            Ad
                         </label>
 
                         <input
@@ -146,6 +150,25 @@ function RegisterPage() {
                             value={name}
                             onChange={(event) =>
                                 setName(
+                                    event.target.value
+                                )
+                            }
+                            required
+                        />
+                    </div>
+
+                    <div className="login-field">
+                        <label htmlFor="surname">
+                            Soyad
+                        </label>
+
+                        <input
+                            id="surname"
+                            type="text"
+                            placeholder="Soyadınızı girin"
+                            value={surname}
+                            onChange={(event) =>
+                                setSurname(
                                     event.target.value
                                 )
                             }

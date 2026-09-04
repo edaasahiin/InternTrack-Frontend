@@ -30,6 +30,9 @@ function InternForm({
     const [name, setName] =
         useState("");
 
+    const [surname, setSurname] =
+        useState("");
+
     const [email, setEmail] =
         useState("");
 
@@ -59,6 +62,7 @@ function InternForm({
                 setDepartments(data ?? []);
             } catch (error) {
                 setIsError(true);
+
                 setMessage(
                     getErrorMessage(error)
                 );
@@ -79,6 +83,7 @@ function InternForm({
 
         const newIntern: CreateInternDto = {
             name,
+            surname,
             email,
             departmentId: Number(
                 departmentId
@@ -103,6 +108,7 @@ function InternForm({
             );
 
             setName("");
+            setSurname("");
             setEmail("");
             setDepartmentId("");
 
@@ -129,6 +135,18 @@ function InternForm({
                     value={name}
                     onChange={(event) =>
                         setName(
+                            event.target.value
+                        )
+                    }
+                    required
+                />
+
+                <input
+                    type="text"
+                    placeholder="Soyad"
+                    value={surname}
+                    onChange={(event) =>
+                        setSurname(
                             event.target.value
                         )
                     }

@@ -11,26 +11,10 @@ import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
 
 import type {
-    Intern
-} from "../interfaces/intern";
-
-import type {
-    TaskItem
-} from "../interfaces/task";
-
-import type {
-    Department
-} from "../interfaces/department";
+    DashboardStats
+} from "../interfaces/dashboard";
 
 import sankoLogo from "../assets/sanko-logo.png";
-
-interface DashboardStats {
-    internCount: number;
-    taskCount: number;
-    completedTaskCount: number;
-    pendingTaskCount: number;
-    departmentCount: number;
-}
 
 function HomePage() {
     const [stats, setStats] =
@@ -51,42 +35,12 @@ function HomePage() {
     useEffect(() => {
         async function loadDashboard() {
             try {
-                const [
-                    interns,
-                    tasks,
-                    departments
-                ] = await Promise.all([
-                    agent.get<Intern[]>(
-                        "/interns"
-                    ),
-                    agent.get<TaskItem[]>(
-                        "/tasks"
-                    ),
-                    agent.get<Department[]>(
-                        "/departments"
-                    )
-                ]);
+                const data =
+                    await agent.get<DashboardStats>(
+                        "/dashboard"
+                    );
 
-                const completedTaskCount =
-                    tasks.filter(
-                        (task) =>
-                            task.status === "Done"
-                    ).length;
-
-                const pendingTaskCount =
-                    tasks.filter(
-                        (task) =>
-                            task.status !== "Done"
-                    ).length;
-
-                setStats({
-                    internCount: interns.length,
-                    taskCount: tasks.length,
-                    completedTaskCount,
-                    pendingTaskCount,
-                    departmentCount:
-                        departments.length
-                });
+                setStats(data);
             } catch {
                 setMessage(
                     "Dashboard bilgileri yüklenemedi."

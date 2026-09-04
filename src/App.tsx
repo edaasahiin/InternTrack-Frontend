@@ -9,8 +9,10 @@ import {
 
 import HomePage from "./pages/HomePage";
 import InternsPage from "./pages/InternsPage";
+import InternDetailPage from "./pages/InternDetailPage";
 import TasksPage from "./pages/TasksPage";
 import DepartmentsPage from "./pages/DepartmentsPage";
+import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
@@ -89,9 +91,12 @@ function AppContent() {
 
                 {" | "}
 
-                <span>
-                    {user?.name}
-                </span>
+                <Link
+                    to="/profile"
+                    className="nav-user"
+                >
+                    {user?.name} {user?.surname}
+                </Link>
 
                 {" | "}
 
@@ -118,6 +123,15 @@ function AppContent() {
                 />
 
                 <Route
+                    path="/interns/:id"
+                    element={
+                        <ProtectedRoute>
+                            <InternDetailPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
                     path="/tasks"
                     element={
                         <ProtectedRoute>
@@ -131,6 +145,15 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <DepartmentsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <ProfilePage />
                         </ProtectedRoute>
                     }
                 />
