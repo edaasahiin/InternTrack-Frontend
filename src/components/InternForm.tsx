@@ -36,6 +36,9 @@ function InternForm({
     const [email, setEmail] =
         useState("");
 
+    const [password, setPassword] =
+        useState("");
+
     const [departmentId, setDepartmentId] =
         useState("");
 
@@ -85,6 +88,7 @@ function InternForm({
             name,
             surname,
             email,
+            password,
             departmentId: Number(
                 departmentId
             )
@@ -110,6 +114,7 @@ function InternForm({
             setName("");
             setSurname("");
             setEmail("");
+            setPassword("");
             setDepartmentId("");
 
             await onInternAdded();
@@ -163,6 +168,19 @@ function InternForm({
                         )
                     }
                     required
+                />
+
+                <input
+                    type="password"
+                    placeholder="Geçici Şifre"
+                    value={password}
+                    onChange={(event) =>
+                        setPassword(
+                            event.target.value
+                        )
+                    }
+                    required
+                    minLength={6}
                 />
 
                 <select
