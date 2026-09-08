@@ -11,6 +11,7 @@ body {
     padding: 32px;
 }
 
+
 /* NAVBAR */
 
 nav {
@@ -45,6 +46,7 @@ nav a:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 
+
 /* BAŞLIKLAR */
 
 h1 {
@@ -68,6 +70,7 @@ p {
     color: #64748b;
 }
 
+
 /* ANA SAYFA HERO */
 
 .hero {
@@ -82,6 +85,7 @@ p {
     max-width: 100%;
     object-fit: contain;
 }
+
 
 /* DASHBOARD */
 
@@ -147,6 +151,7 @@ p {
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.09);
 }
 
+
 /* FORMLAR */
 
 form {
@@ -178,6 +183,7 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(15, 42, 122, 0.1);
 }
 
+
 /* BUTONLAR */
 
 button {
@@ -196,10 +202,21 @@ button:hover {
     transform: translateY(-1px);
 }
 
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button:disabled:hover {
+    background: #0f2a7a;
+    transform: none;
+}
+
+
 /* LİSTE KARTLARI */
 
 .intern-card,
-.task-card,
 .department-card {
     background: white;
     padding: 16px 18px;
@@ -216,9 +233,6 @@ button:hover {
     align-items: center;
 }
 
-.task-card strong {
-    font-size: 16px;
-}
 
 /* STAJYER LİSTE AKSİYONLARI */
 
@@ -245,6 +259,7 @@ button:hover {
     background: #d8e3fb;
     transform: translateY(-1px);
 }
+
 
 /* STAJYER DETAY SAYFASI */
 
@@ -284,33 +299,48 @@ button:hover {
     color: #1f2937;
 }
 
-/* GÖREV FİLTRESİ VE ARAMA */
+
+/* GÖREV ARAMA */
+
+.task-search-section {
+    margin-bottom: 24px;
+}
+
+.task-search-section h3 {
+    margin-bottom: 12px;
+    color: #0f2a7a;
+}
 
 .task-filter {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 22px;
-    padding: 16px 18px;
+
+    width: fit-content;
+    max-width: 100%;
+
+    margin-bottom: 0;
+    padding: 12px 14px;
+
     background: white;
     border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
-}
 
-.task-filter label {
-    font-weight: 600;
-    color: #1f2937;
-    white-space: nowrap;
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.05);
 }
 
 .task-filter input {
-    flex: 1;
+    width: 280px;
+    min-width: 220px;
+    flex: none;
 }
 
 .task-filter select {
-    flex: 0 0 220px;
-    min-width: 180px;
+    width: 150px;
+    min-width: 150px;
+    flex: none;
 }
+
 
 /* STAJYER ARAMA */
 
@@ -334,6 +364,440 @@ button:hover {
 .intern-search input {
     flex: 1;
 }
+
+
+/* GÖREV SİLME İZNİ */
+
+.task-delete-permission {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    width: 100%;
+
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.task-delete-permission input {
+    flex: none;
+    min-width: 0;
+    width: 17px;
+    height: 17px;
+    margin: 0;
+}
+
+
+/* GÖREV GRUPLARI */
+
+.task-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task-group {
+    background: transparent;
+}
+
+.task-group-header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+
+    padding: 16px 18px;
+    margin: 0;
+
+    background: white;
+    color: #1f2937;
+
+    border: none;
+    border-radius: 13px;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.05);
+
+    text-align: left;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        box-shadow 0.2s;
+}
+
+.task-group-header:hover {
+    background: #f8fafc;
+    transform: none;
+
+    box-shadow:
+        0 5px 16px rgba(0, 0, 0, 0.07);
+}
+
+.task-group-title {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.task-group-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-group-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 28px;
+    height: 28px;
+
+    box-sizing: border-box;
+
+    padding: 0 9px;
+
+    border-radius: 999px;
+
+    background: #e8eefc;
+    color: #0f2a7a;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.task-group-arrow {
+    min-width: 12px;
+
+    color: #64748b;
+
+    font-size: 12px;
+    text-align: center;
+}
+
+.task-group-content {
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.task-group-todo .task-group-header {
+    border-left:
+        4px solid #0f2a7a;
+}
+
+.task-group-progress .task-group-header {
+    border-left:
+        4px solid #64748b;
+}
+
+.task-group-done .task-group-header {
+    border-left:
+        4px solid #166534;
+}
+
+.task-group-done .task-group-title {
+    color: #166534;
+}
+
+
+/* GÖREV KARTLARI */
+
+.task-card {
+    position: relative;
+
+    padding: 0;
+    margin-bottom: 8px;
+
+    overflow: hidden;
+
+    background: white;
+
+    border-radius: 12px;
+    border-left:
+        4px solid #0f2a7a;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.task-card:last-child {
+    margin-bottom: 0;
+}
+
+.task-card-header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    box-sizing: border-box;
+
+    padding: 15px 18px;
+
+    background: white;
+    color: #1f2937;
+
+    border: none;
+    border-radius: 0;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.task-card-header:hover {
+    background: #f8fafc;
+    color: #0f2a7a;
+    transform: none;
+}
+
+.task-card-header strong {
+    font-size: 16px;
+}
+
+.task-card-arrow {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.task-card-details {
+    padding:
+        6px 18px 18px 18px;
+
+    border-top:
+        1px solid #e5e7eb;
+}
+
+.task-card-details p {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.task-card-details strong {
+    color: #1f2937;
+}
+
+.task-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-top: 16px;
+}
+
+.task-card-actions button {
+    width: auto;
+}
+
+.task-done-icon {
+    margin-left: 8px;
+    font-size: 16px;
+}
+
+.task-group-done .task-card {
+    opacity: 0.94;
+}
+
+.task-group-done
+.task-card-header strong {
+    color: #475569;
+}
+
+
+/* KUTLAMA ANİMASYONU */
+
+.celebration-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    background:
+        rgba(15, 42, 122, 0.04);
+
+    animation:
+        celebration-overlay-fade
+        2.2s ease forwards;
+}
+
+.celebration-box {
+    position: relative;
+
+    min-width: 280px;
+
+    padding: 28px 36px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 18px 50px
+        rgba(15, 42, 122, 0.22);
+
+    text-align: center;
+
+    animation:
+        celebration-box-pop
+        2.2s ease forwards;
+}
+
+.celebration-title {
+    color: #0f2a7a;
+
+    font-size: 23px;
+    font-weight: 800;
+
+    margin-bottom: 8px;
+}
+
+.celebration-subtitle {
+    color: #64748b;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.celebration-confetti {
+    position: absolute;
+
+    font-size: 24px;
+
+    animation:
+        celebration-confetti-fly
+        1.7s ease-out forwards;
+}
+
+.celebration-confetti-1 {
+    left: 5%;
+    top: 70%;
+}
+
+.celebration-confetti-2 {
+    left: 20%;
+    top: 80%;
+
+    animation-delay: 0.1s;
+}
+
+.celebration-confetti-3 {
+    left: 40%;
+    top: 85%;
+
+    animation-delay: 0.15s;
+}
+
+.celebration-confetti-4 {
+    right: 35%;
+    top: 82%;
+
+    animation-delay: 0.05s;
+}
+
+.celebration-confetti-5 {
+    right: 15%;
+    top: 75%;
+
+    animation-delay: 0.12s;
+}
+
+.celebration-confetti-6 {
+    right: 3%;
+    top: 68%;
+
+    animation-delay: 0.18s;
+}
+
+@keyframes celebration-box-pop {
+    0% {
+        opacity: 0;
+        transform:
+            scale(0.75);
+    }
+
+    15% {
+        opacity: 1;
+        transform:
+            scale(1.08);
+    }
+
+    25% {
+        transform:
+            scale(1);
+    }
+
+    80% {
+        opacity: 1;
+        transform:
+            scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            scale(0.94);
+    }
+}
+
+@keyframes celebration-overlay-fade {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes celebration-confetti-fly {
+    0% {
+        opacity: 0;
+
+        transform:
+            translateY(20px)
+            rotate(0deg)
+            scale(0.5);
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+            translateY(-140px)
+            rotate(220deg)
+            scale(1.25);
+    }
+}
+
 
 /* PROFİL */
 
@@ -385,6 +849,7 @@ button:hover {
     color: #1f2937;
 }
 
+
 /* AVATAR SEÇİCİ */
 
 .avatar-selector {
@@ -432,11 +897,135 @@ button:hover {
     background: #475569;
 }
 
+
+/* PROFİL DÜZENLEME */
+
+.profile-edit-section {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.profile-edit-section h3 {
+    margin-bottom: 18px;
+    color: #0f2a7a;
+}
+
+.profile-edit-section form {
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.change-password-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 9px 14px;
+    border-radius: 9px;
+    background: #e8eefc;
+    color: #0f2a7a;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.change-password-link:hover {
+    background: #d8e3fb;
+    transform: translateY(-1px);
+}
+
+
+/* STAJYER DÜZENLEME */
+
+.intern-edit-section {
+    background: white;
+    padding: 24px;
+    margin-bottom: 28px;
+    border-radius: 16px;
+    border-left: 5px solid #0f2a7a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.intern-edit-section h3 {
+    margin-bottom: 18px;
+    color: #0f2a7a;
+}
+
+.intern-edit-section form {
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.intern-edit-section
+form button[type="button"] {
+    background: #64748b;
+}
+
+.intern-edit-section
+form button[type="button"]:hover {
+    background: #475569;
+}
+
+
+/* ŞİFRE DEĞİŞTİRME */
+
+.password-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.password-card {
+    background: white;
+    padding: 28px;
+    border-radius: 18px;
+    border-left: 5px solid #0f2a7a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.password-card form {
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.password-card p {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+
+/* MESAJLAR */
+
+.success-message {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: #ecfdf5;
+    color: #166534;
+    font-weight: 600;
+}
+
+.error-message {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+
 /* RESPONSIVE */
 
 @media (max-width: 900px) {
     .dashboard {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 }
 
@@ -504,12 +1093,49 @@ button:hover {
         align-items: stretch;
     }
 
-    .task-filter select,
+    .task-search-section
+    .task-filter {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .task-search-section
     .task-filter input,
+    .task-search-section
+    .task-filter select,
     .intern-search input {
         width: 100%;
+        min-width: 0;
         flex: none;
         box-sizing: border-box;
+    }
+
+    .task-groups {
+        gap: 7px;
+    }
+
+    .task-group-header {
+        padding: 14px 15px;
+    }
+
+    .task-group-title {
+        font-size: 16px;
+    }
+
+    .task-card-header {
+        width: 100%;
+    }
+
+    .task-card-actions {
+        flex-direction: column;
+    }
+
+    .task-card-actions button {
+        width: 100%;
+    }
+
+    .task-delete-permission input {
+        width: 17px;
     }
 
     .profile-card {
@@ -532,5 +1158,378 @@ button:hover {
     .avatar-option {
         width: 50px;
         height: 50px;
+    }
+
+    .celebration-box {
+        min-width: 0;
+        width: calc(100% - 70px);
+        padding: 24px 20px;
+    }
+
+    .celebration-title {
+        font-size: 20px;
+    }
+}
+
+/* GÖREVLER - SON UI POLISH */
+
+.task-card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.task-card:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 18px
+        rgba(15, 42, 122, 0.07);
+}
+
+
+/* GÖREV DETAY SATIRLARI */
+
+.task-card-details {
+    background: white;
+}
+
+.task-card-details p {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    margin: 9px 0;
+
+    line-height: 1.5;
+
+    color: #64748b;
+}
+
+.task-card-details p strong {
+    min-width: 165px;
+
+    color: #1f2937;
+
+    font-weight: 700;
+}
+
+.task-card-details p span {
+    flex: 1;
+}
+
+
+/* GÖREV AKSİYONLARI */
+
+.task-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-top: 16px;
+    padding-top: 6px;
+}
+
+.task-card-actions button {
+    width: auto;
+}
+
+
+/* TAMAMLANDI BUTONU */
+
+.task-complete-button {
+    background: #166534;
+}
+
+.task-complete-button:hover {
+    background: #15803d;
+}
+
+
+/* SİL BUTONU */
+
+.task-delete-button {
+    background: #b91c1c;
+}
+
+.task-delete-button:hover {
+    background: #991b1b;
+}
+
+
+/* TAMAMLANAN GÖREVLER */
+
+.task-group-done .task-card {
+    opacity: 0.9;
+}
+
+.task-group-done .task-card-header {
+    background: #f8fafc;
+}
+
+.task-group-done
+.task-card-header strong {
+    color: #475569;
+}
+
+
+/* BOŞ GRUP */
+
+.task-group-empty {
+    margin: 6px 0 2px 0;
+
+    padding: 13px 16px;
+
+    background: #f8fafc;
+
+    border: 1px dashed #dbe1ea;
+    border-radius: 10px;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+    font-style: italic;
+}
+
+
+/* GRUP BAŞLIĞI */
+
+.task-group-header {
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.task-group-header:hover {
+    background: #f8fafc;
+
+    box-shadow:
+        0 6px 18px
+        rgba(15, 42, 122, 0.08);
+
+    transform: translateY(-1px);
+}
+
+
+/* SAYI BADGE */
+
+.task-group-count {
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(15, 42, 122, 0.06);
+}
+
+
+/* OKLAR */
+
+.task-group-arrow,
+.task-card-arrow {
+    transition:
+        transform 0.2s ease;
+
+    user-select: none;
+}
+
+
+/* KUTLAMA */
+
+.celebration-box {
+    border:
+        1px solid
+        rgba(15, 42, 122, 0.08);
+
+    box-shadow:
+        0 22px 60px
+        rgba(15, 42, 122, 0.26);
+}
+
+.celebration-title {
+    letter-spacing: -0.2px;
+}
+
+
+/* MOBİL */
+
+@media (max-width: 768px) {
+    .task-card-details p {
+        display: block;
+    }
+
+    .task-card-details p strong {
+        display: block;
+
+        min-width: 0;
+
+        margin-bottom: 3px;
+    }
+
+    .task-card-actions {
+        flex-direction: column;
+    }
+
+    .task-card-actions button {
+        width: 100%;
+    }
+}
+
+/* GÖREV GRUPLARI - SON DOKUNUŞ */
+
+.task-group-content {
+    margin-top: 8px;
+    padding-left: 10px;
+}
+
+.task-group-content .task-card {
+    margin-bottom: 8px;
+}
+
+.task-group-done .task-card {
+    border-left-color: #166534;
+}
+
+.task-group-progress .task-card {
+    border-left-color: #64748b;
+}
+
+.task-group-empty {
+    margin: 4px 0 4px 10px;
+    padding: 10px 14px;
+}
+
+/* GÖREV EKRANI - BELİRGİN SON POLISH */
+
+.task-groups {
+    gap: 10px;
+}
+
+.task-group {
+    background: transparent;
+}
+
+.task-group-content {
+    margin-top: 10px;
+    padding-left: 18px;
+    border-left: 2px solid #dbe4f0;
+}
+
+.task-group-content .task-card {
+    margin-bottom: 8px;
+}
+
+.task-group-header {
+    min-height: 58px;
+    padding: 16px 18px;
+    background: #ffffff;
+}
+
+.task-group-header:hover {
+    background: #f7faff;
+}
+
+.task-group-title {
+    font-size: 18px;
+}
+
+.task-group-count {
+    min-width: 30px;
+    height: 30px;
+    font-size: 13px;
+}
+
+.task-group-arrow {
+    font-size: 13px;
+}
+
+
+/* GRUP RENKLERİNİ DAHA NETLEŞTİR */
+
+.task-group-todo .task-group-header {
+    border-left: 5px solid #0f2a7a;
+}
+
+.task-group-progress .task-group-header {
+    border-left: 5px solid #64748b;
+}
+
+.task-group-done .task-group-header {
+    border-left: 5px solid #166534;
+}
+
+
+/* GÖREV KARTLARI */
+
+.task-card {
+    border-left-width: 4px;
+    background: #ffffff;
+}
+
+.task-group-progress .task-card {
+    border-left-color: #64748b;
+}
+
+.task-group-done .task-card {
+    border-left-color: #166534;
+    opacity: 0.96;
+}
+
+.task-card-header {
+    min-height: 52px;
+    padding: 14px 16px;
+}
+
+.task-card-header strong {
+    font-size: 16px;
+}
+
+
+/* DETAY ALANI - DAHA KOMPAKT */
+
+.task-card-details {
+    padding: 14px 18px 18px 18px;
+    background: #fbfcfe;
+}
+
+.task-card-details p {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 10px;
+
+    margin: 7px 0;
+}
+
+.task-card-details p strong {
+    min-width: 0;
+}
+
+.task-card-details p span {
+    color: #64748b;
+}
+
+
+/* BOŞ GRUP */
+
+.task-group-empty {
+    margin: 0;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px dashed #dbe1ea;
+}
+
+
+/* MOBİL */
+
+@media (max-width: 768px) {
+    .task-group-content {
+        padding-left: 8px;
+    }
+
+    .task-card-details p {
+        display: block;
+    }
+
+    .task-card-details p strong {
+        display: block;
+        margin-bottom: 3px;
     }
 }

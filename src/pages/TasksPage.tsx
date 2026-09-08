@@ -23,6 +23,11 @@ type TaskFilter =
     | "InProgress"
     | "Done";
 
+type TaskGroup =
+    | "todo"
+    | "progress"
+    | "done";
+
 function TasksPage() {
     const [tasks, setTasks] =
         useState<TaskItem[]>([]);
@@ -42,13 +47,30 @@ function TasksPage() {
     const [isError, setIsError] =
         useState(false);
 
+    const [
+        initialOpenGroup,
+        setInitialOpenGroup
+    ] = useState<TaskGroup | null>(
+        null
+    );
+
+    const [
+        taskListVersion,
+        setTaskListVersion
+    ] = useState(0);
+
     const { user } = useAuth();
 
     const canManageTasks =
         isAdminOrHR(user?.role);
 
-    async function loadTasks() {
-        setIsLoading(true);
+    async function loadTasks(
+        showLoading = true
+    ) {
+        if (showLoading) {
+            setIsLoading(true);
+        }
+
         setMessage("");
         setIsError(false);
 
@@ -66,8 +88,39 @@ function TasksPage() {
                 getErrorMessage(error)
             );
         } finally {
-            setIsLoading(false);
+            if (showLoading) {
+                setIsLoading(false);
+            }
         }
+    }
+
+    async function handleTaskAdded(
+        status: string
+    ) {
+        await loadTasks(false);
+
+        if (status === "ToDo") {
+            setInitialOpenGroup(
+                "todo"
+            );
+        } else if (
+            status === "InProgress"
+        ) {
+            setInitialOpenGroup(
+                "progress"
+            );
+        } else if (
+            status === "Done"
+        ) {
+            setInitialOpenGroup(
+                "done"
+            );
+        }
+
+        setTaskListVersion(
+            (current) =>
+                current + 1
+        );
     }
 
     useEffect(() => {
@@ -97,63 +150,63 @@ function TasksPage() {
 
     return (
         <div>
-            <h2>Görevler</h2>
+            <h2>
+                {canManageTasks
+                    ? "Görevler"
+                    : "Görevlerim"}
+            </h2>
 
-            {canManageTasks && (
-                <TaskForm
-                    onTaskAdded={
-                        loadTasks
-                    }
-                />
-            )}
-
-            <div className="task-filter">
-                <label htmlFor="task-search">
+            <div className="task-search-section">
+                <h3>
                     Görev Ara
-                </label>
+                </h3>
 
-                <input
-                    id="task-search"
-                    type="text"
-                    placeholder="Görev başlığı yazın"
-                    value={searchText}
-                    onChange={(event) =>
-                        setSearchText(
-                            event.target.value
-                        )
-                    }
-                />
+                <div className="task-filter">
+                    <input
+                        id="task-search"
+                        type="text"
+                        placeholder="Görev başlığı yazın"
+                        value={searchText}
+                        onChange={(event) =>
+                            setSearchText(
+                                event.target.value
+                            )
+                        }
+                    />
 
-                <label htmlFor="task-filter">
-                    Durum
-                </label>
+                    <select
+                        id="task-filter"
+                        value={filter}
+                        onChange={(event) =>
+                            setFilter(
+                                event.target.value as TaskFilter
+                            )
+                        }
+                    >
+                        <option value="All">
+                            Tümü
+                        </option>
 
-                <select
-                    id="task-filter"
-                    value={filter}
-                    onChange={(event) => {
-                        setFilter(
-                            event.target.value as TaskFilter
-                        );
-                    }}
-                >
-                    <option value="All">
-                        Tümü
-                    </option>
+                        <option value="ToDo">
+                            Yapılacak
+                        </option>
 
-                    <option value="ToDo">
-                        ToDo
-                    </option>
+                        <option value="InProgress">
+                            Devam Ediyor
+                        </option>
 
-                    <option value="InProgress">
-                        In Progress
-                    </option>
-
-                    <option value="Done">
-                        Done
-                    </option>
-                </select>
+                        <option value="Done">
+                            Tamamlandı
+                        </option>
+                    </select>
+                </div>
             </div>
+
+            <TaskForm
+                onTaskAdded={
+                    handleTaskAdded
+                }
+            />
 
             <AlertMessage
                 message={message}
@@ -164,12 +217,20 @@ function TasksPage() {
                 <LoadingMessage />
             ) : (
                 <TaskList
-                    tasks={filteredTasks}
-                    onTaskChanged={
-                        loadTasks
+                    key={
+                        taskListVersion
+                    }
+                    tasks={
+                        filteredTasks
+                    }
+                    onTaskChanged={() =>
+                        loadTasks(false)
                     }
                     canDelete={
                         canManageTasks
+                    }
+                    initialOpenGroup={
+                        initialOpenGroup
                     }
                 />
             )}

@@ -5,8 +5,12 @@ import {
 } from "react";
 
 import { agent } from "../api/agent";
+import { useAuth } from "../context/AuthContext";
+
 import AlertMessage from "./AlertMessage";
+
 import { getErrorMessage } from "../utils/getErrorMessage";
+import { isAdminOrHR } from "../utils/roleUtils";
 
 import type {
     CreateTaskDto
@@ -17,7 +21,11 @@ import type {
 } from "../interfaces/intern";
 
 interface TaskFormProps {
-    onTaskAdded: () => Promise<void> | void;
+    onTaskAdded: (
+        status: string
+    ) => Promise<void> | void;
+
+    fixedInternId?: number;
 }
 
 interface MessageResponse {
@@ -25,8 +33,17 @@ interface MessageResponse {
 }
 
 function TaskForm({
-    onTaskAdded
+    onTaskAdded,
+    fixedInternId
 }: TaskFormProps) {
+    const { user } = useAuth();
+
+    const canAssignIntern =
+        isAdminOrHR(user?.role);
+
+    const hasFixedIntern =
+        fixedInternId !== undefined;
+
     const [title, setTitle] =
         useState("");
 
@@ -38,6 +55,11 @@ function TaskForm({
 
     const [internId, setInternId] =
         useState("");
+
+    const [
+        canInternDeleteWhenCompleted,
+        setCanInternDeleteWhenCompleted
+    ] = useState(false);
 
     const [interns, setInterns] =
         useState<Intern[]>([]);
@@ -53,6 +75,13 @@ function TaskForm({
 
     useEffect(() => {
         async function loadInterns() {
+            if (
+                !canAssignIntern ||
+                hasFixedIntern
+            ) {
+                return;
+            }
+
             try {
                 const data =
                     await agent.get<Intern[]>(
@@ -62,6 +91,7 @@ function TaskForm({
                 setInterns(data ?? []);
             } catch (error) {
                 setIsError(true);
+
                 setMessage(
                     getErrorMessage(error)
                 );
@@ -69,7 +99,10 @@ function TaskForm({
         }
 
         loadInterns();
-    }, []);
+    }, [
+        canAssignIntern,
+        hasFixedIntern
+    ]);
 
     async function handleSubmit(
         event: FormEvent<HTMLFormElement>
@@ -80,11 +113,27 @@ function TaskForm({
         setIsError(false);
         setIsSubmitting(true);
 
+        const selectedInternId =
+            hasFixedIntern
+                ? fixedInternId
+                : canAssignIntern
+                    ? Number(internId)
+                    : 0;
+
+        const createdStatus =
+            status;
+
         const newTask: CreateTaskDto = {
-            title,
-            description,
+            title: title.trim(),
+            description:
+                description.trim(),
             status,
-            internId: Number(internId)
+            internId:
+                selectedInternId,
+            canInternDeleteWhenCompleted:
+                canAssignIntern
+                    ? canInternDeleteWhenCompleted
+                    : false
         };
 
         try {
@@ -107,9 +156,18 @@ function TaskForm({
             setTitle("");
             setDescription("");
             setStatus("ToDo");
-            setInternId("");
 
-            await onTaskAdded();
+            setCanInternDeleteWhenCompleted(
+                false
+            );
+
+            if (!hasFixedIntern) {
+                setInternId("");
+            }
+
+            await onTaskAdded(
+                createdStatus
+            );
         } catch (error) {
             setIsError(true);
 
@@ -156,42 +214,72 @@ function TaskForm({
                     }
                 >
                     <option value="ToDo">
-                        ToDo
+                        Yapılacak
                     </option>
 
                     <option value="InProgress">
-                        In Progress
+                        Devam Ediyor
                     </option>
 
                     <option value="Done">
-                        Done
+                        Tamamlandı
                     </option>
                 </select>
 
-                <select
-                    value={internId}
-                    onChange={(event) =>
-                        setInternId(
-                            event.target.value
-                        )
-                    }
-                    required
-                >
-                    <option value="">
-                        Stajyer Seç
-                    </option>
-
-                    {interns.map(
-                        (intern) => (
-                            <option
-                                key={intern.id}
-                                value={intern.id}
-                            >
-                                {intern.name}
+                {canAssignIntern &&
+                    !hasFixedIntern && (
+                        <select
+                            value={internId}
+                            onChange={(event) =>
+                                setInternId(
+                                    event.target.value
+                                )
+                            }
+                            required
+                        >
+                            <option value="">
+                                Stajyer Seç
                             </option>
-                        )
+
+                            {interns.map(
+                                (intern) => (
+                                    <option
+                                        key={
+                                            intern.id
+                                        }
+                                        value={
+                                            intern.id
+                                        }
+                                    >
+                                        {
+                                            intern.name
+                                        }{" "}
+                                        {
+                                            intern.surname
+                                        }
+                                    </option>
+                                )
+                            )}
+                        </select>
                     )}
-                </select>
+
+                {canAssignIntern && (
+                    <label className="task-delete-permission">
+                        <input
+                            type="checkbox"
+                            checked={
+                                canInternDeleteWhenCompleted
+                            }
+                            onChange={(event) =>
+                                setCanInternDeleteWhenCompleted(
+                                    event.target.checked
+                                )
+                            }
+                        />
+
+                        Tamamlandıktan sonra stajyer silebilir
+                    </label>
+                )}
 
                 <button
                     type="submit"

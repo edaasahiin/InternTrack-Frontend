@@ -14,6 +14,7 @@ import { useAuth } from "../context/AuthContext";
 
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
+import TaskForm from "../components/TaskForm";
 
 import { getErrorMessage } from "../utils/getErrorMessage";
 import { isAdminOrHR } from "../utils/roleUtils";
@@ -75,72 +76,72 @@ function InternDetailPage() {
     const [isError, setIsError] =
         useState(false);
 
-    useEffect(() => {
-        async function loadInternDetail() {
-            if (!id) {
-                setIsError(true);
+    async function loadInternDetail() {
+        if (!id) {
+            setIsError(true);
 
-                setMessage(
-                    "Stajyer bilgisi bulunamadı."
-                );
+            setMessage(
+                "Stajyer bilgisi bulunamadı."
+            );
 
-                setIsLoading(false);
+            setIsLoading(false);
 
-                return;
-            }
-
-            try {
-                const internData =
-                    await agent.get<Intern>(
-                        `/interns/${id}`
-                    );
-
-                const taskData =
-                    await agent.get<TaskItem[]>(
-                        "/tasks"
-                    );
-
-                const internTasks =
-                    taskData.filter(
-                        (task) =>
-                            task.internId ===
-                            internData.id
-                    );
-
-                setIntern(internData);
-                setTasks(internTasks);
-
-                setName(internData.name);
-                setSurname(internData.surname);
-                setEmail(internData.email);
-
-                setDepartmentId(
-                    internData.departmentId
-                );
-
-                if (canEditIntern) {
-                    const departmentData =
-                        await agent.get<
-                            Department[]
-                        >(
-                            "/departments"
-                        );
-
-                    setDepartments(
-                        departmentData ?? []
-                    );
-                }
-            } catch (error) {
-                setIsError(true);
-
-                setMessage(
-                    getErrorMessage(error)
-                );
-            } finally {
-                setIsLoading(false);
-            }
+            return;
         }
 
+        try {
+            const internData =
+                await agent.get<Intern>(
+                    `/interns/${id}`
+                );
+
+            const taskData =
+                await agent.get<TaskItem[]>(
+                    "/tasks"
+                );
+
+            const internTasks =
+                taskData.filter(
+                    (task) =>
+                        task.internId ===
+                        internData.id
+                );
+
+            setIntern(internData);
+            setTasks(internTasks);
+
+            setName(internData.name);
+            setSurname(internData.surname);
+            setEmail(internData.email);
+
+            setDepartmentId(
+                internData.departmentId
+            );
+
+            if (canEditIntern) {
+                const departmentData =
+                    await agent.get<
+                        Department[]
+                    >(
+                        "/departments"
+                    );
+
+                setDepartments(
+                    departmentData ?? []
+                );
+            }
+        } catch (error) {
+            setIsError(true);
+
+            setMessage(
+                getErrorMessage(error)
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
         loadInternDetail();
     }, [id, canEditIntern]);
 
@@ -209,20 +210,7 @@ function InternDetailPage() {
                 dto
             );
 
-            const updatedIntern =
-                await agent.get<Intern>(
-                    `/interns/${id}`
-                );
-
-            setIntern(updatedIntern);
-
-            setName(updatedIntern.name);
-            setSurname(updatedIntern.surname);
-            setEmail(updatedIntern.email);
-
-            setDepartmentId(
-                updatedIntern.departmentId
-            );
+            await loadInternDetail();
 
             setIsEditing(false);
             setIsError(false);
@@ -425,6 +413,17 @@ function InternDetailPage() {
                                 </form>
                             </div>
                         )}
+
+                    {canEditIntern && (
+                        <TaskForm
+                            fixedInternId={
+                                intern.id
+                            }
+                            onTaskAdded={
+                                loadInternDetail
+                            }
+                        />
+                    )}
 
                     <h3>Görevleri</h3>
 

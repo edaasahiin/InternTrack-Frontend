@@ -90,69 +90,77 @@ function ChangePasswordPage() {
     };
 
     return (
-        <div>
+        <div className="password-page">
             <h2>Şifre Değiştir</h2>
 
-            <p>
-                {user?.mustChangePassword
-                    ? `Merhaba ${user.name}, devam etmek için geçici şifrenizi değiştirmeniz gerekiyor.`
-                    : `Merhaba ${user?.name}, mevcut şifrenizi kullanarak yeni bir şifre belirleyebilirsiniz.`}
-            </p>
+            <div className="password-card">
+                <p>
+                    {user?.mustChangePassword
+                        ? `Merhaba ${user.name}, devam etmek için geçici şifrenizi değiştirmeniz gerekiyor.`
+                        : `Merhaba ${user?.name}, mevcut şifrenizi kullanarak yeni bir şifre belirleyebilirsiniz.`}
+                </p>
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="password"
-                    placeholder="Mevcut Şifre"
-                    value={currentPassword}
-                    onChange={(event) =>
-                        setCurrentPassword(
-                            event.target.value
-                        )
-                    }
-                    required
-                />
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="password"
+                        placeholder="Mevcut Şifre"
+                        value={currentPassword}
+                        onChange={(event) =>
+                            setCurrentPassword(
+                                event.target.value
+                            )
+                        }
+                        required
+                    />
 
-                <input
-                    type="password"
-                    placeholder="Yeni Şifre"
-                    value={newPassword}
-                    onChange={(event) =>
-                        setNewPassword(
-                            event.target.value
-                        )
-                    }
-                    required
-                    minLength={6}
-                />
+                    <input
+                        type="password"
+                        placeholder="Yeni Şifre"
+                        value={newPassword}
+                        onChange={(event) =>
+                            setNewPassword(
+                                event.target.value
+                            )
+                        }
+                        required
+                        minLength={6}
+                    />
 
-                <input
-                    type="password"
-                    placeholder="Yeni Şifre Tekrar"
-                    value={confirmPassword}
-                    onChange={(event) =>
-                        setConfirmPassword(
-                            event.target.value
-                        )
-                    }
-                    required
-                    minLength={6}
-                />
+                    <input
+                        type="password"
+                        placeholder="Yeni Şifre Tekrar"
+                        value={confirmPassword}
+                        onChange={(event) =>
+                            setConfirmPassword(
+                                event.target.value
+                            )
+                        }
+                        required
+                        minLength={6}
+                    />
 
-                {message && (
-                    <p>
-                        {message}
-                    </p>
-                )}
+                    {message && (
+                        <p
+                            className={
+                                isError
+                                    ? "error-message"
+                                    : "success-message"
+                            }
+                        >
+                            {message}
+                        </p>
+                    )}
 
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting
-                        ? "Değiştiriliyor..."
-                        : "Şifreyi Değiştir"}
-                </button>
-            </form>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting
+                            ? "Değiştiriliyor..."
+                            : "Şifreyi Değiştir"}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

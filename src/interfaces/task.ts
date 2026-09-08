@@ -7,6 +7,10 @@ export interface TaskItem {
     status: string;
     internId: number;
     intern?: Intern | null;
+    createdByUserId: number | null;
+    canInternDeleteWhenCompleted: boolean;
+    createdAt: string;
+    completedAt?: string | null;
 }
 
 export interface CreateTaskDto {
@@ -14,6 +18,7 @@ export interface CreateTaskDto {
     description?: string | null;
     status: string;
     internId: number;
+    canInternDeleteWhenCompleted: boolean;
 }
 
 export interface UpdateTaskDto {
@@ -21,4 +26,5 @@ export interface UpdateTaskDto {
     description?: string | null;
     status: string;
     internId: number;
+    canInternDeleteWhenCompleted: boolean;
 }
