@@ -17,3 +17,10 @@ export interface CreateInternDto {
     password: string;
     departmentId: number;
 }
+
+export interface UpdateInternDto {
+    name: string;
+    surname: string;
+    email: string;
+    departmentId: number;
+}

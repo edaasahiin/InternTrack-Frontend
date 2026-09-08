@@ -10,7 +10,8 @@ import { agent } from "../api/agent";
 
 import type {
     AuthUser,
-    UpdateAvatarDto
+    UpdateAvatarDto,
+    UpdateProfileDto
 } from "../interfaces/auth";
 
 interface AuthContextType {
@@ -21,6 +22,11 @@ interface AuthContextType {
     logout: () => Promise<void>;
     updateAvatar: (
         avatar: string | null
+    ) => Promise<void>;
+    updateProfile: (
+        name: string,
+        surname: string,
+        email: string
     ) => Promise<void>;
 }
 
@@ -67,7 +73,9 @@ export function AuthProvider({
             surname: loginResponse.surname,
             avatar: loginResponse.avatar,
             email: loginResponse.email,
-            role: loginResponse.role
+            role: loginResponse.role,
+            mustChangePassword:
+                loginResponse.mustChangePassword
         };
 
         setUser(userData);
@@ -100,6 +108,39 @@ export function AuthProvider({
         });
     };
 
+    const updateProfile = async (
+        name: string,
+        surname: string,
+        email: string
+    ) => {
+        const dto: UpdateProfileDto = {
+            name,
+            surname,
+            email
+        };
+
+        await agent.put<
+            unknown,
+            UpdateProfileDto
+        >(
+            "/auth/profile",
+            dto
+        );
+
+        setUser((currentUser) => {
+            if (!currentUser) {
+                return null;
+            }
+
+            return {
+                ...currentUser,
+                name,
+                surname,
+                email
+            };
+        });
+    };
+
     const logout = async () => {
         try {
             await agent.post<void>(
@@ -121,7 +162,8 @@ export function AuthProvider({
                 isLoading,
                 login,
                 logout,
-                updateAvatar
+                updateAvatar,
+                updateProfile
             }}
         >
             {children}

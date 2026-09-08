@@ -17,8 +17,20 @@ export interface AuthUser {
     avatar: string | null;
     email: string;
     role: string;
+    mustChangePassword: boolean;
 }
 
 export interface UpdateAvatarDto {
     avatar: string | null;
+}
+
+export interface UpdateProfileDto {
+    name: string;
+    surname: string;
+    email: string;
+}
+
+export interface ChangePasswordDto {
+    currentPassword: string;
+    newPassword: string;
 }

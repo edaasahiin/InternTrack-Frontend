@@ -13,11 +13,13 @@ import InternDetailPage from "./pages/InternDetailPage";
 import TasksPage from "./pages/TasksPage";
 import DepartmentsPage from "./pages/DepartmentsPage";
 import ProfilePage from "./pages/ProfilePage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
+import { isAdminOrHR } from "./utils/roleUtils";
 
 function AppContent() {
     const navigate = useNavigate();
@@ -28,6 +30,9 @@ function AppContent() {
         isLoading,
         logout
     } = useAuth();
+
+    const canManageInterns =
+        isAdminOrHR(user?.role);
 
     const handleLogout = async () => {
         await logout();
@@ -64,6 +69,29 @@ function AppContent() {
         );
     }
 
+    if (user?.mustChangePassword) {
+        return (
+            <Routes>
+                <Route
+                    path="/change-password"
+                    element={
+                        <ChangePasswordPage />
+                    }
+                />
+
+                <Route
+                    path="*"
+                    element={
+                        <Navigate
+                            to="/change-password"
+                            replace
+                        />
+                    }
+                />
+            </Routes>
+        );
+    }
+
     return (
         <>
             <nav>
@@ -71,11 +99,15 @@ function AppContent() {
                     Ana Sayfa
                 </Link>
 
-                {" | "}
+                {canManageInterns && (
+                    <>
+                        {" | "}
 
-                <Link to="/interns">
-                    Stajyerler
-                </Link>
+                        <Link to="/interns">
+                            Stajyerler
+                        </Link>
+                    </>
+                )}
 
                 {" | "}
 
@@ -83,11 +115,15 @@ function AppContent() {
                     Görevler
                 </Link>
 
-                {" | "}
+                {canManageInterns && (
+                    <>
+                        {" | "}
 
-                <Link to="/departments">
-                    Departmanlar
-                </Link>
+                        <Link to="/departments">
+                            Departmanlar
+                        </Link>
+                    </>
+                )}
 
                 {" | "}
 
@@ -116,18 +152,32 @@ function AppContent() {
                 <Route
                     path="/interns"
                     element={
-                        <ProtectedRoute>
-                            <InternsPage />
-                        </ProtectedRoute>
+                        canManageInterns ? (
+                            <ProtectedRoute>
+                                <InternsPage />
+                            </ProtectedRoute>
+                        ) : (
+                            <Navigate
+                                to="/"
+                                replace
+                            />
+                        )
                     }
                 />
 
                 <Route
                     path="/interns/:id"
                     element={
-                        <ProtectedRoute>
-                            <InternDetailPage />
-                        </ProtectedRoute>
+                        canManageInterns ? (
+                            <ProtectedRoute>
+                                <InternDetailPage />
+                            </ProtectedRoute>
+                        ) : (
+                            <Navigate
+                                to="/"
+                                replace
+                            />
+                        )
                     }
                 />
 
@@ -143,9 +193,16 @@ function AppContent() {
                 <Route
                     path="/departments"
                     element={
-                        <ProtectedRoute>
-                            <DepartmentsPage />
-                        </ProtectedRoute>
+                        canManageInterns ? (
+                            <ProtectedRoute>
+                                <DepartmentsPage />
+                            </ProtectedRoute>
+                        ) : (
+                            <Navigate
+                                to="/"
+                                replace
+                            />
+                        )
                     }
                 />
 
@@ -154,6 +211,15 @@ function AppContent() {
                     element={
                         <ProtectedRoute>
                             <ProfilePage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/change-password"
+                    element={
+                        <ProtectedRoute>
+                            <ChangePasswordPage />
                         </ProtectedRoute>
                     }
                 />

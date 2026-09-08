@@ -1,30 +1,73 @@
 import {
-    useState
+    useState,
+    type FormEvent
 } from "react";
 
+import {
+    Link
+} from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 const avatarOptions = [
     "😀",
+    "😄",
     "😎",
     "🤓",
+    "🥳",
+    "😊",
+    "😇",
+    "🤩",
     "👩‍💻",
     "🧑‍💻",
+    "👩‍🎓",
+    "🧑‍🎓",
     "🚀",
     "⭐",
-    "🎯"
+    "🌟",
+    "🎯",
+    "💡",
+    "🔥",
+    "⚡",
+    "💻",
+    "📚",
+    "🧠",
+    "🌈",
+    "✨",
+    "🤍",
+    "🫶"
 ];
 
 function ProfilePage() {
     const {
         user,
-        updateAvatar
+        updateAvatar,
+        updateProfile
     } = useAuth();
 
     const [showAvatarOptions, setShowAvatarOptions] =
         useState(false);
 
     const [isUpdatingAvatar, setIsUpdatingAvatar] =
+        useState(false);
+
+    const [name, setName] =
+        useState(user?.name || "");
+
+    const [surname, setSurname] =
+        useState(user?.surname || "");
+
+    const [email, setEmail] =
+        useState(user?.email || "");
+
+    const [profileMessage, setProfileMessage] =
+        useState("");
+
+    const [isProfileError, setIsProfileError] =
+        useState(false);
+
+    const [isUpdatingProfile, setIsUpdatingProfile] =
         useState(false);
 
     const defaultAvatar =
@@ -46,6 +89,38 @@ function ProfilePage() {
             setShowAvatarOptions(false);
         } finally {
             setIsUpdatingAvatar(false);
+        }
+    };
+
+    const handleProfileSubmit = async (
+        event: FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
+
+        setProfileMessage("");
+        setIsProfileError(false);
+        setIsUpdatingProfile(true);
+
+        try {
+            await updateProfile(
+                name.trim(),
+                surname.trim(),
+                email.trim()
+            );
+
+            setIsProfileError(false);
+
+            setProfileMessage(
+                "Profil başarıyla güncellendi."
+            );
+        } catch (error) {
+            setIsProfileError(true);
+
+            setProfileMessage(
+                getErrorMessage(error)
+            );
+        } finally {
+            setIsUpdatingProfile(false);
         }
     };
 
@@ -82,6 +157,13 @@ function ProfilePage() {
                         <strong>Rol:</strong>{" "}
                         {user?.role}
                     </p>
+
+                    <Link
+                        to="/change-password"
+                        className="change-password-link"
+                    >
+                        Şifre Değiştir
+                    </Link>
                 </div>
             </div>
 
@@ -122,6 +204,75 @@ function ProfilePage() {
                     </div>
                 </div>
             )}
+
+            <div className="profile-edit-section">
+                <h3>
+                    Profil Bilgilerini Düzenle
+                </h3>
+
+                <form
+                    onSubmit={handleProfileSubmit}
+                >
+                    <input
+                        type="text"
+                        placeholder="Ad"
+                        value={name}
+                        onChange={(event) =>
+                            setName(
+                                event.target.value
+                            )
+                        }
+                        required
+                        minLength={2}
+                    />
+
+                    <input
+                        type="text"
+                        placeholder="Soyad"
+                        value={surname}
+                        onChange={(event) =>
+                            setSurname(
+                                event.target.value
+                            )
+                        }
+                        required
+                        minLength={2}
+                    />
+
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(event) =>
+                            setEmail(
+                                event.target.value
+                            )
+                        }
+                        required
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={isUpdatingProfile}
+                    >
+                        {isUpdatingProfile
+                            ? "Güncelleniyor..."
+                            : "Profili Güncelle"}
+                    </button>
+                </form>
+
+                {profileMessage && (
+                    <p
+                        className={
+                            isProfileError
+                                ? "error-message"
+                                : "success-message"
+                        }
+                    >
+                        {profileMessage}
+                    </p>
+                )}
+            </div>
         </div>
     );
 }

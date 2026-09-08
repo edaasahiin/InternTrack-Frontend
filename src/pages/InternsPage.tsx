@@ -80,6 +80,9 @@ function InternsPage() {
                 intern.name
                     .toLowerCase()
                     .includes(search) ||
+                intern.surname
+                    .toLowerCase()
+                    .includes(search) ||
                 intern.email
                     .toLowerCase()
                     .includes(search) ||
@@ -109,7 +112,7 @@ function InternsPage() {
                 <input
                     id="intern-search"
                     type="text"
-                    placeholder="Ad, email veya departman"
+                    placeholder="Ad, soyad, email veya departman"
                     value={searchText}
                     onChange={(event) =>
                         setSearchText(
