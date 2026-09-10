@@ -53,6 +53,9 @@ function TaskForm({
     const [status, setStatus] =
         useState("ToDo");
 
+    const [priority, setPriority] =
+        useState("Medium");
+
     const [internId, setInternId] =
         useState("");
 
@@ -128,6 +131,7 @@ function TaskForm({
             description:
                 description.trim(),
             status,
+            priority,
             internId:
                 selectedInternId,
             canInternDeleteWhenCompleted:
@@ -156,6 +160,7 @@ function TaskForm({
             setTitle("");
             setDescription("");
             setStatus("ToDo");
+            setPriority("Medium");
 
             setCanInternDeleteWhenCompleted(
                 false
@@ -223,6 +228,27 @@ function TaskForm({
 
                     <option value="Done">
                         Tamamlandı
+                    </option>
+                </select>
+
+                <select
+                    value={priority}
+                    onChange={(event) =>
+                        setPriority(
+                            event.target.value
+                        )
+                    }
+                >
+                    <option value="Low">
+                        Düşük Öncelik
+                    </option>
+
+                    <option value="Medium">
+                        Orta Öncelik
+                    </option>
+
+                    <option value="High">
+                        Yüksek Öncelik
                     </option>
                 </select>
 

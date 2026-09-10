@@ -1533,3 +1533,38 @@ form button[type="button"]:hover {
         margin-bottom: 3px;
     }
 }
+
+.task-priority-select {
+    width: auto;
+    min-width: 110px;
+    padding: 6px 30px 6px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.task-priority-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.priority-low {
+    background: #e8f7ee;
+    color: #166534;
+    border: 1px solid #bbdfc7;
+}
+
+.priority-medium {
+    background: #fff7df;
+    color: #9a6700;
+    border: 1px solid #f1d48a;
+}
+
+.priority-high {
+    background: #fdeaea;
+    color: #b42318;
+    border: 1px solid #f2b8b5;
+}

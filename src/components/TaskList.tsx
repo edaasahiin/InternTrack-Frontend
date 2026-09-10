@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { agent } from "../api/agent";
 import AlertMessage from "./AlertMessage";
+
 import { getErrorMessage } from "../utils/getErrorMessage";
 
 import type {
@@ -16,9 +17,14 @@ type TaskGroup =
 
 interface TaskListProps {
     tasks: TaskItem[];
-    onTaskChanged: () => Promise<void> | void;
+
+    onTaskChanged:
+        () => Promise<void> | void;
+
     canDelete: boolean;
-    initialOpenGroup?: TaskGroup | null;
+
+    initialOpenGroup?:
+        TaskGroup | null;
 }
 
 interface MessageResponse {
@@ -73,7 +79,8 @@ function TaskList({
     const inProgressTasks =
         tasks.filter(
             (task) =>
-                task.status === "InProgress"
+                task.status ===
+                "InProgress"
         );
 
     const doneTasks =
@@ -98,6 +105,7 @@ function TaskList({
         setOpenGroups(
             (current) => ({
                 ...current,
+
                 [group]:
                     !current[group]
             })
@@ -162,6 +170,24 @@ function TaskList({
         }
     }
 
+    function getPriorityText(
+        priority: string
+    ) {
+        switch (priority) {
+            case "Low":
+                return "Düşük";
+
+            case "Medium":
+                return "Orta";
+
+            case "High":
+                return "Yüksek";
+
+            default:
+                return priority;
+        }
+    }
+
     async function deleteTask(
         id: number
     ) {
@@ -173,10 +199,65 @@ function TaskList({
                 `/tasks/${id}`
             );
 
-            setExpandedTaskId(null);
+            setExpandedTaskId(
+                null
+            );
 
             setMessage(
                 "Görev başarıyla silindi."
+            );
+
+            await onTaskChanged();
+        } catch (error) {
+            setIsError(true);
+
+            setMessage(
+                getErrorMessage(error)
+            );
+        }
+    }
+
+    async function updatePriority(
+        task: TaskItem,
+        newPriority: string
+    ) {
+        setMessage("");
+        setIsError(false);
+
+        const updatedTask:
+            UpdateTaskDto = {
+                title:
+                    task.title,
+
+                description:
+                    task.description,
+
+                status:
+                    task.status,
+
+                priority:
+                    newPriority,
+
+                internId:
+                    task.internId,
+
+                canInternDeleteWhenCompleted:
+                    task.canInternDeleteWhenCompleted
+            };
+
+        try {
+            const data =
+                await agent.put<
+                    MessageResponse,
+                    UpdateTaskDto
+                >(
+                    `/tasks/${task.id}`,
+                    updatedTask
+                );
+
+            setMessage(
+                data?.message ||
+                "Görev önceliği güncellendi."
             );
 
             await onTaskChanged();
@@ -195,14 +276,26 @@ function TaskList({
         setMessage("");
         setIsError(false);
 
-        const updatedTask: UpdateTaskDto = {
-            title: task.title,
-            description: task.description,
-            status: "Done",
-            internId: task.internId,
-            canInternDeleteWhenCompleted:
-                task.canInternDeleteWhenCompleted
-        };
+        const updatedTask:
+            UpdateTaskDto = {
+                title:
+                    task.title,
+
+                description:
+                    task.description,
+
+                status:
+                    "Done",
+
+                priority:
+                    task.priority,
+
+                internId:
+                    task.internId,
+
+                canInternDeleteWhenCompleted:
+                    task.canInternDeleteWhenCompleted
+            };
 
         try {
             await agent.put<
@@ -222,15 +315,21 @@ function TaskList({
             setOpenGroups(
                 (current) => ({
                     ...current,
+
                     done: true
                 })
             );
 
             await onTaskChanged();
 
-            window.setTimeout(() => {
-                setIsCelebrating(false);
-            }, 2200);
+            window.setTimeout(
+                () => {
+                    setIsCelebrating(
+                        false
+                    );
+                },
+                2200
+            );
         } catch (error) {
             setIsError(true);
 
@@ -244,10 +343,12 @@ function TaskList({
         task: TaskItem
     ) {
         const isExpanded =
-            expandedTaskId === task.id;
+            expandedTaskId ===
+            task.id;
 
         const createdByIntern =
-            task.createdByUserId != null &&
+            task.createdByUserId !=
+                null &&
             task.createdByUserId ===
                 task.intern?.userId;
 
@@ -261,6 +362,10 @@ function TaskList({
                 isCompleted &&
                 task.canInternDeleteWhenCompleted
             );
+
+        const canEditPriority =
+            !canDelete &&
+            createdByIntern;
 
         return (
             <div
@@ -321,6 +426,48 @@ function TaskList({
                                 )}
                             </span>
                         </p>
+
+                        
+                        <p>
+    <strong>
+        Öncelik:
+    </strong>
+
+    <span>
+        {canEditPriority ? (
+            <select
+                className={`task-priority-select priority-${task.priority.toLowerCase()}`}
+                value={task.priority}
+                onChange={(event) =>
+                    updatePriority(
+                        task,
+                        event.target.value
+                    )
+                }
+            >
+                <option value="Low">
+                    Düşük
+                </option>
+
+                <option value="Medium">
+                    Orta
+                </option>
+
+                <option value="High">
+                    Yüksek
+                </option>
+            </select>
+        ) : (
+            <span
+                className={`task-priority-badge priority-${task.priority.toLowerCase()}`}
+            >
+                {getPriorityText(
+                    task.priority
+                )}
+            </span>
+        )}
+    </span>
+</p>  
 
                         <p>
                             <strong>
@@ -479,7 +626,9 @@ function TaskList({
                 </div>
             )}
 
-            <h3>Görev Listesi</h3>
+            <h3>
+                Görev Listesi
+            </h3>
 
             <AlertMessage
                 message={message}
