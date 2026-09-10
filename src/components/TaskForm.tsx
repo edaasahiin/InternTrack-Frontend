@@ -56,6 +56,9 @@ function TaskForm({
     const [priority, setPriority] =
         useState("Medium");
 
+    const [dueDate, setDueDate] =
+        useState("");
+
     const [internId, setInternId] =
         useState("");
 
@@ -126,14 +129,30 @@ function TaskForm({
         const createdStatus =
             status;
 
+        const dueDateUtc =
+            dueDate
+                ? new Date(
+                    dueDate
+                ).toISOString()
+                : null;
+
         const newTask: CreateTaskDto = {
-            title: title.trim(),
+            title:
+                title.trim(),
+
             description:
                 description.trim(),
+
             status,
+
             priority,
+
+            dueDate:
+                dueDateUtc,
+
             internId:
                 selectedInternId,
+
             canInternDeleteWhenCompleted:
                 canAssignIntern
                     ? canInternDeleteWhenCompleted
@@ -161,6 +180,7 @@ function TaskForm({
             setDescription("");
             setStatus("ToDo");
             setPriority("Medium");
+            setDueDate("");
 
             setCanInternDeleteWhenCompleted(
                 false
@@ -251,6 +271,25 @@ function TaskForm({
                         Yüksek Öncelik
                     </option>
                 </select>
+
+                <div className="task-due-date-field">
+                    <label
+                        htmlFor="task-due-date"
+                    >
+                        Son Teslim Tarihi
+                    </label>
+
+                    <input
+                        id="task-due-date"
+                        type="datetime-local"
+                        value={dueDate}
+                        onChange={(event) =>
+                            setDueDate(
+                                event.target.value
+                            )
+                        }
+                    />
+                </div>
 
                 {canAssignIntern &&
                     !hasFixedIntern && (

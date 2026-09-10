@@ -1568,3 +1568,46 @@ form button[type="button"]:hover {
     color: #b42318;
     border: 1px solid #f2b8b5;
 }
+
+.task-due-date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.task-due-date-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.task-due-date-field input,
+.task-due-date-input {
+    width: auto;
+    min-width: 190px;
+    padding: 8px 10px;
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+}
+
+.task-overdue {
+    border-left-color: #b42318 !important;
+}
+
+.task-overdue-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #fdeaea;
+    color: #b42318;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.task-overdue-text {
+    color: #b42318;
+    font-weight: 700;
+}

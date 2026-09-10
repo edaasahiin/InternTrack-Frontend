@@ -188,6 +188,48 @@ function TaskList({
         }
     }
 
+    function isOverdue(
+        task: TaskItem
+    ) {
+        if (
+            !task.dueDate ||
+            task.status === "Done"
+        ) {
+            return false;
+        }
+
+        return (
+            parseDateTime(
+                task.dueDate
+            ).getTime() <
+            Date.now()
+        );
+    }
+
+    function toDateTimeLocalValue(
+        value?: string | null
+    ) {
+        if (!value) {
+            return "";
+        }
+
+        const date =
+            parseDateTime(value);
+
+        const offset =
+            date.getTimezoneOffset();
+
+        const localDate =
+            new Date(
+                date.getTime() -
+                offset * 60 * 1000
+            );
+
+        return localDate
+            .toISOString()
+            .slice(0, 16);
+    }
+
     async function deleteTask(
         id: number
     ) {
@@ -238,6 +280,9 @@ function TaskList({
                 priority:
                     newPriority,
 
+                dueDate:
+                    task.dueDate,
+
                 internId:
                     task.internId,
 
@@ -270,6 +315,69 @@ function TaskList({
         }
     }
 
+    async function updateDueDate(
+        task: TaskItem,
+        newDueDate: string
+    ) {
+        setMessage("");
+        setIsError(false);
+
+        const dueDateUtc =
+            newDueDate
+                ? new Date(
+                    newDueDate
+                ).toISOString()
+                : null;
+
+        const updatedTask:
+            UpdateTaskDto = {
+                title:
+                    task.title,
+
+                description:
+                    task.description,
+
+                status:
+                    task.status,
+
+                priority:
+                    task.priority,
+
+                dueDate:
+                    dueDateUtc,
+
+                internId:
+                    task.internId,
+
+                canInternDeleteWhenCompleted:
+                    task.canInternDeleteWhenCompleted
+            };
+
+        try {
+            const data =
+                await agent.put<
+                    MessageResponse,
+                    UpdateTaskDto
+                >(
+                    `/tasks/${task.id}`,
+                    updatedTask
+                );
+
+            setMessage(
+                data?.message ||
+                "Son teslim tarihi güncellendi."
+            );
+
+            await onTaskChanged();
+        } catch (error) {
+            setIsError(true);
+
+            setMessage(
+                getErrorMessage(error)
+            );
+        }
+    }
+
     async function completeTask(
         task: TaskItem
     ) {
@@ -289,6 +397,9 @@ function TaskList({
 
                 priority:
                     task.priority,
+
+                dueDate:
+                    task.dueDate,
 
                 internId:
                     task.internId,
@@ -355,6 +466,9 @@ function TaskList({
         const isCompleted =
             task.status === "Done";
 
+        const taskIsOverdue =
+            isOverdue(task);
+
         const canDeleteThisTask =
             canDelete ||
             createdByIntern ||
@@ -363,13 +477,17 @@ function TaskList({
                 task.canInternDeleteWhenCompleted
             );
 
-        const canEditPriority =
+        const canEditOwnTask =
             !canDelete &&
             createdByIntern;
 
         return (
             <div
-                className="task-card"
+                className={`task-card ${
+                    taskIsOverdue
+                        ? "task-overdue"
+                        : ""
+                }`}
                 key={task.id}
             >
                 <button
@@ -391,6 +509,12 @@ function TaskList({
                             "Done" && (
                             <span className="task-done-icon">
                                 ✅
+                            </span>
+                        )}
+
+                        {taskIsOverdue && (
+                            <span className="task-overdue-badge">
+                                Gecikti
                             </span>
                         )}
                     </strong>
@@ -427,47 +551,99 @@ function TaskList({
                             </span>
                         </p>
 
-                        
                         <p>
-    <strong>
-        Öncelik:
-    </strong>
+                            <strong>
+                                Öncelik:
+                            </strong>
 
-    <span>
-        {canEditPriority ? (
-            <select
-                className={`task-priority-select priority-${task.priority.toLowerCase()}`}
-                value={task.priority}
-                onChange={(event) =>
-                    updatePriority(
-                        task,
-                        event.target.value
-                    )
-                }
-            >
-                <option value="Low">
-                    Düşük
-                </option>
+                            <span>
+                                {canEditOwnTask ? (
+                                    <select
+                                        className={`task-priority-select priority-${task.priority.toLowerCase()}`}
+                                        value={
+                                            task.priority
+                                        }
+                                        onChange={(event) =>
+                                            updatePriority(
+                                                task,
+                                                event
+                                                    .target
+                                                    .value
+                                            )
+                                        }
+                                    >
+                                        <option value="Low">
+                                            Düşük
+                                        </option>
 
-                <option value="Medium">
-                    Orta
-                </option>
+                                        <option value="Medium">
+                                            Orta
+                                        </option>
 
-                <option value="High">
-                    Yüksek
-                </option>
-            </select>
-        ) : (
-            <span
-                className={`task-priority-badge priority-${task.priority.toLowerCase()}`}
-            >
-                {getPriorityText(
-                    task.priority
-                )}
-            </span>
-        )}
-    </span>
-</p>  
+                                        <option value="High">
+                                            Yüksek
+                                        </option>
+                                    </select>
+                                ) : (
+                                    <span
+                                        className={`task-priority-badge priority-${task.priority.toLowerCase()}`}
+                                    >
+                                        {getPriorityText(
+                                            task.priority
+                                        )}
+                                    </span>
+                                )}
+                            </span>
+                        </p>
+
+                        {task.dueDate && (
+                            <p>
+                                <strong>
+                                    Son Teslim:
+                                </strong>
+
+                                <span>
+                                    {canEditOwnTask ? (
+                                        <input
+                                            className="task-due-date-input"
+                                            type="datetime-local"
+                                            value={
+                                                toDateTimeLocalValue(
+                                                    task.dueDate
+                                                )
+                                            }
+                                            onChange={(event) =>
+                                                updateDueDate(
+                                                    task,
+                                                    event
+                                                        .target
+                                                        .value
+                                                )
+                                            }
+                                        />
+                                    ) : (
+                                        <>
+                                            {formatDate(
+                                                task.dueDate
+                                            )}
+
+                                            {" - "}
+
+                                            {formatTime(
+                                                task.dueDate
+                                            )}
+
+                                            {taskIsOverdue && (
+                                                <span className="task-overdue-text">
+                                                    {" "}
+                                                    (Gecikti)
+                                                </span>
+                                            )}
+                                        </>
+                                    )}
+                                </span>
+                            </p>
+                        )}
 
                         <p>
                             <strong>
