@@ -1,7 +1,15 @@
 export interface DashboardStats {
     internCount: number;
+
     taskCount: number;
+
+    toDoTaskCount: number;
+
+    inProgressTaskCount: number;
+
     completedTaskCount: number;
-    pendingTaskCount: number;
+
+    overdueTaskCount: number;
+
     departmentCount: number;
 }

@@ -28,8 +28,10 @@ function HomePage() {
         useState<DashboardStats>({
             internCount: 0,
             taskCount: 0,
+            toDoTaskCount: 0,
+            inProgressTaskCount: 0,
             completedTaskCount: 0,
-            pendingTaskCount: 0,
+            overdueTaskCount: 0,
             departmentCount: 0
         });
 
@@ -70,7 +72,9 @@ function HomePage() {
                 />
 
                 <div>
-                    <h1>InternTrack</h1>
+                    <h1>
+                        InternTrack
+                    </h1>
 
                     <p>
                         {canManage
@@ -96,61 +100,122 @@ function HomePage() {
             ) : (
                 <div className="dashboard">
                     {canManage && (
-                        <div className="dashboard-card">
-                            <h3>
-                                {stats.internCount}
-                            </h3>
+                        <Link
+                            to="/interns"
+                            className="dashboard-card-link"
+                        >
+                            <div className="dashboard-card">
+                                <h3>
+                                    {stats.internCount}
+                                </h3>
 
-                            <p>Stajyer</p>
-                        </div>
+                                <p>
+                                    Stajyer
+                                </p>
+                            </div>
+                        </Link>
                     )}
 
-                    <div className="dashboard-card">
-                        <h3>
-                            {stats.taskCount}
-                        </h3>
+                    <Link
+                        to="/tasks"
+                        className="dashboard-card-link"
+                    >
+                        <div className="dashboard-card">
+                            <h3>
+                                {stats.taskCount}
+                            </h3>
 
-                        <p>
-                            {canManage
-                                ? "Toplam Görev"
-                                : "Görevlerim"}
-                        </p>
-                    </div>
+                            <p>
+                                {canManage
+                                    ? "Toplam Görev"
+                                    : "Görevlerim"}
+                            </p>
+                        </div>
+                    </Link>
 
-                    <div className="dashboard-card">
-                        <h3>
-                            {
-                                stats.completedTaskCount
-                            }
-                        </h3>
+                    <Link
+                        to="/tasks?filter=todo"
+                        className="dashboard-card-link"
+                    >
+                        <div className="dashboard-card">
+                            <h3>
+                                {stats.toDoTaskCount}
+                            </h3>
 
-                        <p>
-                            Tamamlanan Görev
-                        </p>
-                    </div>
+                            <p>
+                                Yapılacak Görev
+                            </p>
+                        </div>
+                    </Link>
 
-                    <div className="dashboard-card">
-                        <h3>
-                            {
-                                stats.pendingTaskCount
-                            }
-                        </h3>
-
-                        <p>
-                            Bekleyen Görev
-                        </p>
-                    </div>
-
-                    {canManage && (
+                    <Link
+                        to="/tasks?filter=progress"
+                        className="dashboard-card-link"
+                    >
                         <div className="dashboard-card">
                             <h3>
                                 {
-                                    stats.departmentCount
+                                    stats.inProgressTaskCount
                                 }
                             </h3>
 
-                            <p>Departman</p>
+                            <p>
+                                Devam Eden Görev
+                            </p>
                         </div>
+                    </Link>
+
+                    <Link
+                        to="/tasks?filter=done"
+                        className="dashboard-card-link"
+                    >
+                        <div className="dashboard-card">
+                            <h3>
+                                {
+                                    stats.completedTaskCount
+                                }
+                            </h3>
+
+                            <p>
+                                Tamamlanan Görev
+                            </p>
+                        </div>
+                    </Link>
+
+                    <Link
+                        to="/tasks?filter=overdue"
+                        className="dashboard-card-link"
+                    >
+                        <div className="dashboard-card dashboard-card-overdue">
+                            <h3>
+                                {
+                                    stats.overdueTaskCount
+                                }
+                            </h3>
+
+                            <p>
+                                Geciken Görev
+                            </p>
+                        </div>
+                    </Link>
+
+                    {canManage && (
+                        <Link
+                            to="/departments"
+                            className="dashboard-card-link"
+                        >
+                            <div className="dashboard-card">
+                                <h3>
+                                    {
+                                        stats.departmentCount
+                                    }
+                                </h3>
+
+                                <p>
+                                    Departman
+                                </p>
+                            </div>
+                        </Link>
                     )}
                 </div>
             )}

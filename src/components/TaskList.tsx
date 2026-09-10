@@ -13,7 +13,8 @@ import type {
 type TaskGroup =
     | "todo"
     | "progress"
-    | "done";
+    | "done"
+    | "overdue";
 
 interface TaskListProps {
     tasks: TaskItem[];
@@ -23,8 +24,8 @@ interface TaskListProps {
 
     canDelete: boolean;
 
-    initialOpenGroup?:
-        TaskGroup | null;
+    initialOpenGroups?:
+        TaskGroup[];
 }
 
 interface MessageResponse {
@@ -35,7 +36,7 @@ function TaskList({
     tasks,
     onTaskChanged,
     canDelete,
-    initialOpenGroup = null
+    initialOpenGroups = []
 }: TaskListProps) {
     const [message, setMessage] =
         useState("");
@@ -58,35 +59,87 @@ function TaskList({
         setOpenGroups
     ] = useState({
         todo:
-            initialOpenGroup ===
-            "todo",
+            initialOpenGroups.includes(
+                "todo"
+            ),
 
         progress:
-            initialOpenGroup ===
-            "progress",
+            initialOpenGroups.includes(
+                "progress"
+            ),
 
         done:
-            initialOpenGroup ===
-            "done"
+            initialOpenGroups.includes(
+                "done"
+            ),
+
+        overdue:
+            initialOpenGroups.includes(
+                "overdue"
+            )
     });
+
+    function parseDateTime(
+        value: string
+    ) {
+        const hasTimezone =
+            value.endsWith("Z") ||
+            /[+-]\d{2}:\d{2}$/.test(
+                value
+            );
+
+        return new Date(
+            hasTimezone
+                ? value
+                : `${value}Z`
+        );
+    }
+
+    function isOverdue(
+        task: TaskItem
+    ) {
+        if (
+            !task.dueDate ||
+            task.status === "Done"
+        ) {
+            return false;
+        }
+
+        return (
+            parseDateTime(
+                task.dueDate
+            ).getTime() <
+            Date.now()
+        );
+    }
 
     const todoTasks =
         tasks.filter(
             (task) =>
-                task.status === "ToDo"
+                task.status ===
+                    "ToDo" &&
+                !isOverdue(task)
         );
 
     const inProgressTasks =
         tasks.filter(
             (task) =>
                 task.status ===
-                "InProgress"
+                    "InProgress" &&
+                !isOverdue(task)
         );
 
     const doneTasks =
         tasks.filter(
             (task) =>
-                task.status === "Done"
+                task.status ===
+                "Done"
+        );
+
+    const overdueTasks =
+        tasks.filter(
+            (task) =>
+                isOverdue(task)
         );
 
     function toggleTask(
@@ -109,22 +162,6 @@ function TaskList({
                 [group]:
                     !current[group]
             })
-        );
-    }
-
-    function parseDateTime(
-        value: string
-    ) {
-        const hasTimezone =
-            value.endsWith("Z") ||
-            /[+-]\d{2}:\d{2}$/.test(
-                value
-            );
-
-        return new Date(
-            hasTimezone
-                ? value
-                : `${value}Z`
         );
     }
 
@@ -186,24 +223,6 @@ function TaskList({
             default:
                 return priority;
         }
-    }
-
-    function isOverdue(
-        task: TaskItem
-    ) {
-        if (
-            !task.dueDate ||
-            task.status === "Done"
-        ) {
-            return false;
-        }
-
-        return (
-            parseDateTime(
-                task.dueDate
-            ).getTime() <
-            Date.now()
-        );
     }
 
     function toDateTimeLocalValue(
@@ -496,7 +515,8 @@ function TaskList({
                 task.intern?.userId;
 
         const isCompleted =
-            task.status === "Done";
+            task.status ===
+            "Done";
 
         const taskIsOverdue =
             isOverdue(task);
@@ -861,7 +881,10 @@ function TaskList({
             />
 
             <div className="task-groups">
-                <section className="task-group task-group-todo">
+                <section
+                    id="task-group-todo"
+                    className="task-group task-group-todo"
+                >
                     <button
                         type="button"
                         className="task-group-header"
@@ -909,7 +932,10 @@ function TaskList({
                     )}
                 </section>
 
-                <section className="task-group task-group-progress">
+                <section
+                    id="task-group-progress"
+                    className="task-group task-group-progress"
+                >
                     <button
                         type="button"
                         className="task-group-header"
@@ -957,7 +983,10 @@ function TaskList({
                     )}
                 </section>
 
-                <section className="task-group task-group-done">
+                <section
+                    id="task-group-done"
+                    className="task-group task-group-done"
+                >
                     <button
                         type="button"
                         className="task-group-header"
@@ -994,6 +1023,57 @@ function TaskList({
                             {doneTasks.length >
                             0 ? (
                                 doneTasks.map(
+                                    renderTask
+                                )
+                            ) : (
+                                <p className="task-group-empty">
+                                    Bu bölümde görev yok.
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </section>
+
+                <section
+                    id="task-group-overdue"
+                    className="task-group task-group-overdue"
+                >
+                    <button
+                        type="button"
+                        className="task-group-header"
+                        aria-expanded={
+                            openGroups.overdue
+                        }
+                        onClick={() =>
+                            toggleGroup(
+                                "overdue"
+                            )
+                        }
+                    >
+                        <span className="task-group-title">
+                            Gecikenler
+                        </span>
+
+                        <span className="task-group-right">
+                            <span className="task-group-count">
+                                {
+                                    overdueTasks.length
+                                }
+                            </span>
+
+                            <span className="task-group-arrow">
+                                {openGroups.overdue
+                                    ? "▲"
+                                    : "▼"}
+                            </span>
+                        </span>
+                    </button>
+
+                    {openGroups.overdue && (
+                        <div className="task-group-content">
+                            {overdueTasks.length >
+                            0 ? (
+                                overdueTasks.map(
                                     renderTask
                                 )
                             ) : (

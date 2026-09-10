@@ -1631,3 +1631,22 @@ form button[type="button"]:hover {
 .task-start-button:active {
     transform: scale(0.98);
 }
+
+.dashboard-card-overdue {
+    border-color: #f0b8b3;
+    background: #fff7f6;
+}
+
+.dashboard-card-overdue h3,
+.dashboard-card-overdue p {
+    color: #b42318;
+}
+
+.task-group-overdue .task-group-header {
+    border-left-color: #b42318;
+    background: #fff7f6;
+}
+
+.task-group-overdue .task-group-title {
+    color: #b42318;
+}

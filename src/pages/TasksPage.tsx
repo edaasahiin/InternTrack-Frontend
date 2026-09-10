@@ -3,6 +3,10 @@ import {
     useState
 } from "react";
 
+import {
+    useSearchParams
+} from "react-router-dom";
+
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 import AlertMessage from "../components/AlertMessage";
@@ -21,14 +25,19 @@ type TaskFilter =
     | "All"
     | "ToDo"
     | "InProgress"
-    | "Done";
+    | "Done"
+    | "Overdue";
 
 type TaskGroup =
     | "todo"
     | "progress"
+    | "overdue"
     | "done";
 
 function TasksPage() {
+    const [searchParams] =
+        useSearchParams();
+
     const [tasks, setTasks] =
         useState<TaskItem[]>([]);
 
@@ -48,21 +57,54 @@ function TasksPage() {
         useState(false);
 
     const [
-        initialOpenGroup,
-        setInitialOpenGroup
-    ] = useState<TaskGroup | null>(
-        null
-    );
+        initialOpenGroups,
+        setInitialOpenGroups
+    ] = useState<TaskGroup[]>([]);
 
     const [
         taskListVersion,
         setTaskListVersion
     ] = useState(0);
 
-    const { user } = useAuth();
+    const { user } =
+        useAuth();
 
     const canManageTasks =
         isAdminOrHR(user?.role);
+
+    function parseDateTime(
+        value: string
+    ) {
+        const hasTimezone =
+            value.endsWith("Z") ||
+            /[+-]\d{2}:\d{2}$/.test(
+                value
+            );
+
+        return new Date(
+            hasTimezone
+                ? value
+                : `${value}Z`
+        );
+    }
+
+    function isOverdue(
+        task: TaskItem
+    ) {
+        if (
+            !task.dueDate ||
+            task.status === "Done"
+        ) {
+            return false;
+        }
+
+        return (
+            parseDateTime(
+                task.dueDate
+            ).getTime() <
+            Date.now()
+        );
+    }
 
     async function loadTasks(
         showLoading = true
@@ -80,7 +122,9 @@ function TasksPage() {
                     "/tasks"
                 );
 
-            setTasks(data ?? []);
+            setTasks(
+                data ?? []
+            );
         } catch (error) {
             setIsError(true);
 
@@ -100,21 +144,29 @@ function TasksPage() {
         await loadTasks(false);
 
         if (status === "ToDo") {
-            setInitialOpenGroup(
+            setFilter("ToDo");
+
+            setInitialOpenGroups([
                 "todo"
-            );
+            ]);
         } else if (
             status === "InProgress"
         ) {
-            setInitialOpenGroup(
-                "progress"
+            setFilter(
+                "InProgress"
             );
+
+            setInitialOpenGroups([
+                "progress"
+            ]);
         } else if (
             status === "Done"
         ) {
-            setInitialOpenGroup(
+            setFilter("Done");
+
+            setInitialOpenGroups([
                 "done"
-            );
+            ]);
         }
 
         setTaskListVersion(
@@ -127,26 +179,239 @@ function TasksPage() {
         loadTasks();
     }, []);
 
-    const filteredTasks =
-        tasks.filter((task) => {
-            const matchesStatus =
-                filter === "All" ||
-                task.status === filter;
-
-            const matchesSearch =
-                task.title
-                    .toLowerCase()
-                    .includes(
-                        searchText
-                            .trim()
-                            .toLowerCase()
-                    );
-
-            return (
-                matchesStatus &&
-                matchesSearch
+    useEffect(() => {
+        const dashboardFilter =
+            searchParams.get(
+                "filter"
             );
-        });
+
+        if (
+            dashboardFilter ===
+            "todo"
+        ) {
+            setFilter("ToDo");
+
+            setInitialOpenGroups([
+                "todo"
+            ]);
+        } else if (
+            dashboardFilter ===
+            "progress"
+        ) {
+            setFilter(
+                "InProgress"
+            );
+
+            setInitialOpenGroups([
+                "progress"
+            ]);
+        } else if (
+            dashboardFilter ===
+            "done"
+        ) {
+            setFilter("Done");
+
+            setInitialOpenGroups([
+                "done"
+            ]);
+        } else if (
+            dashboardFilter ===
+            "overdue"
+        ) {
+            setFilter(
+                "Overdue"
+            );
+
+            setInitialOpenGroups([
+                "overdue"
+            ]);
+        } else {
+            setFilter("All");
+
+            setInitialOpenGroups(
+                []
+            );
+        }
+
+        setTaskListVersion(
+            (current) =>
+                current + 1
+        );
+    }, [searchParams]);
+
+    const filteredTasks =
+        tasks.filter(
+            (task) => {
+                let matchesStatus =
+                    true;
+
+                if (
+                    filter === "ToDo"
+                ) {
+                    matchesStatus =
+                        task.status ===
+                            "ToDo" &&
+                        !isOverdue(
+                            task
+                        );
+                } else if (
+                    filter ===
+                    "InProgress"
+                ) {
+                    matchesStatus =
+                        task.status ===
+                            "InProgress" &&
+                        !isOverdue(
+                            task
+                        );
+                } else if (
+                    filter === "Done"
+                ) {
+                    matchesStatus =
+                        task.status ===
+                        "Done";
+                } else if (
+                    filter ===
+                    "Overdue"
+                ) {
+                    matchesStatus =
+                        isOverdue(
+                            task
+                        );
+                }
+
+                const matchesSearch =
+                    task.title
+                        .toLowerCase()
+                        .includes(
+                            searchText
+                                .trim()
+                                .toLowerCase()
+                        );
+
+                return (
+                    matchesStatus &&
+                    matchesSearch
+                );
+            }
+        );
+
+    useEffect(() => {
+        if (isLoading) {
+            return;
+        }
+
+        const dashboardFilter =
+            searchParams.get(
+                "filter"
+            );
+
+        let targetId:
+            string | null = null;
+
+        if (
+            dashboardFilter ===
+            "todo"
+        ) {
+            targetId =
+                "task-group-todo";
+        } else if (
+            dashboardFilter ===
+            "progress"
+        ) {
+            targetId =
+                "task-group-progress";
+        } else if (
+            dashboardFilter ===
+            "done"
+        ) {
+            targetId =
+                "task-group-done";
+        } else if (
+            dashboardFilter ===
+            "overdue"
+        ) {
+            targetId =
+                "task-group-overdue";
+        }
+
+        if (!targetId) {
+            return;
+        }
+
+        const timer =
+            window.setTimeout(
+                () => {
+                    document
+                        .getElementById(
+                            targetId
+                        )
+                        ?.scrollIntoView({
+                            behavior:
+                                "smooth",
+
+                            block:
+                                "start"
+                        });
+                },
+                150
+            );
+
+        return () => {
+            window.clearTimeout(
+                timer
+            );
+        };
+    }, [
+        isLoading,
+        searchParams,
+        taskListVersion
+    ]);
+
+    function handleFilterChange(
+        newFilter: TaskFilter
+    ) {
+        setFilter(
+            newFilter
+        );
+
+        if (
+            newFilter === "ToDo"
+        ) {
+            setInitialOpenGroups([
+                "todo"
+            ]);
+        } else if (
+            newFilter ===
+            "InProgress"
+        ) {
+            setInitialOpenGroups([
+                "progress"
+            ]);
+        } else if (
+            newFilter === "Done"
+        ) {
+            setInitialOpenGroups([
+                "done"
+            ]);
+        } else if (
+            newFilter ===
+            "Overdue"
+        ) {
+            setInitialOpenGroups([
+                "overdue"
+            ]);
+        } else {
+            setInitialOpenGroups(
+                []
+            );
+        }
+
+        setTaskListVersion(
+            (current) =>
+                current + 1
+        );
+    }
 
     return (
         <div>
@@ -166,10 +431,14 @@ function TasksPage() {
                         id="task-search"
                         type="text"
                         placeholder="Görev başlığı yazın"
-                        value={searchText}
+                        value={
+                            searchText
+                        }
                         onChange={(event) =>
                             setSearchText(
-                                event.target.value
+                                event
+                                    .target
+                                    .value
                             )
                         }
                     />
@@ -178,8 +447,10 @@ function TasksPage() {
                         id="task-filter"
                         value={filter}
                         onChange={(event) =>
-                            setFilter(
-                                event.target.value as TaskFilter
+                            handleFilterChange(
+                                event
+                                    .target
+                                    .value as TaskFilter
                             )
                         }
                     >
@@ -193,6 +464,10 @@ function TasksPage() {
 
                         <option value="InProgress">
                             Devam Ediyor
+                        </option>
+
+                        <option value="Overdue">
+                            Geciken
                         </option>
 
                         <option value="Done">
@@ -229,8 +504,8 @@ function TasksPage() {
                     canDelete={
                         canManageTasks
                     }
-                    initialOpenGroup={
-                        initialOpenGroup
+                    initialOpenGroups={
+                        initialOpenGroups
                     }
                 />
             )}
