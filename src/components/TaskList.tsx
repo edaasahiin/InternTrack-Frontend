@@ -378,8 +378,9 @@ function TaskList({
         }
     }
 
-    async function completeTask(
-        task: TaskItem
+    async function changeTaskStatus(
+        task: TaskItem,
+        newStatus: string
     ) {
         setMessage("");
         setIsError(false);
@@ -393,7 +394,7 @@ function TaskList({
                     task.description,
 
                 status:
-                    "Done",
+                    newStatus,
 
                 priority:
                     task.priority,
@@ -409,38 +410,69 @@ function TaskList({
             };
 
         try {
-            await agent.put<
-                MessageResponse,
-                UpdateTaskDto
-            >(
-                `/tasks/${task.id}`,
-                updatedTask
-            );
+            const data =
+                await agent.put<
+                    MessageResponse,
+                    UpdateTaskDto
+                >(
+                    `/tasks/${task.id}`,
+                    updatedTask
+                );
 
-            setIsCelebrating(true);
+            if (
+                newStatus ===
+                "InProgress"
+            ) {
+                setMessage(
+                    data?.message ||
+                    "Görev başlatıldı."
+                );
 
-            setMessage(
-                "🎉 Tebrikler! Görev tamamlandı."
-            );
+                setOpenGroups(
+                    (current) => ({
+                        ...current,
 
-            setOpenGroups(
-                (current) => ({
-                    ...current,
+                        progress: true
+                    })
+                );
+            }
 
-                    done: true
-                })
-            );
+            if (
+                newStatus ===
+                "Done"
+            ) {
+                setIsCelebrating(
+                    true
+                );
+
+                setMessage(
+                    "🎉 Tebrikler! Görev tamamlandı."
+                );
+
+                setOpenGroups(
+                    (current) => ({
+                        ...current,
+
+                        done: true
+                    })
+                );
+            }
 
             await onTaskChanged();
 
-            window.setTimeout(
-                () => {
-                    setIsCelebrating(
-                        false
-                    );
-                },
-                2200
-            );
+            if (
+                newStatus ===
+                "Done"
+            ) {
+                window.setTimeout(
+                    () => {
+                        setIsCelebrating(
+                            false
+                        );
+                    },
+                    2200
+                );
+            }
         } catch (error) {
             setIsError(true);
 
@@ -724,14 +756,31 @@ function TaskList({
                         )}
 
                         <div className="task-card-actions">
-                            {task.status !==
-                                "Done" && (
+                            {task.status ===
+                                "ToDo" && (
+                                <button
+                                    type="button"
+                                    className="task-start-button"
+                                    onClick={() =>
+                                        changeTaskStatus(
+                                            task,
+                                            "InProgress"
+                                        )
+                                    }
+                                >
+                                    Görevi Başlat
+                                </button>
+                            )}
+
+                            {task.status ===
+                                "InProgress" && (
                                 <button
                                     type="button"
                                     className="task-complete-button"
                                     onClick={() =>
-                                        completeTask(
-                                            task
+                                        changeTaskStatus(
+                                            task,
+                                            "Done"
                                         )
                                     }
                                 >
