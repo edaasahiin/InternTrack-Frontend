@@ -1,71 +1,117 @@
 import {
     useEffect,
-    useState,
-    type FormEvent
+    useState
 } from "react";
 
-import { agent } from "../api/agent";
-
+import DepartmentForm from "../components/DepartmentForm";
+import DepartmentList from "../components/DepartmentList";
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
 
-import { getErrorMessage } from "../utils/getErrorMessage";
-import { useAuth } from "../context/AuthContext";
-import { isAdminOrHR } from "../utils/roleUtils";
+import Modal from "../components/common/Modal";
+import SearchToolbar from "../components/common/SearchToolbar";
+
+import departmentService from "../services/departmentService";
+
+import {
+    getErrorMessage
+} from "../utils/getErrorMessage";
+
+import {
+    useAuth
+} from "../context/AuthContext";
+
+import {
+    isAdminOrHR
+} from "../utils/roleUtils";
 
 import type {
     Department,
     CreateDepartmentDto
 } from "../interfaces/department";
 
-interface MessageResponse {
-    message?: string;
-}
-
 function DepartmentsPage() {
-    const [departments, setDepartments] =
-        useState<Department[]>([]);
+    const [
+        departments,
+        setDepartments
+    ] = useState<Department[]>([]);
 
-    const [name, setName] =
-        useState("");
+    const [
+        searchText,
+        setSearchText
+    ] = useState("");
 
-    const [message, setMessage] =
-        useState("");
+    const [
+        showDepartmentForm,
+        setShowDepartmentForm
+    ] = useState(false);
 
-    const [isError, setIsError] =
-        useState(false);
+    const [
+        message,
+        setMessage
+    ] = useState("");
 
-    const [isSubmitting, setIsSubmitting] =
-        useState(false);
+    const [
+        isError,
+        setIsError
+    ] = useState(false);
 
-    const [isLoading, setIsLoading] =
-        useState(true);
+    const [
+        isSubmitting,
+        setIsSubmitting
+    ] = useState(false);
 
-    const { user } = useAuth();
+    const [
+        isUpdating,
+        setIsUpdating
+    ] = useState(false);
+
+    const [
+        isLoading,
+        setIsLoading
+    ] = useState(true);
+
+    const { user } =
+        useAuth();
 
     const canManageDepartments =
-        isAdminOrHR(user?.role);
+        isAdminOrHR(
+            user?.role
+        );
 
-    async function loadDepartments() {
-        setIsLoading(true);
+    async function loadDepartments(
+        showLoading = true
+    ) {
+        if (showLoading) {
+            setIsLoading(
+                true
+            );
+        }
+
         setMessage("");
         setIsError(false);
 
         try {
             const data =
-                await agent.get<Department[]>(
-                    "/departments"
-                );
+                await departmentService.getAll();
 
-            setDepartments(data ?? []);
+            setDepartments(
+                data ?? []
+            );
         } catch (error) {
             setIsError(true);
 
             setMessage(
-                getErrorMessage(error)
+                getErrorMessage(
+                    error
+                )
             );
         } finally {
-            setIsLoading(false);
+            if (showLoading) {
+                setIsLoading(
+                    false
+                );
+            }
         }
     }
 
@@ -73,142 +119,234 @@ function DepartmentsPage() {
         loadDepartments();
     }, []);
 
-    async function handleSubmit(
-        event: FormEvent<HTMLFormElement>
-    ) {
-        event.preventDefault();
+    function openDepartmentForm() {
+        setMessage("");
+        setIsError(false);
 
+        setShowDepartmentForm(
+            true
+        );
+    }
+
+    function closeDepartmentForm() {
+        setShowDepartmentForm(
+            false
+        );
+    }
+
+    async function handleAddDepartment(
+        name: string
+    ) {
         setMessage("");
         setIsError(false);
         setIsSubmitting(true);
 
-        const newDepartment:
+        const dto:
             CreateDepartmentDto = {
                 name
             };
 
         try {
             const data =
-                await agent.post<
-                    MessageResponse,
-                    CreateDepartmentDto
-                >(
-                    "/departments",
-                    newDepartment
+                await departmentService.create(
+                    dto
                 );
 
-            setIsError(false);
+            await loadDepartments(
+                false
+            );
 
             setMessage(
                 data?.message ||
                 "Departman oluşturuldu."
             );
 
-            setName("");
-
-            await loadDepartments();
+            closeDepartmentForm();
         } catch (error) {
             setIsError(true);
 
             setMessage(
-                getErrorMessage(error)
+                getErrorMessage(
+                    error
+                )
             );
         } finally {
-            setIsSubmitting(false);
+            setIsSubmitting(
+                false
+            );
         }
     }
 
-    async function deleteDepartment(
-        id: number
+    async function handleUpdateDepartment(
+        department: Department,
+        newName: string
+    ): Promise<boolean> {
+        setMessage("");
+        setIsError(false);
+        setIsUpdating(true);
+
+        const dto:
+            CreateDepartmentDto = {
+                name:
+                    newName
+            };
+
+        try {
+            const data =
+                await departmentService.update(
+                    department.id,
+                    dto
+                );
+
+            await loadDepartments(
+                false
+            );
+
+            setMessage(
+                data?.message ||
+                "Departman güncellendi."
+            );
+
+            return true;
+        } catch (error) {
+            setIsError(true);
+
+            setMessage(
+                getErrorMessage(
+                    error
+                )
+            );
+
+            return false;
+        } finally {
+            setIsUpdating(
+                false
+            );
+        }
+    }
+
+    async function handleDeleteDepartment(
+        department: Department
     ) {
         setMessage("");
         setIsError(false);
 
         try {
-            await agent.delete<void>(
-                `/departments/${id}`
+            await departmentService.delete(
+                department.id
             );
 
-            setIsError(false);
+            await loadDepartments(
+                false
+            );
 
             setMessage(
                 "Departman başarıyla silindi."
             );
-
-            await loadDepartments();
         } catch (error) {
             setIsError(true);
 
             setMessage(
-                getErrorMessage(error)
+                getErrorMessage(
+                    error
+                )
             );
         }
     }
 
+    const filteredDepartments =
+        departments.filter(
+            (department) => {
+                const search =
+                    searchText
+                        .trim()
+                        .toLowerCase();
+
+                if (!search) {
+                    return true;
+                }
+
+                return department.name
+                    .toLowerCase()
+                    .includes(
+                        search
+                    );
+            }
+        );
+
     return (
-        <div>
-            <h2>Departmanlar</h2>
+        <div className="departments-page">
+            <h2>
+                Departmanlar
+            </h2>
 
-            {canManageDepartments && (
-                <form onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Departman Adı"
-                        value={name}
-                        onChange={(event) =>
-                            setName(
-                                event.target.value
-                            )
-                        }
-                        required
-                    />
-
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting
-                            ? "Ekleniyor..."
-                            : "Departman Ekle"}
-                    </button>
-                </form>
-            )}
-
-            <AlertMessage
-                message={message}
-                isError={isError}
+            <SearchToolbar
+                title="Departman Ara"
+                searchValue={
+                    searchText
+                }
+                searchPlaceholder="Departman adı yazın"
+                onSearchChange={
+                    setSearchText
+                }
+                addButtonText="+ Departman Ekle"
+                onAdd={
+                    openDepartmentForm
+                }
+                showAddButton={
+                    canManageDepartments
+                }
             />
 
-            <h3>Departman Listesi</h3>
+            <AlertMessage
+                message={
+                    message
+                }
+                isError={
+                    isError
+                }
+            />
 
             {isLoading ? (
                 <LoadingMessage />
-            ) : departments.length === 0 ? (
-                <p>Henüz departman yok.</p>
             ) : (
-                departments.map(
-                    (department) => (
-                        <div
-                            className="department-card"
-                            key={department.id}
-                        >
-                            {department.name}
-
-                            {canManageDepartments && (
-                                <button
-                                    onClick={() =>
-                                        deleteDepartment(
-                                            department.id
-                                        )
-                                    }
-                                >
-                                    Sil
-                                </button>
-                            )}
-                        </div>
-                    )
-                )
+                <DepartmentList
+                    departments={
+                        filteredDepartments
+                    }
+                    canManage={
+                        canManageDepartments
+                    }
+                    isUpdating={
+                        isUpdating
+                    }
+                    onUpdate={
+                        handleUpdateDepartment
+                    }
+                    onDelete={
+                        handleDeleteDepartment
+                    }
+                />
             )}
+
+            <Modal
+                isOpen={
+                    showDepartmentForm
+                }
+                title="Departman Ekle"
+                onClose={
+                    closeDepartmentForm
+                }
+            >
+                <DepartmentForm
+                    isSubmitting={
+                        isSubmitting
+                    }
+                    onSubmit={
+                        handleAddDepartment
+                    }
+                />
+            </Modal>
         </div>
     );
 }

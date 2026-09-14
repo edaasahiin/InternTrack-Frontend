@@ -6,7 +6,7 @@ import {
     type ReactNode
 } from "react";
 
-import { agent } from "../api/agent";
+import authService from "../services/authService";
 
 import type {
     AuthUser,
@@ -16,13 +16,21 @@ import type {
 
 interface AuthContextType {
     user: AuthUser | null;
+
     isAuthenticated: boolean;
+
     isLoading: boolean;
-    login: (loginResponse: AuthUser) => void;
+
+    login: (
+        loginResponse: AuthUser
+    ) => void;
+
     logout: () => Promise<void>;
+
     updateAvatar: (
         avatar: string | null
     ) => Promise<void>;
+
     updateProfile: (
         name: string,
         surname: string,
@@ -35,30 +43,43 @@ interface AuthProviderProps {
 }
 
 const AuthContext =
-    createContext<AuthContextType | null>(null);
+    createContext<
+        AuthContextType | null
+    >(null);
 
 export function AuthProvider({
     children
 }: AuthProviderProps) {
-    const [user, setUser] =
-        useState<AuthUser | null>(null);
+    const [
+        user,
+        setUser
+    ] = useState<
+        AuthUser | null
+    >(null);
 
-    const [isLoading, setIsLoading] =
-        useState(true);
+    const [
+        isLoading,
+        setIsLoading
+    ] = useState(true);
 
     useEffect(() => {
         async function loadCurrentUser() {
             try {
                 const currentUser =
-                    await agent.get<AuthUser>(
-                        "/auth/me"
-                    );
+                    await authService
+                        .getCurrentUser();
 
-                setUser(currentUser);
+                setUser(
+                    currentUser
+                );
             } catch {
-                setUser(null);
+                setUser(
+                    null
+                );
             } finally {
-                setIsLoading(false);
+                setIsLoading(
+                    false
+                );
             }
         }
 
@@ -68,91 +89,119 @@ export function AuthProvider({
     const login = (
         loginResponse: AuthUser
     ) => {
-        const userData: AuthUser = {
-            name: loginResponse.name,
-            surname: loginResponse.surname,
-            avatar: loginResponse.avatar,
-            email: loginResponse.email,
-            role: loginResponse.role,
-            mustChangePassword:
-                loginResponse.mustChangePassword
-        };
+        const userData:
+            AuthUser = {
+                name:
+                    loginResponse.name,
 
-        setUser(userData);
-    };
+                surname:
+                    loginResponse.surname,
 
-    const updateAvatar = async (
-        avatar: string | null
-    ) => {
-        const dto: UpdateAvatarDto = {
-            avatar
-        };
+                avatar:
+                    loginResponse.avatar,
 
-        await agent.put<
-            unknown,
-            UpdateAvatarDto
-        >(
-            "/auth/avatar",
-            dto
-        );
+                email:
+                    loginResponse.email,
 
-        setUser((currentUser) => {
-            if (!currentUser) {
-                return null;
-            }
+                role:
+                    loginResponse.role,
 
-            return {
-                ...currentUser,
-                avatar
+                mustChangePassword:
+                    loginResponse
+                        .mustChangePassword
             };
-        });
-    };
 
-    const updateProfile = async (
-        name: string,
-        surname: string,
-        email: string
-    ) => {
-        const dto: UpdateProfileDto = {
-            name,
-            surname,
-            email
-        };
-
-        await agent.put<
-            unknown,
-            UpdateProfileDto
-        >(
-            "/auth/profile",
-            dto
+        setUser(
+            userData
         );
-
-        setUser((currentUser) => {
-            if (!currentUser) {
-                return null;
-            }
-
-            return {
-                ...currentUser,
-                name,
-                surname,
-                email
-            };
-        });
     };
 
-    const logout = async () => {
-        try {
-            await agent.post<void>(
-                "/auth/logout"
+    const updateAvatar =
+        async (
+            avatar: string | null
+        ) => {
+            const dto:
+                UpdateAvatarDto = {
+                    avatar
+                };
+
+            await authService
+                .updateAvatar(
+                    dto
+                );
+
+            setUser(
+                (
+                    currentUser
+                ) => {
+                    if (
+                        !currentUser
+                    ) {
+                        return null;
+                    }
+
+                    return {
+                        ...currentUser,
+                        avatar
+                    };
+                }
             );
-        } finally {
-            setUser(null);
-        }
-    };
+        };
+
+    const updateProfile =
+        async (
+            name: string,
+            surname: string,
+            email: string
+        ) => {
+            const dto:
+                UpdateProfileDto = {
+                    name,
+                    surname,
+                    email
+                };
+
+            await authService
+                .updateProfile(
+                    dto
+                );
+
+            setUser(
+                (
+                    currentUser
+                ) => {
+                    if (
+                        !currentUser
+                    ) {
+                        return null;
+                    }
+
+                    return {
+                        ...currentUser,
+                        name,
+                        surname,
+                        email
+                    };
+                }
+            );
+        };
+
+    const logout =
+        async () => {
+            try {
+                await authService
+                    .logout();
+            } finally {
+                setUser(
+                    null
+                );
+            }
+        };
 
     const isAuthenticated =
-        Boolean(user);
+        Boolean(
+            user
+        );
 
     return (
         <AuthContext.Provider
@@ -173,7 +222,9 @@ export function AuthProvider({
 
 export function useAuth() {
     const context =
-        useContext(AuthContext);
+        useContext(
+            AuthContext
+        );
 
     if (!context) {
         throw new Error(

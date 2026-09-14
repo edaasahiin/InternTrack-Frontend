@@ -8,11 +8,10 @@ import {
     useNavigate
 } from "react-router-dom";
 
-import { agent } from "../api/agent";
+import authService from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
 import type {
-    AuthUser,
     LoginDto
 } from "../interfaces/auth";
 
@@ -38,47 +37,55 @@ function LoginPage() {
     const [isLoading, setIsLoading] =
         useState(false);
 
-    const navigate = useNavigate();
-    const { login } = useAuth();
+    const navigate =
+        useNavigate();
 
-    const handleSubmit = async (
-        event: FormEvent<HTMLFormElement>
-    ) => {
-        event.preventDefault();
+    const { login } =
+        useAuth();
 
-        setMessage("");
-        setIsLoading(true);
+    const handleSubmit =
+        async (
+            event:
+                FormEvent<HTMLFormElement>
+        ) => {
+            event.preventDefault();
 
-        const loginDto: LoginDto = {
-            email,
-            password
-        };
+            setMessage("");
+            setIsLoading(true);
 
-        try {
-            const response =
-                await agent.post<
-                    AuthUser,
-                    LoginDto
-                >(
-                    "/auth/login",
-                    loginDto
+            const loginDto:
+                LoginDto = {
+                    email,
+                    password
+                };
+
+            try {
+                const response =
+                    await authService.login(
+                        loginDto
+                    );
+
+                login(
+                    response
                 );
 
-            login(response);
+                navigate(
+                    "/"
+                );
+            } catch (error) {
+                const apiError =
+                    error as ApiError;
 
-            navigate("/");
-        } catch (error) {
-            const apiError =
-                error as ApiError;
-
-            setMessage(
-                apiError.message ||
-                "Giriş başarısız."
-            );
-        } finally {
-            setIsLoading(false);
-        }
-    };
+                setMessage(
+                    apiError.message ||
+                    "Giriş başarısız."
+                );
+            } finally {
+                setIsLoading(
+                    false
+                );
+            }
+        };
 
     return (
         <div className="login-page">
@@ -90,7 +97,9 @@ function LoginPage() {
                         alt="Sanko Logo"
                     />
 
-                    <h1>InternTrack</h1>
+                    <h1>
+                        InternTrack
+                    </h1>
 
                     <p>
                         Staj Takip Sistemine giriş yapın.
@@ -99,7 +108,9 @@ function LoginPage() {
 
                 <form
                     className="login-form"
-                    onSubmit={handleSubmit}
+                    onSubmit={
+                        handleSubmit
+                    }
                 >
                     <div className="login-field">
                         <label htmlFor="email">
@@ -110,10 +121,14 @@ function LoginPage() {
                             id="email"
                             type="email"
                             placeholder="ornek@email.com"
-                            value={email}
+                            value={
+                                email
+                            }
                             onChange={(event) =>
                                 setEmail(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             required
@@ -129,10 +144,14 @@ function LoginPage() {
                             id="password"
                             type="password"
                             placeholder="Şifrenizi girin"
-                            value={password}
+                            value={
+                                password
+                            }
                             onChange={(event) =>
                                 setPassword(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             required
@@ -148,7 +167,9 @@ function LoginPage() {
                     <button
                         className="login-button"
                         type="submit"
-                        disabled={isLoading}
+                        disabled={
+                            isLoading
+                        }
                     >
                         {isLoading
                             ? "Giriş yapılıyor..."
@@ -157,6 +178,7 @@ function LoginPage() {
 
                     <div className="auth-link">
                         Hesabın yok mu?{" "}
+
                         <Link to="/register">
                             Kayıt Ol
                         </Link>

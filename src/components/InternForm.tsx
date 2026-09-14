@@ -1,12 +1,7 @@
 import {
-    useEffect,
     useState,
     type FormEvent
 } from "react";
-
-import { agent } from "../api/agent";
-import AlertMessage from "./AlertMessage";
-import { getErrorMessage } from "../utils/getErrorMessage";
 
 import type {
     CreateInternDto
@@ -17,212 +12,185 @@ import type {
 } from "../interfaces/department";
 
 interface InternFormProps {
-    onInternAdded: () => Promise<void> | void;
-}
+    departments: Department[];
 
-interface MessageResponse {
-    message?: string;
+    isSubmitting: boolean;
+
+    onSubmit: (
+        intern: CreateInternDto
+    ) => Promise<void> | void;
 }
 
 function InternForm({
-    onInternAdded
+    departments,
+    isSubmitting,
+    onSubmit
 }: InternFormProps) {
-    const [name, setName] =
-        useState("");
+    const [
+        name,
+        setName
+    ] = useState("");
 
-    const [surname, setSurname] =
-        useState("");
+    const [
+        surname,
+        setSurname
+    ] = useState("");
 
-    const [email, setEmail] =
-        useState("");
+    const [
+        email,
+        setEmail
+    ] = useState("");
 
-    const [password, setPassword] =
-        useState("");
+    const [
+        password,
+        setPassword
+    ] = useState("");
 
-    const [departmentId, setDepartmentId] =
-        useState("");
-
-    const [departments, setDepartments] =
-        useState<Department[]>([]);
-
-    const [message, setMessage] =
-        useState("");
-
-    const [isError, setIsError] =
-        useState(false);
-
-    const [isSubmitting, setIsSubmitting] =
-        useState(false);
-
-    useEffect(() => {
-        async function loadDepartments() {
-            try {
-                const data =
-                    await agent.get<Department[]>(
-                        "/departments"
-                    );
-
-                setDepartments(data ?? []);
-            } catch (error) {
-                setIsError(true);
-
-                setMessage(
-                    getErrorMessage(error)
-                );
-            }
-        }
-
-        loadDepartments();
-    }, []);
+    const [
+        departmentId,
+        setDepartmentId
+    ] = useState("");
 
     async function handleSubmit(
         event: FormEvent<HTMLFormElement>
     ) {
         event.preventDefault();
 
-        setMessage("");
-        setIsError(false);
-        setIsSubmitting(true);
+        const newIntern:
+            CreateInternDto = {
+                name:
+                    name.trim(),
 
-        const newIntern: CreateInternDto = {
-            name,
-            surname,
-            email,
-            password,
-            departmentId: Number(
-                departmentId
-            )
-        };
+                surname:
+                    surname.trim(),
 
-        try {
-            const data =
-                await agent.post<
-                    MessageResponse,
-                    CreateInternDto
-                >(
-                    "/interns",
-                    newIntern
-                );
+                email:
+                    email.trim(),
 
-            setIsError(false);
+                password,
 
-            setMessage(
-                data?.message ||
-                "Stajyer başarıyla eklendi."
-            );
+                departmentId:
+                    Number(
+                        departmentId
+                    )
+            };
 
-            setName("");
-            setSurname("");
-            setEmail("");
-            setPassword("");
-            setDepartmentId("");
-
-            await onInternAdded();
-        } catch (error) {
-            setIsError(true);
-
-            setMessage(
-                getErrorMessage(error)
-            );
-        } finally {
-            setIsSubmitting(false);
-        }
+        await onSubmit(
+            newIntern
+        );
     }
 
     return (
-        <div>
-            <h3>Stajyer Ekle</h3>
-
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Ad"
-                    value={name}
-                    onChange={(event) =>
-                        setName(
-                            event.target.value
-                        )
-                    }
-                    required
-                />
-
-                <input
-                    type="text"
-                    placeholder="Soyad"
-                    value={surname}
-                    onChange={(event) =>
-                        setSurname(
-                            event.target.value
-                        )
-                    }
-                    required
-                />
-
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(event) =>
-                        setEmail(
-                            event.target.value
-                        )
-                    }
-                    required
-                />
-
-                <input
-                    type="password"
-                    placeholder="Geçici Şifre"
-                    value={password}
-                    onChange={(event) =>
-                        setPassword(
-                            event.target.value
-                        )
-                    }
-                    required
-                    minLength={6}
-                />
-
-                <select
-                    value={departmentId}
-                    onChange={(event) =>
-                        setDepartmentId(
-                            event.target.value
-                        )
-                    }
-                    required
-                >
-                    <option value="">
-                        Departman Seç
-                    </option>
-
-                    {departments.map(
-                        (department) => (
-                            <option
-                                key={department.id}
-                                value={department.id}
-                            >
-                                {department.name}
-                            </option>
-                        )
-                    )}
-                </select>
-
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting
-                        ? "Ekleniyor..."
-                        : "Stajyer Ekle"}
-                </button>
-            </form>
-
-            <AlertMessage
-                message={message}
-                isError={isError}
+        <form
+            onSubmit={
+                handleSubmit
+            }
+        >
+            <input
+                type="text"
+                placeholder="Ad"
+                value={name}
+                onChange={(event) =>
+                    setName(
+                        event
+                            .target
+                            .value
+                    )
+                }
+                required
             />
-        </div>
+
+            <input
+                type="text"
+                placeholder="Soyad"
+                value={surname}
+                onChange={(event) =>
+                    setSurname(
+                        event
+                            .target
+                            .value
+                    )
+                }
+                required
+            />
+
+            <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(event) =>
+                    setEmail(
+                        event
+                            .target
+                            .value
+                    )
+                }
+                required
+            />
+
+            <input
+                type="password"
+                placeholder="Geçici Şifre"
+                value={password}
+                onChange={(event) =>
+                    setPassword(
+                        event
+                            .target
+                            .value
+                    )
+                }
+                required
+                minLength={6}
+            />
+
+            <select
+                value={
+                    departmentId
+                }
+                onChange={(event) =>
+                    setDepartmentId(
+                        event
+                            .target
+                            .value
+                    )
+                }
+                required
+            >
+                <option value="">
+                    Departman Seç
+                </option>
+
+                {departments.map(
+                    (
+                        department
+                    ) => (
+                        <option
+                            key={
+                                department.id
+                            }
+                            value={
+                                department.id
+                            }
+                        >
+                            {
+                                department.name
+                            }
+                        </option>
+                    )
+                )}
+            </select>
+
+            <button
+                type="submit"
+                disabled={
+                    isSubmitting
+                }
+            >
+                {isSubmitting
+                    ? "Ekleniyor..."
+                    : "Stajyer Ekle"}
+            </button>
+        </form>
     );
 }
 

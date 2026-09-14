@@ -7,91 +7,127 @@ import {
     useNavigate
 } from "react-router-dom";
 
-import { agent } from "../api/agent";
-import { useAuth } from "../context/AuthContext";
-import { getErrorMessage } from "../utils/getErrorMessage";
+import authService from "../services/authService";
+
+import {
+    useAuth
+} from "../context/AuthContext";
+
+import {
+    getErrorMessage
+} from "../utils/getErrorMessage";
 
 import type {
     ChangePasswordDto
 } from "../interfaces/auth";
 
 function ChangePasswordPage() {
-    const navigate = useNavigate();
+    const navigate =
+        useNavigate();
 
     const {
         user,
         logout
     } = useAuth();
 
-    const [currentPassword, setCurrentPassword] =
-        useState("");
+    const [
+        currentPassword,
+        setCurrentPassword
+    ] = useState("");
 
-    const [newPassword, setNewPassword] =
-        useState("");
+    const [
+        newPassword,
+        setNewPassword
+    ] = useState("");
 
-    const [confirmPassword, setConfirmPassword] =
-        useState("");
+    const [
+        confirmPassword,
+        setConfirmPassword
+    ] = useState("");
 
-    const [message, setMessage] =
-        useState("");
+    const [
+        message,
+        setMessage
+    ] = useState("");
 
-    const [isError, setIsError] =
-        useState(false);
+    const [
+        isError,
+        setIsError
+    ] = useState(false);
 
-    const [isSubmitting, setIsSubmitting] =
-        useState(false);
+    const [
+        isSubmitting,
+        setIsSubmitting
+    ] = useState(false);
 
-    const handleSubmit = async (
-        event: FormEvent<HTMLFormElement>
-    ) => {
-        event.preventDefault();
+    const handleSubmit =
+        async (
+            event:
+                FormEvent<HTMLFormElement>
+        ) => {
+            event.preventDefault();
 
-        setMessage("");
-        setIsError(false);
+            setMessage("");
+            setIsError(false);
 
-        if (newPassword !== confirmPassword) {
-            setIsError(true);
+            if (
+                newPassword !==
+                confirmPassword
+            ) {
+                setIsError(
+                    true
+                );
 
-            setMessage(
-                "Yeni şifreler birbiriyle eşleşmiyor."
+                setMessage(
+                    "Yeni şifreler birbiriyle eşleşmiyor."
+                );
+
+                return;
+            }
+
+            setIsSubmitting(
+                true
             );
 
-            return;
-        }
+            const dto:
+                ChangePasswordDto = {
+                    currentPassword,
+                    newPassword
+                };
 
-        setIsSubmitting(true);
+            try {
+                await authService
+                    .changePassword(
+                        dto
+                    );
 
-        const dto: ChangePasswordDto = {
-            currentPassword,
-            newPassword
+                await logout();
+
+                navigate(
+                    "/login"
+                );
+            } catch (error) {
+                setIsError(
+                    true
+                );
+
+                setMessage(
+                    getErrorMessage(
+                        error
+                    )
+                );
+            } finally {
+                setIsSubmitting(
+                    false
+                );
+            }
         };
-
-        try {
-            await agent.put<
-                unknown,
-                ChangePasswordDto
-            >(
-                "/auth/change-password",
-                dto
-            );
-
-            await logout();
-
-            navigate("/login");
-        } catch (error) {
-            setIsError(true);
-
-            setMessage(
-                getErrorMessage(error)
-            );
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
     return (
         <div className="password-page">
-            <h2>Şifre Değiştir</h2>
+            <h2>
+                Şifre Değiştir
+            </h2>
 
             <div className="password-card">
                 <p>
@@ -100,14 +136,22 @@ function ChangePasswordPage() {
                         : `Merhaba ${user?.name}, mevcut şifrenizi kullanarak yeni bir şifre belirleyebilirsiniz.`}
                 </p>
 
-                <form onSubmit={handleSubmit}>
+                <form
+                    onSubmit={
+                        handleSubmit
+                    }
+                >
                     <input
                         type="password"
                         placeholder="Mevcut Şifre"
-                        value={currentPassword}
+                        value={
+                            currentPassword
+                        }
                         onChange={(event) =>
                             setCurrentPassword(
-                                event.target.value
+                                event
+                                    .target
+                                    .value
                             )
                         }
                         required
@@ -116,10 +160,14 @@ function ChangePasswordPage() {
                     <input
                         type="password"
                         placeholder="Yeni Şifre"
-                        value={newPassword}
+                        value={
+                            newPassword
+                        }
                         onChange={(event) =>
                             setNewPassword(
-                                event.target.value
+                                event
+                                    .target
+                                    .value
                             )
                         }
                         required
@@ -129,10 +177,14 @@ function ChangePasswordPage() {
                     <input
                         type="password"
                         placeholder="Yeni Şifre Tekrar"
-                        value={confirmPassword}
+                        value={
+                            confirmPassword
+                        }
                         onChange={(event) =>
                             setConfirmPassword(
-                                event.target.value
+                                event
+                                    .target
+                                    .value
                             )
                         }
                         required
@@ -153,7 +205,9 @@ function ChangePasswordPage() {
 
                     <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={
+                            isSubmitting
+                        }
                     >
                         {isSubmitting
                             ? "Değiştiriliyor..."

@@ -17,12 +17,17 @@ import ChangePasswordPage from "./pages/ChangePasswordPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
-import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./context/AuthContext";
-import { isAdminOrHR } from "./utils/roleUtils";
+import {
+    useAuth
+} from "./context/AuthContext";
+
+import {
+    isAdminOrHR
+} from "./utils/roleUtils";
 
 function AppContent() {
-    const navigate = useNavigate();
+    const navigate =
+        useNavigate();
 
     const {
         user,
@@ -32,15 +37,25 @@ function AppContent() {
     } = useAuth();
 
     const canManageInterns =
-        isAdminOrHR(user?.role);
+        isAdminOrHR(
+            user?.role
+        );
 
-    const handleLogout = async () => {
-        await logout();
-        navigate("/login");
-    };
+    const handleLogout =
+        async () => {
+            await logout();
+
+            navigate(
+                "/login"
+            );
+        };
 
     if (isLoading) {
-        return <p>Yükleniyor...</p>;
+        return (
+            <p>
+                Yükleniyor...
+            </p>
+        );
     }
 
     if (!isAuthenticated) {
@@ -48,12 +63,16 @@ function AppContent() {
             <Routes>
                 <Route
                     path="/login"
-                    element={<LoginPage />}
+                    element={
+                        <LoginPage />
+                    }
                 />
 
                 <Route
                     path="/register"
-                    element={<RegisterPage />}
+                    element={
+                        <RegisterPage />
+                    }
                 />
 
                 <Route
@@ -69,7 +88,9 @@ function AppContent() {
         );
     }
 
-    if (user?.mustChangePassword) {
+    if (
+        user?.mustChangePassword
+    ) {
         return (
             <Routes>
                 <Route
@@ -131,13 +152,17 @@ function AppContent() {
                     to="/profile"
                     className="nav-user"
                 >
-                    {user?.name} {user?.surname}
+                    {user?.name}{" "}
+                    {user?.surname}
                 </Link>
 
                 {" | "}
 
                 <button
-                    onClick={handleLogout}
+                    type="button"
+                    onClick={
+                        handleLogout
+                    }
                 >
                     Çıkış Yap
                 </button>
@@ -146,16 +171,16 @@ function AppContent() {
             <Routes>
                 <Route
                     path="/"
-                    element={<HomePage />}
+                    element={
+                        <HomePage />
+                    }
                 />
 
                 <Route
                     path="/interns"
                     element={
                         canManageInterns ? (
-                            <ProtectedRoute>
-                                <InternsPage />
-                            </ProtectedRoute>
+                            <InternsPage />
                         ) : (
                             <Navigate
                                 to="/"
@@ -169,9 +194,7 @@ function AppContent() {
                     path="/interns/:id"
                     element={
                         canManageInterns ? (
-                            <ProtectedRoute>
-                                <InternDetailPage />
-                            </ProtectedRoute>
+                            <InternDetailPage />
                         ) : (
                             <Navigate
                                 to="/"
@@ -184,9 +207,7 @@ function AppContent() {
                 <Route
                     path="/tasks"
                     element={
-                        <ProtectedRoute>
-                            <TasksPage />
-                        </ProtectedRoute>
+                        <TasksPage />
                     }
                 />
 
@@ -194,9 +215,7 @@ function AppContent() {
                     path="/departments"
                     element={
                         canManageInterns ? (
-                            <ProtectedRoute>
-                                <DepartmentsPage />
-                            </ProtectedRoute>
+                            <DepartmentsPage />
                         ) : (
                             <Navigate
                                 to="/"
@@ -209,18 +228,14 @@ function AppContent() {
                 <Route
                     path="/profile"
                     element={
-                        <ProtectedRoute>
-                            <ProfilePage />
-                        </ProtectedRoute>
+                        <ProfilePage />
                     }
                 />
 
                 <Route
                     path="/change-password"
                     element={
-                        <ProtectedRoute>
-                            <ChangePasswordPage />
-                        </ProtectedRoute>
+                        <ChangePasswordPage />
                     }
                 />
 

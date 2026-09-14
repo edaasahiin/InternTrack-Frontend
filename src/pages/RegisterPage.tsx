@@ -9,7 +9,8 @@ import {
     useNavigate
 } from "react-router-dom";
 
-import { agent } from "../api/agent";
+import authService from "../services/authService";
+import departmentService from "../services/departmentService";
 
 import type {
     RegisterDto
@@ -29,41 +30,59 @@ interface ApiError extends Error {
 }
 
 function RegisterPage() {
-    const [name, setName] =
-        useState("");
+    const [
+        name,
+        setName
+    ] = useState("");
 
-    const [surname, setSurname] =
-        useState("");
+    const [
+        surname,
+        setSurname
+    ] = useState("");
 
-    const [email, setEmail] =
-        useState("");
+    const [
+        email,
+        setEmail
+    ] = useState("");
 
-    const [password, setPassword] =
-        useState("");
+    const [
+        password,
+        setPassword
+    ] = useState("");
 
-    const [departmentId, setDepartmentId] =
-        useState("");
+    const [
+        departmentId,
+        setDepartmentId
+    ] = useState("");
 
-    const [departments, setDepartments] =
-        useState<Department[]>([]);
+    const [
+        departments,
+        setDepartments
+    ] = useState<Department[]>([]);
 
-    const [message, setMessage] =
-        useState("");
+    const [
+        message,
+        setMessage
+    ] = useState("");
 
-    const [isLoading, setIsLoading] =
-        useState(false);
+    const [
+        isLoading,
+        setIsLoading
+    ] = useState(false);
 
-    const navigate = useNavigate();
+    const navigate =
+        useNavigate();
 
     useEffect(() => {
-        const loadDepartments = async () => {
+        async function loadDepartments() {
             try {
                 const data =
-                    await agent.get<Department[]>(
-                        "/departments"
-                    );
+                    await departmentService
+                        .getAll();
 
-                setDepartments(data);
+                setDepartments(
+                    data ?? []
+                );
             } catch (error) {
                 const apiError =
                     error as ApiError;
@@ -73,49 +92,62 @@ function RegisterPage() {
                     "Departmanlar yüklenemedi."
                 );
             }
-        };
+        }
 
         loadDepartments();
     }, []);
 
-    const handleSubmit = async (
-        event: FormEvent<HTMLFormElement>
-    ) => {
-        event.preventDefault();
+    const handleSubmit =
+        async (
+            event:
+                FormEvent<HTMLFormElement>
+        ) => {
+            event.preventDefault();
 
-        setMessage("");
-        setIsLoading(true);
+            setMessage("");
+            setIsLoading(true);
 
-        const registerDto: RegisterDto = {
-            name,
-            surname,
-            email,
-            password,
-            departmentId: Number(departmentId)
+            const registerDto:
+                RegisterDto = {
+                    name:
+                        name.trim(),
+
+                    surname:
+                        surname.trim(),
+
+                    email:
+                        email.trim(),
+
+                    password,
+
+                    departmentId:
+                        Number(
+                            departmentId
+                        )
+                };
+
+            try {
+                await authService.register(
+                    registerDto
+                );
+
+                navigate(
+                    "/login"
+                );
+            } catch (error) {
+                const apiError =
+                    error as ApiError;
+
+                setMessage(
+                    apiError.message ||
+                    "Kayıt işlemi başarısız."
+                );
+            } finally {
+                setIsLoading(
+                    false
+                );
+            }
         };
-
-        try {
-            await agent.post<
-                unknown,
-                RegisterDto
-            >(
-                "/auth/register",
-                registerDto
-            );
-
-            navigate("/login");
-        } catch (error) {
-            const apiError =
-                error as ApiError;
-
-            setMessage(
-                apiError.message ||
-                "Kayıt işlemi başarısız."
-            );
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     return (
         <div className="login-page">
@@ -127,7 +159,9 @@ function RegisterPage() {
                         alt="Sanko Logo"
                     />
 
-                    <h1>Kayıt Ol</h1>
+                    <h1>
+                        Kayıt Ol
+                    </h1>
 
                     <p>
                         InternTrack stajyer hesabınızı oluşturun.
@@ -136,7 +170,9 @@ function RegisterPage() {
 
                 <form
                     className="login-form"
-                    onSubmit={handleSubmit}
+                    onSubmit={
+                        handleSubmit
+                    }
                 >
                     <div className="login-field">
                         <label htmlFor="name">
@@ -147,10 +183,14 @@ function RegisterPage() {
                             id="name"
                             type="text"
                             placeholder="Adınızı girin"
-                            value={name}
+                            value={
+                                name
+                            }
                             onChange={(event) =>
                                 setName(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             required
@@ -166,10 +206,14 @@ function RegisterPage() {
                             id="surname"
                             type="text"
                             placeholder="Soyadınızı girin"
-                            value={surname}
+                            value={
+                                surname
+                            }
                             onChange={(event) =>
                                 setSurname(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             required
@@ -185,10 +229,14 @@ function RegisterPage() {
                             id="email"
                             type="email"
                             placeholder="ornek@email.com"
-                            value={email}
+                            value={
+                                email
+                            }
                             onChange={(event) =>
                                 setEmail(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             required
@@ -204,10 +252,14 @@ function RegisterPage() {
                             id="password"
                             type="password"
                             placeholder="En az 6 karakter"
-                            value={password}
+                            value={
+                                password
+                            }
                             onChange={(event) =>
                                 setPassword(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             required
@@ -222,10 +274,14 @@ function RegisterPage() {
 
                         <select
                             id="department"
-                            value={departmentId}
+                            value={
+                                departmentId
+                            }
                             onChange={(event) =>
                                 setDepartmentId(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 )
                             }
                             required
@@ -235,12 +291,20 @@ function RegisterPage() {
                             </option>
 
                             {departments.map(
-                                (department) => (
+                                (
+                                    department
+                                ) => (
                                     <option
-                                        key={department.id}
-                                        value={department.id}
+                                        key={
+                                            department.id
+                                        }
+                                        value={
+                                            department.id
+                                        }
                                     >
-                                        {department.name}
+                                        {
+                                            department.name
+                                        }
                                     </option>
                                 )
                             )}
@@ -256,7 +320,9 @@ function RegisterPage() {
                     <button
                         className="login-button"
                         type="submit"
-                        disabled={isLoading}
+                        disabled={
+                            isLoading
+                        }
                     >
                         {isLoading
                             ? "Kayıt oluşturuluyor..."
@@ -265,6 +331,7 @@ function RegisterPage() {
 
                     <div className="auth-link">
                         Zaten hesabın var mı?{" "}
+
                         <Link to="/login">
                             Giriş Yap
                         </Link>

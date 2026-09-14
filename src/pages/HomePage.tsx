@@ -3,11 +3,19 @@ import {
     useState
 } from "react";
 
-import { Link } from "react-router-dom";
+import {
+    Link
+} from "react-router-dom";
 
-import { agent } from "../api/agent";
-import { useAuth } from "../context/AuthContext";
-import { isAdminOrHR } from "../utils/roleUtils";
+import dashboardService from "../services/dashboardService";
+
+import {
+    useAuth
+} from "../context/AuthContext";
+
+import {
+    isAdminOrHR
+} from "../utils/roleUtils";
 
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
@@ -19,43 +27,55 @@ import type {
 import sankoLogo from "../assets/sanko-logo.png";
 
 function HomePage() {
-    const { user } = useAuth();
+    const { user } =
+        useAuth();
 
     const canManage =
-        isAdminOrHR(user?.role);
+        isAdminOrHR(
+            user?.role
+        );
 
-    const [stats, setStats] =
-        useState<DashboardStats>({
-            internCount: 0,
-            taskCount: 0,
-            toDoTaskCount: 0,
-            inProgressTaskCount: 0,
-            completedTaskCount: 0,
-            overdueTaskCount: 0,
-            departmentCount: 0
-        });
+    const [
+        stats,
+        setStats
+    ] = useState<DashboardStats>({
+        internCount: 0,
+        taskCount: 0,
+        toDoTaskCount: 0,
+        inProgressTaskCount: 0,
+        completedTaskCount: 0,
+        overdueTaskCount: 0,
+        departmentCount: 0
+    });
 
-    const [isLoading, setIsLoading] =
-        useState(true);
+    const [
+        isLoading,
+        setIsLoading
+    ] = useState(true);
 
-    const [message, setMessage] =
-        useState("");
+    const [
+        message,
+        setMessage
+    ] = useState("");
 
     useEffect(() => {
         async function loadDashboard() {
             try {
                 const data =
-                    await agent.get<DashboardStats>(
-                        "/dashboard"
-                    );
+                    await dashboardService
+                        .getStats();
 
-                setStats(data);
+                setStats(
+                    data
+                );
             } catch {
                 setMessage(
                     "Dashboard bilgileri yüklenemedi."
                 );
             } finally {
-                setIsLoading(false);
+                setIsLoading(
+                    false
+                );
             }
         }
 
@@ -91,8 +111,12 @@ function HomePage() {
             </h2>
 
             <AlertMessage
-                message={message}
-                isError={true}
+                message={
+                    message
+                }
+                isError={
+                    true
+                }
             />
 
             {isLoading ? (
@@ -106,7 +130,9 @@ function HomePage() {
                         >
                             <div className="dashboard-card">
                                 <h3>
-                                    {stats.internCount}
+                                    {
+                                        stats.internCount
+                                    }
                                 </h3>
 
                                 <p>
@@ -122,7 +148,9 @@ function HomePage() {
                     >
                         <div className="dashboard-card">
                             <h3>
-                                {stats.taskCount}
+                                {
+                                    stats.taskCount
+                                }
                             </h3>
 
                             <p>
@@ -139,7 +167,9 @@ function HomePage() {
                     >
                         <div className="dashboard-card">
                             <h3>
-                                {stats.toDoTaskCount}
+                                {
+                                    stats.toDoTaskCount
+                                }
                             </h3>
 
                             <p>
