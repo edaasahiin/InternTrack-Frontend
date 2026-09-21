@@ -1,16 +1,20 @@
-# React + Vite
+InternTrack Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Replace:
+- src/styles/index.css
+- src/utils/taskMapper.ts
 
-Currently, two official plugins are available:
+Delete:
+- src/interfaces/user.ts
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Why:
+1. Department table had an older !important width block (40% / 170% / 30%)
+   that overrode the later intended 25% / 25% / 50% layout.
+2. taskMapper still defined UpdateTaskDto & { isActive?: boolean } even though
+   UpdateTaskDto already contains isActive?: boolean.
+3. src/interfaces/user.ts is not imported anywhere in src.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+After applying:
+npm run typecheck
+npm run lint
+npm run build

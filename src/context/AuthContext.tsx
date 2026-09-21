@@ -16,9 +16,7 @@ import type {
 
 interface AuthContextType {
     user: AuthUser | null;
-
     isAuthenticated: boolean;
-
     isLoading: boolean;
 
     login: (
@@ -43,24 +41,34 @@ interface AuthProviderProps {
 }
 
 const AuthContext =
-    createContext<
-        AuthContextType | null
-    >(null);
+    createContext<AuthContextType | null>(
+        null
+    );
+
+function createAuthUser(
+    response: AuthUser
+): AuthUser {
+    return {
+        name: response.name,
+        surname: response.surname,
+        avatar: response.avatar,
+        email: response.email,
+        role: response.role,
+        mustChangePassword:
+            response.mustChangePassword
+    };
+}
 
 export function AuthProvider({
     children
 }: AuthProviderProps) {
-    const [
-        user,
-        setUser
-    ] = useState<
-        AuthUser | null
-    >(null);
+    const [user, setUser] =
+        useState<AuthUser | null>(
+            null
+        );
 
-    const [
-        isLoading,
-        setIsLoading
-    ] = useState(true);
+    const [isLoading, setIsLoading] =
+        useState(true);
 
     useEffect(() => {
         async function loadCurrentUser() {
@@ -69,17 +77,11 @@ export function AuthProvider({
                     await authService
                         .getCurrentUser();
 
-                setUser(
-                    currentUser
-                );
+                setUser(currentUser);
             } catch {
-                setUser(
-                    null
-                );
+                setUser(null);
             } finally {
-                setIsLoading(
-                    false
-                );
+                setIsLoading(false);
             }
         }
 
@@ -89,30 +91,10 @@ export function AuthProvider({
     const login = (
         loginResponse: AuthUser
     ) => {
-        const userData:
-            AuthUser = {
-                name:
-                    loginResponse.name,
-
-                surname:
-                    loginResponse.surname,
-
-                avatar:
-                    loginResponse.avatar,
-
-                email:
-                    loginResponse.email,
-
-                role:
-                    loginResponse.role,
-
-                mustChangePassword:
-                    loginResponse
-                        .mustChangePassword
-            };
-
         setUser(
-            userData
+            createAuthUser(
+                loginResponse
+            )
         );
     };
 
@@ -126,26 +108,18 @@ export function AuthProvider({
                 };
 
             await authService
-                .updateAvatar(
-                    dto
-                );
+                .updateAvatar(dto);
 
-            setUser(
-                (
-                    currentUser
-                ) => {
-                    if (
-                        !currentUser
-                    ) {
-                        return null;
-                    }
-
-                    return {
-                        ...currentUser,
-                        avatar
-                    };
+            setUser((currentUser) => {
+                if (!currentUser) {
+                    return null;
                 }
-            );
+
+                return {
+                    ...currentUser,
+                    avatar
+                };
+            });
         };
 
     const updateProfile =
@@ -162,46 +136,33 @@ export function AuthProvider({
                 };
 
             await authService
-                .updateProfile(
-                    dto
-                );
+                .updateProfile(dto);
 
-            setUser(
-                (
-                    currentUser
-                ) => {
-                    if (
-                        !currentUser
-                    ) {
-                        return null;
-                    }
-
-                    return {
-                        ...currentUser,
-                        name,
-                        surname,
-                        email
-                    };
+            setUser((currentUser) => {
+                if (!currentUser) {
+                    return null;
                 }
-            );
+
+                return {
+                    ...currentUser,
+                    name,
+                    surname,
+                    email
+                };
+            });
         };
 
     const logout =
         async () => {
             try {
-                await authService
-                    .logout();
+                await authService.logout();
             } finally {
-                setUser(
-                    null
-                );
+                setUser(null);
             }
         };
 
     const isAuthenticated =
-        Boolean(
-            user
-        );
+        user !== null;
 
     return (
         <AuthContext.Provider
@@ -222,9 +183,7 @@ export function AuthProvider({
 
 export function useAuth() {
     const context =
-        useContext(
-            AuthContext
-        );
+        useContext(AuthContext);
 
     if (!context) {
         throw new Error(

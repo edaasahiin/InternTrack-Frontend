@@ -6,25 +6,27 @@ import type {
     UpdateInternDto
 } from "../interfaces/intern";
 
-interface MessageResponse {
-    message?: string;
-}
+import type {
+    MessageResponse
+} from "../interfaces/common";
 
 const internService = {
     getAll(): Promise<Intern[]> {
-        return apiService.get<
-            Intern[]
-        >(
+        return apiService.get<Intern[]>(
             "/interns"
+        );
+    },
+
+    getAllIncludingInactive(): Promise<Intern[]> {
+        return apiService.get<Intern[]>(
+            "/interns/all"
         );
     },
 
     getById(
         id: number
     ): Promise<Intern> {
-        return apiService.get<
-            Intern
-        >(
+        return apiService.get<Intern>(
             `/interns/${id}`
         );
     },
@@ -59,6 +61,14 @@ const internService = {
     ): Promise<void> {
         return apiService.delete<void>(
             `/interns/${id}`
+        );
+    },
+
+    restore(
+        id: number
+    ): Promise<MessageResponse> {
+        return apiService.patch<MessageResponse>(
+            `/interns/${id}/restore`
         );
     }
 };

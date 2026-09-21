@@ -23,6 +23,13 @@ import {
 } from "../utils/roleUtils";
 
 import {
+    matchesActiveFilter,
+    normalizeSearchText,
+    shouldIncludeInactive,
+    type ActiveFilter
+} from "../utils/activeFilter";
+
+import {
     getErrorMessage
 } from "../utils/getErrorMessage";
 
@@ -50,6 +57,13 @@ function InternsPage() {
         searchText,
         setSearchText
     ] = useState("");
+
+    const [
+        activeFilter,
+        setActiveFilter
+    ] = useState<ActiveFilter>(
+        "Active"
+    );
 
     const [
         isLoading,
@@ -89,8 +103,13 @@ function InternsPage() {
             user?.role
         );
 
+    const isAdmin =
+        user?.role === "Admin";
+
     async function loadInterns(
-        showLoading = true
+        showLoading = true,
+        selectedActiveFilter =
+            activeFilter
     ) {
         if (showLoading) {
             setIsLoading(
@@ -102,8 +121,18 @@ function InternsPage() {
         setIsError(false);
 
         try {
+            const includeInactive =
+                shouldIncludeInactive(
+                    isAdmin,
+                    selectedActiveFilter
+                );
+
             const data =
-                await internService.getAll();
+                includeInactive
+                    ? await internService
+                        .getAllIncludingInactive()
+                    : await internService
+                        .getAll();
 
             setInterns(
                 data ?? []
@@ -135,7 +164,8 @@ function InternsPage() {
 
         try {
             const data =
-                await departmentService.getAll();
+                await departmentService
+                    .getAll();
 
             setDepartments(
                 data ?? []
@@ -153,6 +183,19 @@ function InternsPage() {
                 false
             );
         }
+    }
+
+    async function handleActiveFilterChange(
+        newFilter: ActiveFilter
+    ) {
+        setActiveFilter(
+            newFilter
+        );
+
+        await loadInterns(
+            true,
+            newFilter
+        );
     }
 
     async function openInternForm() {
@@ -182,7 +225,10 @@ function InternsPage() {
     ) {
         setMessage("");
         setIsError(false);
-        setIsSubmitting(true);
+
+        setIsSubmitting(
+            true
+        );
 
         try {
             const data =
@@ -215,23 +261,39 @@ function InternsPage() {
         }
     }
 
-    async function handleDeleteIntern(
+    async function handleToggleInternActive(
         intern: Intern
     ) {
+        if (!isAdmin) {
+            return;
+        }
+
         setMessage("");
         setIsError(false);
 
         try {
-            await internService.delete(
-                intern.id
-            );
+            const data =
+                intern.isActive
+                    ? await internService
+                        .delete(
+                            intern.id
+                        )
+                    : await internService
+                        .restore(
+                            intern.id
+                        );
 
             await loadInterns(
                 false
             );
 
             setMessage(
-                "Stajyer başarıyla silindi."
+                data?.message ||
+                (
+                    intern.isActive
+                        ? "Stajyer pasif hale getirildi."
+                        : "Stajyer tekrar aktif hale getirildi."
+                )
             );
         } catch (error) {
             setIsError(true);
@@ -248,49 +310,67 @@ function InternsPage() {
         loadInterns();
     }, []);
 
+    const normalizedSearch =
+        normalizeSearchText(
+            searchText
+        );
+
     const filteredInterns =
         interns.filter(
             (intern) => {
-                const search =
-                    searchText
-                        .trim()
-                        .toLowerCase();
-
-                if (!search) {
-                    return true;
-                }
-
-                return (
+                const matchesSearch =
+                    !normalizedSearch ||
                     intern.name
                         .toLowerCase()
                         .includes(
-                            search
+                            normalizedSearch
                         ) ||
                     intern.surname
                         .toLowerCase()
                         .includes(
-                            search
+                            normalizedSearch
                         ) ||
                     intern.email
                         .toLowerCase()
                         .includes(
-                            search
+                            normalizedSearch
                         ) ||
                     intern.department
                         ?.name
                         ?.toLowerCase()
                         .includes(
-                            search
-                        )
+                            normalizedSearch
+                        );
+
+                return (
+                    matchesSearch &&
+                    matchesActiveFilter(
+                        intern.isActive,
+                        activeFilter
+                    )
                 );
             }
         );
 
     return (
         <div className="interns-page">
-            <h2>
-                Stajyerler
-            </h2>
+            <div className="interns-page-heading">
+                <h2>
+                    Stajyerler
+                </h2>
+
+                {canManageInterns && (
+                    <button
+                        type="button"
+                        className="interns-page-add-button"
+                        onClick={
+                            openInternForm
+                        }
+                    >
+                        + Stajyer Ekle
+                    </button>
+                )}
+            </div>
 
             <SearchToolbar
                 title="Stajyer Ara"
@@ -301,14 +381,43 @@ function InternsPage() {
                 onSearchChange={
                     setSearchText
                 }
-                addButtonText="+ Stajyer Ekle"
-                onAdd={
-                    openInternForm
-                }
-                showAddButton={
-                    canManageInterns
-                }
-            />
+                showAddButton={false}
+            >
+                {isAdmin && (
+                    <div className="intern-toolbar-filter">
+                        <label
+                            htmlFor="intern-active-filter"
+                        >
+                            Stajyer Aktifliği
+                        </label>
+
+                        <select
+                            id="intern-active-filter"
+                            value={
+                                activeFilter
+                            }
+                            onChange={(event) =>
+                                handleActiveFilterChange(
+                                    event.target
+                                        .value as ActiveFilter
+                                )
+                            }
+                        >
+                            <option value="Active">
+                                Aktifler
+                            </option>
+
+                            <option value="Inactive">
+                                Pasifler
+                            </option>
+
+                            <option value="All">
+                                Tümü
+                            </option>
+                        </select>
+                    </div>
+                )}
+            </SearchToolbar>
 
             <AlertMessage
                 message={
@@ -326,11 +435,11 @@ function InternsPage() {
                     interns={
                         filteredInterns
                     }
-                    canDelete={
-                        canManageInterns
+                    canToggleActive={
+                        isAdmin
                     }
-                    onDelete={
-                        handleDeleteIntern
+                    onToggleActive={
+                        handleToggleInternActive
                     }
                 />
             )}

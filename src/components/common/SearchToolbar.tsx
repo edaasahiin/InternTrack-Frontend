@@ -32,43 +32,53 @@ function SearchToolbar({
     showAddButton = true,
     children
 }: SearchToolbarProps) {
+    const shouldShowAddButton =
+        showAddButton &&
+        addButtonText &&
+        onAdd;
+
     return (
         <div className="search-toolbar">
-            <div className="search-toolbar-header">
-                <h3>
-                    {title}
-                </h3>
+            {shouldShowAddButton && (
+                <div className="search-toolbar-header">
+                    <div />
 
-                {showAddButton &&
-                    addButtonText &&
-                    onAdd && (
-                        <button
-                            type="button"
-                            className="search-toolbar-add-button"
-                            onClick={
-                                onAdd
-                            }
-                        >
-                            {addButtonText}
-                        </button>
-                    )}
-            </div>
+                    <button
+                        type="button"
+                        className="search-toolbar-add-button"
+                        onClick={
+                            onAdd
+                        }
+                    >
+                        {addButtonText}
+                    </button>
+                </div>
+            )}
 
             <div className="search-toolbar-controls">
-                <input
-                    type="text"
-                    placeholder={
-                        searchPlaceholder
-                    }
-                    value={
-                        searchValue
-                    }
-                    onChange={(event) =>
-                        onSearchChange(
-                            event.target.value
-                        )
-                    }
-                />
+                <div className="search-toolbar-search-field">
+                    <label
+                        htmlFor="search-toolbar-input"
+                    >
+                        {title}
+                    </label>
+
+                    <input
+                        id="search-toolbar-input"
+                        type="text"
+                        placeholder={
+                            searchPlaceholder
+                        }
+                        value={
+                            searchValue
+                        }
+                        onChange={(event) =>
+                            onSearchChange(
+                                event.target.value
+                            )
+                        }
+                    />
+                </div>
 
                 {children}
             </div>

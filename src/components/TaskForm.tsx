@@ -1,37 +1,91 @@
 import {
+    useEffect,
     useState,
     type FormEvent
 } from "react";
 
+import ErrorModal from "./ErrorModal";
+
 import type {
-    CreateTaskDto
+    CreateTaskDto,
+    TaskItem
 } from "../interfaces/task";
 
 import type {
     Intern
 } from "../interfaces/intern";
 
+type TaskFormMode =
+    | "create"
+    | "edit";
+
+export interface TaskFormData
+    extends CreateTaskDto {
+    isActive?: boolean;
+}
+
 interface TaskFormProps {
     interns: Intern[];
-
     canAssignIntern: boolean;
-
+    canChangeActive?: boolean;
     fixedInternId?: number;
-
     isSubmitting: boolean;
+    mode?: TaskFormMode;
+    initialTask?: TaskItem | null;
 
     onSubmit: (
-        task: CreateTaskDto
+        task: TaskFormData
     ) => Promise<void> | void;
+}
+
+const DEFAULT_STATUS = "ToDo";
+const DEFAULT_PRIORITY = "Medium";
+
+function toDateTimeLocalValue(
+    value?: string | null
+): string {
+    if (!value) {
+        return "";
+    }
+
+    const hasTimezone =
+        value.endsWith("Z") ||
+        /[+-]\d{2}:\d{2}$/.test(value);
+
+    const date =
+        new Date(
+            hasTimezone
+                ? value
+                : `${value}Z`
+        );
+
+    const offset =
+        date.getTimezoneOffset();
+
+    const localDate =
+        new Date(
+            date.getTime() -
+                offset * 60 * 1000
+        );
+
+    return localDate
+        .toISOString()
+        .slice(0, 16);
 }
 
 function TaskForm({
     interns,
     canAssignIntern,
+    canChangeActive = false,
     fixedInternId,
     isSubmitting,
+    mode = "create",
+    initialTask = null,
     onSubmit
 }: TaskFormProps) {
+    const isEditMode =
+        mode === "edit";
+
     const hasFixedIntern =
         fixedInternId !== undefined;
 
@@ -48,12 +102,16 @@ function TaskForm({
     const [
         status,
         setStatus
-    ] = useState("ToDo");
+    ] = useState(
+        DEFAULT_STATUS
+    );
 
     const [
         priority,
         setPriority
-    ] = useState("Medium");
+    ] = useState(
+        DEFAULT_PRIORITY
+    );
 
     const [
         dueDate,
@@ -70,29 +128,163 @@ function TaskForm({
         setCanInternDeleteWhenCompleted
     ] = useState(false);
 
-    async function handleSubmit(
-        event: FormEvent<HTMLFormElement>
+    const [
+        isActive,
+        setIsActive
+    ] = useState(true);
+
+    const [
+        validationMessage,
+        setValidationMessage
+    ] = useState("");
+
+    function resetForm() {
+        setTitle("");
+        setDescription("");
+        setStatus(
+            DEFAULT_STATUS
+        );
+        setPriority(
+            DEFAULT_PRIORITY
+        );
+        setDueDate("");
+        setInternId("");
+        setCanInternDeleteWhenCompleted(
+            false
+        );
+        setIsActive(true);
+        setValidationMessage("");
+    }
+
+    function populateForm(
+        task: TaskItem
     ) {
-        event.preventDefault();
+        setTitle(task.title);
 
-        const selectedInternId =
-            hasFixedIntern
-                ? fixedInternId
-                : canAssignIntern
-                    ? Number(
-                        internId
-                    )
-                    : 0;
+        setDescription(
+            task.description ?? ""
+        );
 
-        const dueDateUtc =
-            dueDate
-                ? new Date(
-                    dueDate
-                ).toISOString()
-                : null;
+        setStatus(task.status);
+        setPriority(task.priority);
 
-        const newTask:
-            CreateTaskDto = {
+        setDueDate(
+            toDateTimeLocalValue(
+                task.dueDate
+            )
+        );
+
+        setInternId(
+            String(task.internId)
+        );
+
+        setCanInternDeleteWhenCompleted(
+            task.canInternDeleteWhenCompleted
+        );
+
+        setIsActive(
+            task.isActive
+        );
+
+        setValidationMessage("");
+    }
+
+    useEffect(() => {
+        if (
+            isEditMode &&
+            initialTask
+        ) {
+            populateForm(
+                initialTask
+            );
+
+            return;
+        }
+
+        resetForm();
+    }, [
+        isEditMode,
+        initialTask
+    ]);
+
+    function isDueDateInvalid(
+        value: string
+    ): boolean {
+        if (!value) {
+            return false;
+        }
+
+        const initialDueDate =
+            isEditMode
+                ? toDateTimeLocalValue(
+                    initialTask?.dueDate
+                )
+                : "";
+
+        const dueDateChanged =
+            !isEditMode ||
+            value !== initialDueDate;
+
+        if (!dueDateChanged) {
+            return false;
+        }
+
+        return (
+            new Date(
+                value
+            ).getTime() <
+            Date.now()
+        );
+    }
+
+    function validateDueDate(
+        value: string
+    ): boolean {
+        if (!value) {
+            setValidationMessage("");
+
+            return true;
+        }
+
+        if (
+            isDueDateInvalid(
+                value
+            )
+        ) {
+            setValidationMessage(
+                "Son teslim tarihi geçmiş bir tarih ve saat olamaz."
+            );
+
+            return false;
+        }
+
+        setValidationMessage("");
+
+        return true;
+    }
+
+    function getSelectedInternId():
+        number {
+        if (hasFixedIntern) {
+            return fixedInternId;
+        }
+
+        if (canAssignIntern) {
+            return Number(
+                internId
+            );
+        }
+
+        return (
+            initialTask?.internId ??
+            0
+        );
+    }
+
+    function createTaskData():
+        TaskFormData {
+        const task:
+            TaskFormData = {
                 title:
                     title.trim(),
 
@@ -104,204 +296,404 @@ function TaskForm({
                 priority,
 
                 dueDate:
-                    dueDateUtc,
+                    dueDate
+                        ? new Date(
+                            dueDate
+                        ).toISOString()
+                        : null,
 
                 internId:
-                    selectedInternId,
+                    getSelectedInternId(),
 
                 canInternDeleteWhenCompleted:
                     canAssignIntern
                         ? canInternDeleteWhenCompleted
-                        : false
+                        : initialTask
+                            ?.canInternDeleteWhenCompleted ??
+                            false
             };
 
+        if (
+            isEditMode &&
+            canChangeActive
+        ) {
+            task.isActive =
+                isActive;
+        }
+
+        return task;
+    }
+
+    async function handleSubmit(
+        event: FormEvent<HTMLFormElement>
+    ) {
+        event.preventDefault();
+
+        if (
+            !validateDueDate(
+                dueDate
+            )
+        ) {
+            return;
+        }
+
+        if (!title.trim()) {
+            setValidationMessage(
+                "Görev başlığı zorunludur."
+            );
+
+            return;
+        }
+
+        if (
+            canAssignIntern &&
+            !hasFixedIntern &&
+            !internId
+        ) {
+            setValidationMessage(
+                "Lütfen bir stajyer seçin."
+            );
+
+            return;
+        }
+
+        setValidationMessage("");
+
         await onSubmit(
-            newTask
+            createTaskData()
         );
     }
 
+    function handleDueDateChange(
+        value: string
+    ) {
+        if (
+            isDueDateInvalid(
+                value
+            )
+        ) {
+            setValidationMessage(
+                "Son teslim tarihi geçmiş bir tarih ve saat olamaz."
+            );
+
+            return;
+        }
+
+        setDueDate(value);
+        setValidationMessage("");
+    }
+
+    function getSubmitButtonText():
+        string {
+        if (isSubmitting) {
+            return isEditMode
+                ? "Güncelleniyor..."
+                : "Ekleniyor...";
+        }
+
+        return isEditMode
+            ? "Değişiklikleri Kaydet"
+            : "Görev Ekle";
+    }
+
     return (
-        <form
-            onSubmit={
-                handleSubmit
-            }
-        >
-            <input
-                placeholder="Görev Başlığı"
-                value={
-                    title
+        <>
+            <ErrorModal
+                message={
+                    validationMessage
                 }
-                onChange={(event) =>
-                    setTitle(
-                        event
-                            .target
-                            .value
-                    )
-                }
-                required
-            />
-
-            <input
-                placeholder="Açıklama"
-                value={
-                    description
-                }
-                onChange={(event) =>
-                    setDescription(
-                        event
-                            .target
-                            .value
-                    )
+                onClose={() =>
+                    setValidationMessage("")
                 }
             />
 
-            <select
-                value={
-                    status
+            <form
+                className="task-form"
+                onSubmit={
+                    handleSubmit
                 }
-                onChange={(event) =>
-                    setStatus(
-                        event
-                            .target
-                            .value
-                    )
-                }
+                noValidate
             >
-                <option value="ToDo">
-                    Yapılacak
-                </option>
+                <div className="task-form-grid">
+                    <div className="task-form-field">
+                        <label
+                            htmlFor="task-title"
+                        >
+                            Başlık
+                        </label>
 
-                <option value="InProgress">
-                    Devam Ediyor
-                </option>
+                        <input
+                            id="task-title"
+                            type="text"
+                            placeholder="Görev başlığı"
+                            value={title}
+                            onChange={(event) =>
+                                setTitle(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
 
-                <option value="Done">
-                    Tamamlandı
-                </option>
-            </select>
+                    <div className="task-form-field">
+                        <label
+                            htmlFor="task-description"
+                        >
+                            Açıklama
+                        </label>
 
-            <select
-                value={
-                    priority
-                }
-                onChange={(event) =>
-                    setPriority(
-                        event
-                            .target
-                            .value
-                    )
-                }
-            >
-                <option value="Low">
-                    Düşük Öncelik
-                </option>
+                        <input
+                            id="task-description"
+                            type="text"
+                            placeholder="Görev açıklaması"
+                            value={
+                                description
+                            }
+                            onChange={(event) =>
+                                setDescription(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
 
-                <option value="Medium">
-                    Orta Öncelik
-                </option>
+                    <div className="task-form-field">
+                        <label
+                            htmlFor="task-status"
+                        >
+                            Görev Durumu
+                        </label>
 
-                <option value="High">
-                    Yüksek Öncelik
-                </option>
-            </select>
+                        <select
+                            id="task-status"
+                            value={status}
+                            onChange={(event) =>
+                                setStatus(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="ToDo">
+                                Yapılacak
+                            </option>
 
-            <div className="task-due-date-field">
-                <label
-                    htmlFor="task-due-date"
-                >
-                    Son Teslim Tarihi
-                </label>
+                            <option value="InProgress">
+                                Devam Ediyor
+                            </option>
 
-                <input
-                    id="task-due-date"
-                    type="datetime-local"
-                    value={
-                        dueDate
-                    }
-                    onChange={(event) =>
-                        setDueDate(
-                            event
-                                .target
-                                .value
-                        )
-                    }
-                />
-            </div>
+                            <option value="Done">
+                                Tamamlandı
+                            </option>
+                        </select>
+                    </div>
 
-            {canAssignIntern &&
-                !hasFixedIntern && (
-                    <select
-                        value={
-                            internId
-                        }
-                        onChange={(event) =>
-                            setInternId(
-                                event
-                                    .target
-                                    .value
-                            )
-                        }
-                        required
-                    >
-                        <option value="">
-                            Stajyer Seç
-                        </option>
+                    <div className="task-form-field">
+                        <label
+                            htmlFor="task-priority"
+                        >
+                            Öncelik
+                        </label>
 
-                        {interns.map(
-                            (
-                                intern
-                            ) => (
-                                <option
-                                    key={
-                                        intern.id
-                                    }
-                                    value={
-                                        intern.id
+                        <select
+                            id="task-priority"
+                            value={
+                                priority
+                            }
+                            onChange={(event) =>
+                                setPriority(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="Low">
+                                Düşük Öncelik
+                            </option>
+
+                            <option value="Medium">
+                                Orta Öncelik
+                            </option>
+
+                            <option value="High">
+                                Yüksek Öncelik
+                            </option>
+                        </select>
+                    </div>
+
+                    {isEditMode && (
+                        <div className="task-form-status-action">
+                            {status === "ToDo" && (
+                                <button
+                                    type="button"
+                                    className="task-start-button"
+                                    onClick={() =>
+                                        setStatus(
+                                            "InProgress"
+                                        )
                                     }
                                 >
-                                    {
-                                        intern.name
-                                    }{" "}
-                                    {
-                                        intern.surname
+                                    Başlat
+                                </button>
+                            )}
+
+                            {status ===
+                                "InProgress" && (
+                                <button
+                                    type="button"
+                                    className="task-complete-button"
+                                    onClick={() =>
+                                        setStatus(
+                                            "Done"
+                                        )
                                     }
-                                </option>
-                            )
+                                >
+                                    Tamamlandı
+                                </button>
+                            )}
+
+                            {status === "Done" && (
+                                <span className="task-form-completed-badge">
+                                    ✓ Görev Tamamlandı
+                                </span>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="task-form-field">
+                        <label
+                            htmlFor="task-due-date"
+                        >
+                            Son Teslim Tarihi
+                        </label>
+
+                        <input
+                            id="task-due-date"
+                            type="datetime-local"
+                            value={dueDate}
+                            onChange={(event) =>
+                                handleDueDateChange(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
+
+                    {canAssignIntern &&
+                        !hasFixedIntern && (
+                            <div className="task-form-field">
+                                <label
+                                    htmlFor="task-intern"
+                                >
+                                    Stajyer
+                                </label>
+
+                                <select
+                                    id="task-intern"
+                                    value={
+                                        internId
+                                    }
+                                    onChange={(event) =>
+                                        setInternId(
+                                            event.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="">
+                                        Stajyer Seç
+                                    </option>
+
+                                    {interns.map(
+                                        (intern) => (
+                                            <option
+                                                key={
+                                                    intern.id
+                                                }
+                                                value={
+                                                    intern.id
+                                                }
+                                            >
+                                                {
+                                                    intern.name
+                                                }{" "}
+                                                {
+                                                    intern.surname
+                                                }
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
                         )}
-                    </select>
+
+                    {isEditMode &&
+                        canChangeActive && (
+                            <div className="task-form-field">
+                                <label
+                                    htmlFor="task-active-status"
+                                >
+                                    Görev Aktifliği
+                                </label>
+
+                                <select
+                                    id="task-active-status"
+                                    value={
+                                        isActive
+                                            ? "active"
+                                            : "inactive"
+                                    }
+                                    onChange={(event) =>
+                                        setIsActive(
+                                            event.target.value ===
+                                                "active"
+                                        )
+                                    }
+                                >
+                                    <option value="active">
+                                        Aktif
+                                    </option>
+
+                                    <option value="inactive">
+                                        Pasif
+                                    </option>
+                                </select>
+                            </div>
+                        )}
+                </div>
+
+                {canAssignIntern && (
+                    <label className="task-delete-permission task-form-checkbox">
+                        <input
+                            type="checkbox"
+                            checked={
+                                canInternDeleteWhenCompleted
+                            }
+                            onChange={(event) =>
+                                setCanInternDeleteWhenCompleted(
+                                    event.target.checked
+                                )
+                            }
+                        />
+
+                        <span>
+                            Tamamlandıktan sonra stajyer silebilir
+                        </span>
+                    </label>
                 )}
 
-            {canAssignIntern && (
-                <label className="task-delete-permission">
-                    <input
-                        type="checkbox"
-                        checked={
-                            canInternDeleteWhenCompleted
+                <div className="task-form-footer">
+                    <button
+                        type="submit"
+                        className="task-form-submit-button"
+                        disabled={
+                            isSubmitting
                         }
-                        onChange={(event) =>
-                            setCanInternDeleteWhenCompleted(
-                                event
-                                    .target
-                                    .checked
-                            )
+                    >
+                        {
+                            getSubmitButtonText()
                         }
-                    />
-
-                    Tamamlandıktan sonra stajyer silebilir
-                </label>
-            )}
-
-            <button
-                type="submit"
-                disabled={
-                    isSubmitting
-                }
-            >
-                {isSubmitting
-                    ? "Ekleniyor..."
-                    : "Görev Ekle"}
-            </button>
-        </form>
+                    </button>
+                </div>
+            </form>
+        </>
     );
 }
 

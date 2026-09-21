@@ -6,10 +6,20 @@ import axios, {
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL;
 
-export interface ApiError
-    extends Error {
+const AUTH_ENDPOINTS_WITHOUT_REFRESH = [
+    "/auth/login",
+    "/auth/refresh",
+    "/auth/logout"
+];
+
+export interface ApiErrorData {
+    message?: string;
+    errors?: Record<string, string[]>;
+}
+
+export interface ApiError extends Error {
     status: number;
-    data: unknown;
+    data: ApiErrorData | null;
 }
 
 interface RetryRequestConfig
@@ -17,74 +27,88 @@ interface RetryRequestConfig
     _retry?: boolean;
 }
 
-interface ErrorResponse {
-    message?: string;
-}
-
 function createApiError(
     error: unknown
 ): ApiError {
-    if (
-        axios.isAxiosError(
-            error
-        )
-    ) {
-        const axiosError =
-            error as AxiosError<
-                ErrorResponse
-            >;
-
-        const status =
-            axiosError.response
-                ?.status ?? 0;
-
-        const data =
-            axiosError.response
-                ?.data ?? null;
-
-        const message =
-            axiosError.response
-                ?.data
-                ?.message ||
-            (
-                status === 0
-                    ? "Sunucuya bağlanılamadı."
-                    : "İşlem gerçekleştirilemedi."
-            );
-
-        const apiError =
-            new Error(
-                message
-            ) as ApiError;
-
-        apiError.status =
-            status;
-
-        apiError.data =
-            data;
-
-        return apiError;
+    if (!axios.isAxiosError(error)) {
+        return createError(
+            "Beklenmeyen bir hata oluştu.",
+            0,
+            null
+        );
     }
 
-    const apiError =
-        new Error(
-            "Beklenmeyen bir hata oluştu."
-        ) as ApiError;
+    const axiosError =
+        error as AxiosError<ApiErrorData>;
 
-    apiError.status = 0;
-    apiError.data = null;
+    const status =
+        axiosError.response?.status ?? 0;
 
-    return apiError;
+    const data =
+        axiosError.response?.data ?? null;
+
+    const message =
+        data?.message ??
+        (
+            status === 0
+                ? "Sunucuya bağlanılamadı."
+                : "İşlem gerçekleştirilemedi."
+        );
+
+    return createError(
+        message,
+        status,
+        data
+    );
+}
+
+function createError(
+    message: string,
+    status: number,
+    data: ApiErrorData | null
+): ApiError {
+    const error =
+        new Error(message) as ApiError;
+
+    error.status = status;
+    error.data = data;
+
+    return error;
+}
+
+function isRefreshExcludedEndpoint(
+    endpoint: string
+): boolean {
+    return AUTH_ENDPOINTS_WITHOUT_REFRESH
+        .some((authEndpoint) =>
+            endpoint.includes(authEndpoint)
+        );
+}
+
+function shouldRefreshRequest(
+    status: number | undefined,
+    request: RetryRequestConfig | undefined
+): request is RetryRequestConfig {
+    if (
+        status !== 401 ||
+        !request ||
+        request._retry
+    ) {
+        return false;
+    }
+
+    const endpoint =
+        request.url ?? "";
+
+    return !isRefreshExcludedEndpoint(
+        endpoint
+    );
 }
 
 const axiosClient =
     axios.create({
-        baseURL:
-            API_BASE_URL,
-
-        withCredentials:
-            true,
-
+        baseURL: API_BASE_URL,
+        withCredentials: true,
         headers: {
             "Content-Type":
                 "application/json"
@@ -95,26 +119,31 @@ let refreshPromise:
     Promise<void> | null =
     null;
 
-async function refreshToken() {
+async function refreshToken(): Promise<void> {
     await axiosClient.post(
         "/auth/refresh"
     );
 }
 
-axiosClient.interceptors.response.use(
-    (response) =>
-        response,
+function getRefreshPromise(): Promise<void> {
+    if (!refreshPromise) {
+        refreshPromise =
+            refreshToken()
+                .finally(() => {
+                    refreshPromise = null;
+                });
+    }
 
-    async (error) => {
-        if (
-            !axios.isAxiosError(
-                error
-            )
-        ) {
+    return refreshPromise;
+}
+
+axiosClient.interceptors.response.use(
+    (response) => response,
+
+    async (error: unknown) => {
+        if (!axios.isAxiosError(error)) {
             return Promise.reject(
-                createApiError(
-                    error
-                )
+                createApiError(error)
             );
         }
 
@@ -126,69 +155,32 @@ axiosClient.interceptors.response.use(
         const status =
             error.response?.status;
 
-        const endpoint =
-            originalRequest?.url ??
-            "";
-
-        const isLoginRequest =
-            endpoint.includes(
-                "/auth/login"
-            );
-
-        const isRefreshRequest =
-            endpoint.includes(
-                "/auth/refresh"
-            );
-
-        const shouldRefresh =
-            status === 401 &&
-            originalRequest &&
-            !originalRequest._retry &&
-            !isLoginRequest &&
-            !isRefreshRequest;
-
         if (
-            shouldRefresh &&
-            originalRequest
+            !shouldRefreshRequest(
+                status,
+                originalRequest
+            )
         ) {
-            originalRequest._retry =
-                true;
-
-            try {
-                if (
-                    !refreshPromise
-                ) {
-                    refreshPromise =
-                        refreshToken()
-                            .finally(
-                                () => {
-                                    refreshPromise =
-                                        null;
-                                }
-                            );
-                }
-
-                await refreshPromise;
-
-                return axiosClient(
-                    originalRequest
-                );
-            } catch (
-                refreshError
-            ) {
-                return Promise.reject(
-                    createApiError(
-                        refreshError
-                    )
-                );
-            }
+            return Promise.reject(
+                createApiError(error)
+            );
         }
 
-        return Promise.reject(
-            createApiError(
-                error
-            )
-        );
+        originalRequest._retry = true;
+
+        try {
+            await getRefreshPromise();
+
+            return axiosClient(
+                originalRequest
+            );
+        } catch (refreshError) {
+            return Promise.reject(
+                createApiError(
+                    refreshError
+                )
+            );
+        }
     }
 );
 

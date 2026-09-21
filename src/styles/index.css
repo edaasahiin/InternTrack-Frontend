@@ -1,0 +1,4832 @@
+body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    background: #eef2f7;
+    color: #1f2937;
+}
+
+#root {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+
+/* NAVBAR */
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #0f2a7a;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 9px 14px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+nav a:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.nav-user {
+    color: white;
+    font-weight: 600;
+    padding: 9px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* BAŞLIKLAR */
+
+h1 {
+    font-size: 36px;
+    margin: 0 0 8px 0;
+    color: #0f2a7a;
+}
+
+h2 {
+    font-size: 27px;
+    margin-top: 34px;
+    margin-bottom: 22px;
+}
+
+h3 {
+    margin-top: 0;
+    color: #1f2937;
+}
+
+p {
+    color: #64748b;
+}
+
+
+/* ANA SAYFA HERO */
+
+.hero {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 35px;
+}
+
+.company-logo {
+    width: 180px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+
+/* DASHBOARD */
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.dashboard-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+}
+
+.dashboard-card {
+    height: 100%;
+    min-height: 120px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: white;
+    padding: 26px;
+    border-radius: 16px;
+    border-top: 4px solid #0f2a7a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.dashboard-card h3 {
+    margin-bottom: 10px;
+}
+
+.dashboard > .dashboard-card h3 {
+    font-size: 32px;
+    line-height: 1;
+    color: #0f2a7a;
+}
+
+.dashboard-card p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.dashboard-card-link .dashboard-card {
+    cursor: pointer;
+}
+
+.dashboard-card-link:hover .dashboard-card {
+    transform: translateY(-5px);
+    border-top-color: #173a9c;
+    box-shadow: 0 12px 30px rgba(15, 42, 122, 0.14);
+}
+
+.dashboard > .dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.09);
+}
+
+
+/* FORMLAR */
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+input,
+select {
+    flex: 1;
+    min-width: 170px;
+    padding: 12px 14px;
+    border: 1px solid #dbe1ea;
+    border-radius: 9px;
+    background: white;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus,
+select:focus {
+    border-color: #0f2a7a;
+    box-shadow: 0 0 0 3px rgba(15, 42, 122, 0.1);
+}
+
+
+/* BUTONLAR */
+
+button {
+    padding: 11px 17px;
+    border: none;
+    border-radius: 9px;
+    background: #0f2a7a;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #173a9c;
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button:disabled:hover {
+    background: #0f2a7a;
+    transform: none;
+}
+
+
+/* LİSTE KARTLARI */
+
+.intern-card,
+.department-card {
+    background: white;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border-left: 4px solid #0f2a7a;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/* STAJYER LİSTE AKSİYONLARI */
+
+.intern-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 9px;
+    background: #e8eefc;
+    color: #0f2a7a;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.detail-link:hover {
+    background: #d8e3fb;
+    transform: translateY(-1px);
+}
+
+
+/* STAJYER DETAY SAYFASI */
+
+.detail-back-link {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 8px;
+    color: #0f2a7a;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.detail-back-link:hover {
+    text-decoration: underline;
+}
+
+.intern-detail-card {
+    background: white;
+    padding: 26px;
+    margin-bottom: 28px;
+    border-radius: 16px;
+    border-left: 5px solid #0f2a7a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.intern-detail-card h3 {
+    margin-bottom: 18px;
+    font-size: 22px;
+    color: #0f2a7a;
+}
+
+.intern-detail-card p {
+    margin: 10px 0;
+}
+
+.intern-detail-card strong {
+    color: #1f2937;
+}
+
+
+/* GÖREV SİLME İZNİ */
+
+.task-delete-permission {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    width: 100%;
+
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.task-delete-permission input {
+    flex: none;
+    min-width: 0;
+    width: 17px;
+    height: 17px;
+    margin: 0;
+}
+
+
+/* GÖREV KARTLARI */
+
+.task-card {
+    position: relative;
+
+    padding: 0;
+    margin-bottom: 8px;
+
+    overflow: hidden;
+
+    background: white;
+
+    border-radius: 12px;
+    border-left:
+        4px solid #0f2a7a;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.task-card:last-child {
+    margin-bottom: 0;
+}
+
+
+/* KUTLAMA ANİMASYONU */
+
+.celebration-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    background:
+        rgba(15, 42, 122, 0.04);
+
+    animation:
+        celebration-overlay-fade
+        2.2s ease forwards;
+}
+
+.celebration-box {
+    position: relative;
+
+    min-width: 280px;
+
+    padding: 28px 36px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 18px 50px
+        rgba(15, 42, 122, 0.22);
+
+    text-align: center;
+
+    animation:
+        celebration-box-pop
+        2.2s ease forwards;
+}
+
+.celebration-title {
+    color: #0f2a7a;
+
+    font-size: 23px;
+    font-weight: 800;
+
+    margin-bottom: 8px;
+}
+
+.celebration-subtitle {
+    color: #64748b;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.celebration-confetti {
+    position: absolute;
+
+    font-size: 24px;
+
+    animation:
+        celebration-confetti-fly
+        1.7s ease-out forwards;
+}
+
+.celebration-confetti-1 {
+    left: 5%;
+    top: 70%;
+}
+
+.celebration-confetti-2 {
+    left: 20%;
+    top: 80%;
+
+    animation-delay: 0.1s;
+}
+
+.celebration-confetti-3 {
+    left: 40%;
+    top: 85%;
+
+    animation-delay: 0.15s;
+}
+
+.celebration-confetti-4 {
+    right: 35%;
+    top: 82%;
+
+    animation-delay: 0.05s;
+}
+
+.celebration-confetti-5 {
+    right: 15%;
+    top: 75%;
+
+    animation-delay: 0.12s;
+}
+
+.celebration-confetti-6 {
+    right: 3%;
+    top: 68%;
+
+    animation-delay: 0.18s;
+}
+
+@keyframes celebration-box-pop {
+    0% {
+        opacity: 0;
+        transform:
+            scale(0.75);
+    }
+
+    15% {
+        opacity: 1;
+        transform:
+            scale(1.08);
+    }
+
+    25% {
+        transform:
+            scale(1);
+    }
+
+    80% {
+        opacity: 1;
+        transform:
+            scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            scale(0.94);
+    }
+}
+
+@keyframes celebration-overlay-fade {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes celebration-confetti-fly {
+    0% {
+        opacity: 0;
+
+        transform:
+            translateY(20px)
+            rotate(0deg)
+            scale(0.5);
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+            translateY(-140px)
+            rotate(220deg)
+            scale(1.25);
+    }
+}
+
+
+/* PROFİL */
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background: white;
+    padding: 28px;
+    border-radius: 18px;
+    border-left: 5px solid #0f2a7a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
+}
+
+.profile-avatar {
+    width: 88px;
+    height: 88px;
+    min-width: 88px;
+    padding: 0;
+    border-radius: 50%;
+    background: #0f2a7a;
+    color: white;
+    font-size: 34px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid #e8eefc;
+    box-shadow: 0 6px 18px rgba(15, 42, 122, 0.18);
+}
+
+.profile-avatar:hover {
+    background: #173a9c;
+    transform: scale(1.04);
+}
+
+.profile-info h3 {
+    margin-bottom: 14px;
+    font-size: 24px;
+    color: #0f2a7a;
+}
+
+.profile-info p {
+    margin: 8px 0;
+}
+
+.profile-info strong {
+    color: #1f2937;
+}
+
+
+/* AVATAR SEÇİCİ */
+
+.avatar-selector {
+    background: white;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.avatar-selector h3 {
+    margin-bottom: 16px;
+}
+
+.avatar-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.avatar-option {
+    width: 54px;
+    height: 54px;
+    padding: 0;
+    border-radius: 14px;
+    background: #f1f5f9;
+    color: #1f2937;
+    font-size: 28px;
+    border: 1px solid #dbe1ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-option:hover {
+    background: #e8eefc;
+    transform: translateY(-2px) scale(1.04);
+}
+
+
+/* PROFİL DÜZENLEME */
+
+.profile-edit-section {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.profile-edit-section h3 {
+    margin-bottom: 18px;
+    color: #0f2a7a;
+}
+
+.profile-edit-section form {
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.change-password-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 9px 14px;
+    border-radius: 9px;
+    background: #e8eefc;
+    color: #0f2a7a;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.change-password-link:hover {
+    background: #d8e3fb;
+    transform: translateY(-1px);
+}
+
+
+/* STAJYER DÜZENLEME */
+
+.intern-edit-section {
+    background: white;
+    padding: 24px;
+    margin-bottom: 28px;
+    border-radius: 16px;
+    border-left: 5px solid #0f2a7a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.intern-edit-section h3 {
+    margin-bottom: 18px;
+    color: #0f2a7a;
+}
+
+.intern-edit-section form {
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.intern-edit-section
+form button[type="button"] {
+    background: #64748b;
+}
+
+.intern-edit-section
+form button[type="button"]:hover {
+    background: #475569;
+}
+
+
+/* ŞİFRE DEĞİŞTİRME */
+
+.password-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.password-card {
+    background: white;
+    padding: 28px;
+    border-radius: 18px;
+    border-left: 5px solid #0f2a7a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.password-card form {
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.password-card p {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+
+/* MESAJLAR */
+
+.success-message {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: #ecfdf5;
+    color: #166534;
+    font-weight: 600;
+}
+
+.error-message {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .dashboard {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    #root {
+        padding: 18px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+    }
+
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .company-logo {
+        width: 150px;
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-card {
+        min-height: 105px;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    input,
+    select,
+    button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .intern-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .intern-actions {
+        width: 100%;
+    }
+
+    .intern-actions .detail-link,
+    .intern-actions button {
+        flex: 1;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .intern-detail-card {
+        padding: 20px;
+    }
+
+    .task-delete-permission input {
+        width: 17px;
+    }
+
+    .profile-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+    }
+
+    .profile-avatar {
+        width: 76px;
+        height: 76px;
+        min-width: 76px;
+        font-size: 30px;
+    }
+
+    .avatar-options {
+        gap: 10px;
+    }
+
+    .avatar-option {
+        width: 50px;
+        height: 50px;
+    }
+
+    .celebration-box {
+        min-width: 0;
+        width: calc(100% - 70px);
+        padding: 24px 20px;
+    }
+
+    .celebration-title {
+        font-size: 20px;
+    }
+}
+
+/* =========================================================
+   INTERN / DEPARTMENT PAGE HELPERS
+   ========================================================= */
+
+.interns-page,
+.departments-page,
+.tasks-page {
+    width: 100%;
+}
+
+.department-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.department-edit-input {
+    flex: 1;
+    min-width: 0;
+    margin-right: 12px;
+}
+
+.department-edit-button {
+    background: #2563eb;
+}
+
+.department-edit-button:hover {
+    background: #1d4ed8;
+}
+
+.department-save-button {
+    background: #166534;
+}
+
+.department-save-button:hover {
+    background: #15803d;
+}
+
+.department-cancel-button {
+    background: #64748b;
+}
+
+.department-cancel-button:hover {
+    background: #475569;
+}
+
+.department-delete-button,
+.intern-delete-button {
+    background: #b91c1c;
+}
+
+.department-delete-button:hover,
+.intern-delete-button:hover {
+    background: #991b1b;
+}
+
+.department-modal-form {
+    display: flex;
+    gap: 12px;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+    box-shadow: none;
+}
+
+.department-modal-form input {
+    flex: 1;
+}
+
+
+/* =========================================================
+   COMMON TABLE
+   ========================================================= */
+
+.table-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+
+    overflow-x: auto;
+
+    padding: 8px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 20px
+        rgba(0, 0, 0, 0.06);
+}
+
+.common-table {
+    width: 100%;
+    min-width: 900px;
+
+    border-collapse: collapse;
+}
+
+.common-table thead tr {
+    background: #f8fafc;
+}
+
+.common-table th {
+    padding: 16px;
+
+    text-align: left;
+
+    color: #475569;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.common-table td {
+    padding: 16px;
+
+    vertical-align: middle;
+
+    border-bottom: 1px solid #eef2f7;
+}
+
+.common-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.common-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.common-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-empty {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 24px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    color: #64748b;
+
+    text-align: center;
+
+    box-shadow:
+        0 6px 20px
+        rgba(0, 0, 0, 0.06);
+}
+
+
+/* =========================================================
+   COMMON MODAL
+   ========================================================= */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    padding: 24px;
+
+    background: rgba(15, 23, 42, 0.52);
+
+    backdrop-filter: blur(2px);
+}
+
+.modal-container {
+    width: min(1000px, 95vw);
+    max-height: 90vh;
+
+    box-sizing: border-box;
+
+    overflow-y: auto;
+
+    padding: 24px;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 24px 70px
+        rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+.modal-header h3 {
+    margin: 0;
+
+    color: #0f2a7a;
+}
+
+.modal-close {
+    width: 38px;
+    height: 38px;
+
+    flex: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f5f9;
+    color: #334155;
+
+    font-size: 25px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: #e2e8f0;
+    color: #0f2a7a;
+
+    transform: none;
+}
+
+.modal-content {
+    width: 100%;
+}
+
+.modal-content form {
+    margin: 0;
+
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   COMMON SEARCH TOOLBAR
+   ========================================================= */
+
+.search-toolbar {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin-bottom: 24px;
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 24px
+        rgba(15, 23, 42, 0.08);
+}
+
+.search-toolbar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 16px;
+
+    margin-bottom: 14px;
+}
+
+.search-toolbar-add-button {
+    flex: none;
+}
+
+.search-toolbar-controls {
+    display: flex;
+    align-items: flex-end;
+
+    gap: 12px;
+
+    width: 100%;
+}
+
+.search-toolbar-search-field {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.search-toolbar-search-field label,
+.task-toolbar-filter label {
+    height: 16px;
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.search-toolbar-search-field input {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   COMMON ALERT
+   ========================================================= */
+
+.alert-message {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin: 14px 0;
+    padding: 13px 15px;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.alert-message-error {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.alert-message-success {
+    background: #ecfdf5;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.alert-message-icon {
+    flex: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.alert-message-text {
+    flex: 1;
+}
+
+.alert-message-compact {
+    margin: 6px 0 2px;
+    padding: 11px 13px;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   ERROR MODAL
+   ========================================================= */
+
+.error-modal-backdrop {
+    position: fixed;
+    inset: 0;
+
+    z-index: 30000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, 0.55);
+
+    backdrop-filter: blur(3px);
+}
+
+.error-modal-box {
+    position: relative;
+
+    width: min(420px, 92vw);
+
+    box-sizing: border-box;
+
+    padding: 28px 26px 24px;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 24px 70px
+        rgba(0, 0, 0, 0.28);
+
+    text-align: center;
+
+    animation:
+        error-modal-pop
+        0.18s ease;
+}
+
+.error-modal-close {
+    position: absolute;
+
+    top: 14px;
+    right: 14px;
+
+    width: 34px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f5f9;
+    color: #334155;
+
+    font-size: 22px;
+    line-height: 1;
+}
+
+.error-modal-close:hover {
+    background: #e2e8f0;
+    color: #0f2a7a;
+
+    transform: none;
+}
+
+.error-modal-icon {
+    width: 52px;
+    height: 52px;
+
+    margin: 0 auto 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fee2e2;
+    color: #b91c1c;
+
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.error-modal-box h3 {
+    margin: 0 0 10px;
+
+    color: #b91c1c;
+
+    font-size: 21px;
+}
+
+.error-modal-box p {
+    margin: 0 0 22px;
+
+    color: #475569;
+
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.error-modal-button {
+    min-width: 100px;
+
+    background: #b91c1c;
+}
+
+.error-modal-button:hover {
+    background: #991b1b;
+}
+
+@keyframes error-modal-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* =========================================================
+   SOFT DELETE - DEPARTMENT / INTERN
+   ========================================================= */
+
+.inactive-toggle-button {
+    width: auto;
+    flex: none;
+
+    background: #64748b;
+}
+
+.inactive-toggle-button:hover {
+    background: #475569;
+}
+
+.inactive-toggle-button.active {
+    background: #0f2a7a;
+}
+
+.inactive-toggle-button.active:hover {
+    background: #173a9c;
+}
+
+.inactive-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    background: #e2e8f0;
+    color: #475569;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.department-card-inactive,
+.intern-card-inactive {
+    opacity: 0.72;
+
+    background: #f8fafc;
+
+    border-left-color: #94a3b8;
+}
+
+.department-name-area {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.intern-info-area {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.intern-info-area > div {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.intern-secondary-info {
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.department-restore-button,
+.intern-restore-button {
+    background: #15803d;
+}
+
+.department-restore-button:hover,
+.intern-restore-button:hover {
+    background: #166534;
+}
+
+
+/* =========================================================
+   TASK STATUS / PRIORITY / DATE
+   ========================================================= */
+
+.task-status-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 6px;
+}
+
+.task-status-badge,
+.priority-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-todo {
+    background: #e0e7ff;
+    color: #1d4ed8;
+}
+
+.status-inprogress {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.status-done {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.priority-low {
+    background: #e0f2fe;
+    color: #0369a1;
+
+    border: 1px solid #bae6fd;
+}
+
+.priority-medium {
+    background: #fef3c7;
+    color: #b45309;
+
+    border: 1px solid #f5d275;
+}
+
+.priority-high {
+    background: #fee2e2;
+    color: #b91c1c;
+
+    border: 1px solid #f5b5b5;
+}
+
+.task-date-cell {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    font-size: 14px;
+}
+
+.task-overdue-badge {
+    display: inline-block;
+
+    padding: 3px 8px;
+
+    border-radius: 999px;
+
+    background: #fdeaea;
+    color: #b42318;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.task-row-overdue {
+    background: #fff7f7;
+}
+
+.task-row-inactive {
+    opacity: 1;
+
+    background: #f8fafc;
+}
+
+.task-row-inactive td {
+    color: #64748b;
+}
+
+.task-row-inactive:hover {
+    background: #f1f5f9 !important;
+}
+
+
+/* =========================================================
+   TASK ACTIVE STATUS
+   ========================================================= */
+
+.task-active-badge,
+.task-inactive-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 58px;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.task-active-badge {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.task-inactive-badge {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+
+/* =========================================================
+   TASK TABLE - COMPACT FINAL
+   ========================================================= */
+
+.task-table-section {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    scroll-margin-top: 24px;
+}
+
+.task-main-info,
+.task-intern-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.task-title-cell,
+.task-intern-name {
+    display: block;
+
+    max-width: 175px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-title-cell {
+    color: #0f172a;
+
+    font-weight: 700;
+}
+
+.task-description-under-title,
+.task-intern-email {
+    display: block;
+
+    max-width: 175px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.task-title-cell,
+.task-description-under-title,
+.task-intern-name,
+.task-intern-email {
+    cursor: help;
+}
+
+.task-table-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    min-width: 70px;
+}
+
+.task-table-actions .task-edit-button {
+    width: auto;
+    min-width: 70px;
+
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.task-edit-button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    background: #94a3b8;
+    color: #ffffff;
+
+    box-shadow: none;
+}
+
+.task-edit-button:disabled:hover {
+    background: #94a3b8;
+
+    transform: none;
+}
+
+.tasks-page table th:nth-child(1),
+.tasks-page table td:nth-child(1) {
+    width: 190px;
+    max-width: 190px;
+}
+
+.tasks-page table th:nth-child(2),
+.tasks-page table td:nth-child(2) {
+    width: 130px;
+}
+
+.tasks-page table th:nth-child(3),
+.tasks-page table td:nth-child(3) {
+    width: 90px;
+}
+
+.tasks-page table th:nth-child(4),
+.tasks-page table td:nth-child(4) {
+    width: 90px;
+}
+
+.tasks-page table th:nth-child(5),
+.tasks-page table td:nth-child(5) {
+    width: 190px;
+    max-width: 190px;
+}
+
+.tasks-page table th:nth-child(6),
+.tasks-page table td:nth-child(6) {
+    width: 115px;
+}
+
+.tasks-page table th:nth-child(7),
+.tasks-page table td:nth-child(7) {
+    width: 80px;
+    max-width: 80px;
+}
+
+
+/* =========================================================
+   TASK FORM
+   ========================================================= */
+
+.task-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 22px;
+}
+
+.task-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px 20px;
+}
+
+.task-form-field,
+.task-due-date-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.task-form-field label,
+.task-due-date-field label {
+    margin: 0;
+
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.task-form-field input,
+.task-form-field select,
+.task-due-date-field input {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+}
+
+.task-form-status-action {
+    grid-column: 1 / -1;
+
+    display: flex;
+    align-items: center;
+
+    min-height: 42px;
+}
+
+.task-form-status-action button {
+    width: auto;
+
+    min-width: 130px;
+
+    margin: 0;
+}
+
+.task-start-button {
+    background: #2563eb;
+}
+
+.task-start-button:hover {
+    background: #1d4ed8;
+}
+
+.task-complete-button {
+    background: #166534;
+}
+
+.task-complete-button:hover {
+    background: #15803d;
+}
+
+.task-form-completed-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 9px 14px;
+
+    border-radius: 9px;
+
+    background: #dcfce7;
+    color: #166534;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.task-form-checkbox,
+.task-delete-permission {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    width: fit-content;
+
+    margin: 0;
+
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.task-form-checkbox input,
+.task-delete-permission input {
+    width: 17px;
+    height: 17px;
+
+    min-width: 0;
+
+    margin: 0;
+
+    flex: none;
+}
+
+.task-form-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding-top: 4px;
+}
+
+.task-form-submit-button {
+    width: auto;
+
+    min-width: 190px;
+
+    margin: 0;
+
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+/* =========================================================
+   TASK PAGE HEADER + FILTERS - FINAL
+   ========================================================= */
+
+.tasks-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+.tasks-page-heading h2 {
+    margin: 0;
+}
+
+.tasks-page-add-button {
+    width: auto;
+
+    margin: 0;
+
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #0f2a7a;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.tasks-page-add-button:hover {
+    background: #173a9c;
+}
+
+.tasks-page .search-toolbar-controls {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        170px
+        170px;
+
+    align-items: end;
+
+    gap: 14px;
+
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+}
+
+.tasks-page .task-toolbar-filter {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+
+    box-sizing: border-box;
+}
+
+.tasks-page .task-toolbar-filter select {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    margin: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   RESPONSIVE - FINAL
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .tasks-page .search-toolbar-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .tasks-page-heading {
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        padding: 6px;
+    }
+
+    .common-table th,
+    .common-table td {
+        padding: 12px;
+    }
+
+    .modal-backdrop {
+        padding: 12px;
+    }
+
+    .modal-container {
+        width: 100%;
+        max-height: 92vh;
+
+        padding: 18px;
+    }
+
+    .search-toolbar-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .search-toolbar-add-button {
+        width: 100%;
+    }
+
+    .search-toolbar-controls {
+        flex-direction: column;
+    }
+
+    .search-toolbar-controls input,
+    .search-toolbar-controls select {
+        width: 100%;
+    }
+
+    .alert-message {
+        padding: 12px 13px;
+    }
+
+    .department-card {
+        gap: 12px;
+    }
+
+    .department-actions {
+        width: 100%;
+    }
+
+    .department-actions button {
+        flex: 1;
+    }
+
+    .department-edit-input {
+        width: 100%;
+
+        margin-right: 0;
+    }
+
+    .department-modal-form {
+        flex-direction: column;
+    }
+
+    .task-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .task-form-status-action {
+        grid-column: auto;
+    }
+
+    .task-form-footer {
+        justify-content: stretch;
+    }
+
+    .task-form-submit-button {
+        width: 100%;
+    }
+
+    .task-table-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .task-table-actions button {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   INTERNS PAGE - FINAL TABLE LAYOUT
+   ========================================================= */
+
+.interns-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+.interns-page-heading h2 {
+    margin: 0;
+}
+
+.interns-page-add-button {
+    width: auto;
+
+    margin: 0;
+
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #0f2a7a;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.interns-page-add-button:hover {
+    background: #173a9c;
+}
+
+.interns-page .search-toolbar-controls {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        170px;
+
+    align-items: end;
+
+    gap: 14px;
+
+    width: 100%;
+}
+
+.intern-toolbar-filter {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.intern-toolbar-filter label {
+    height: 16px;
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.intern-toolbar-filter select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    margin: 0;
+
+    box-sizing: border-box;
+}
+
+.intern-table-name {
+    color: #0f172a;
+
+    font-weight: 700;
+}
+
+.intern-table-email,
+.intern-table-department {
+    color: #64748b;
+}
+
+.intern-table-name,
+.intern-table-email,
+.intern-table-department {
+    display: block;
+
+    max-width: 220px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    cursor: help;
+}
+
+.intern-table-actions {
+    display: flex;
+    align-items: center;
+}
+
+.intern-edit-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 70px;
+
+    box-sizing: border-box;
+
+    padding: 10px 14px;
+
+    border-radius: 9px;
+
+    background: #0f2a7a;
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition: 0.2s;
+}
+
+.intern-edit-link:hover {
+    background: #173a9c;
+
+    transform: translateY(-1px);
+}
+
+.intern-row-inactive {
+    background: #f8fafc;
+}
+
+.intern-row-inactive td {
+    color: #64748b;
+}
+
+.intern-row-inactive:hover {
+    background: #f1f5f9 !important;
+}
+
+.interns-page table th:nth-child(1),
+.interns-page table td:nth-child(1) {
+    width: 210px;
+}
+
+.interns-page table th:nth-child(2),
+.interns-page table td:nth-child(2) {
+    width: 230px;
+}
+
+.interns-page table th:nth-child(3),
+.interns-page table td:nth-child(3) {
+    width: 200px;
+}
+
+.interns-page table th:nth-child(4),
+.interns-page table td:nth-child(4) {
+    width: 100px;
+}
+
+.interns-page table th:nth-child(5),
+.interns-page table td:nth-child(5) {
+    width: 90px;
+}
+
+@media (max-width: 900px) {
+    .interns-page .search-toolbar-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .interns-page-heading {
+        align-items: flex-start;
+    }
+}
+
+/* =========================================================
+   INTERN DETAIL PAGE - FINAL
+   ========================================================= */
+
+.intern-detail-page {
+    width: 100%;
+}
+
+.intern-detail-page-heading {
+    margin-bottom: 20px;
+}
+
+.intern-detail-page-heading h2 {
+    margin: 20px 0 0;
+}
+
+
+/* =========================================================
+   INTERN SUMMARY CARD
+   ========================================================= */
+
+.intern-profile-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    box-sizing: border-box;
+
+    margin-bottom: 30px;
+    padding: 26px 28px;
+
+    border: 1px solid #e7ebf1;
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 24px
+        rgba(15, 23, 42, 0.06);
+}
+
+.intern-profile-summary-main {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+
+    min-width: 0;
+}
+
+.intern-profile-avatar {
+    width: 58px;
+    height: 58px;
+
+    flex: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: #e8eefc;
+    color: #0f2a7a;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.intern-profile-title-row {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 12px;
+}
+
+.intern-profile-title-row h3 {
+    margin: 0;
+
+    color: #0f2a7a;
+
+    font-size: 22px;
+}
+
+.intern-profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 12px 28px;
+}
+
+.intern-profile-meta span {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.intern-profile-meta strong {
+    color: #94a3b8;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+.intern-profile-edit-button {
+    flex: none;
+
+    width: auto;
+
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+
+/* =========================================================
+   INTERN TASK SECTION
+   ========================================================= */
+
+.intern-detail-tasks-section {
+    width: 100%;
+}
+
+.intern-detail-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 16px;
+}
+
+.intern-detail-section-heading > div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.intern-detail-section-heading span {
+    color: #94a3b8;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.7px;
+}
+
+.intern-detail-section-heading h3 {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 20px;
+}
+
+.intern-detail-add-task-button {
+    flex: none;
+
+    width: auto;
+
+    margin: 0;
+}
+
+.intern-detail-task-main {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.intern-detail-task-main strong {
+    max-width: 220px;
+
+    overflow: hidden;
+
+    color: #0f172a;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.intern-detail-task-main span {
+    max-width: 260px;
+
+    overflow: hidden;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   INTERN EDIT MODAL
+   ========================================================= */
+
+.intern-detail-edit-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 22px;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    box-shadow: none;
+}
+
+.intern-detail-edit-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px 20px;
+}
+
+.intern-detail-form-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.intern-detail-form-field label {
+    margin: 0;
+
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.intern-detail-form-field input,
+.intern-detail-form-field select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+}
+
+.intern-detail-edit-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding-top: 4px;
+}
+
+.intern-detail-edit-footer button {
+    width: auto;
+}
+
+.intern-detail-cancel-button {
+    background: #64748b;
+}
+
+.intern-detail-cancel-button:hover {
+    background: #475569;
+}
+
+
+/* =========================================================
+   INTERN DETAIL RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .intern-profile-summary {
+        align-items: flex-start;
+        flex-direction: column;
+
+        padding: 22px;
+    }
+
+    .intern-profile-summary-main {
+        align-items: flex-start;
+    }
+
+    .intern-profile-edit-button {
+        width: 100%;
+    }
+
+    .intern-detail-section-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .intern-detail-add-task-button {
+        width: 100%;
+    }
+
+    .intern-detail-edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .intern-detail-edit-footer {
+        flex-direction: column-reverse;
+    }
+
+    .intern-detail-edit-footer button {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   DEPARTMENTS PAGE - FINAL
+   ========================================================= */
+
+.departments-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+.departments-page-heading h2 {
+    margin: 0;
+}
+
+.departments-page-add-button {
+    width: auto;
+
+    margin: 0;
+
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #0f2a7a;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.departments-page-add-button:hover {
+    background: #173a9c;
+}
+
+
+/* =========================================================
+   DEPARTMENT SEARCH FILTER
+   ========================================================= */
+
+.departments-page .search-toolbar-controls {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        170px;
+
+    align-items: end;
+
+    gap: 14px;
+
+    width: 100%;
+}
+
+.department-toolbar-filter {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.department-toolbar-filter label {
+    height: 16px;
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.department-toolbar-filter select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    margin: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   DEPARTMENT TABLE
+   ========================================================= */
+
+.department-table-name {
+    display: block;
+
+    max-width: 420px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #0f172a;
+
+    font-weight: 700;
+
+    cursor: help;
+}
+
+.department-table-actions {
+    display: flex;
+    align-items: center;
+}
+
+.department-table-edit-button {
+    width: auto;
+    min-width: 70px;
+
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.department-row-inactive {
+    background: #f8fafc;
+}
+
+.department-row-inactive td {
+    color: #64748b;
+}
+
+.department-row-inactive:hover {
+    background: #f1f5f9 !important;
+}
+
+.departments-page table th:nth-child(1),
+.departments-page table td:nth-child(1) {
+    width: auto;
+}
+
+.departments-page table th:nth-child(2),
+.departments-page table td:nth-child(2) {
+    width: 130px;
+}
+
+.departments-page table th:nth-child(3),
+.departments-page table td:nth-child(3) {
+    width: 100px;
+}
+
+
+/* =========================================================
+   DEPARTMENT CREATE MODAL
+   ========================================================= */
+
+.department-modal-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    box-shadow: none;
+}
+
+.department-modal-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.department-modal-field label {
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.department-modal-field input {
+    width: 100%;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+}
+
+.department-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.department-modal-footer button {
+    width: auto;
+
+    min-width: 150px;
+}
+
+
+/* =========================================================
+   DEPARTMENT EDIT MODAL
+   ========================================================= */
+
+.department-edit-modal-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 22px;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    box-shadow: none;
+}
+
+.department-edit-modal-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px 20px;
+}
+
+.department-edit-modal-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.department-edit-modal-field label {
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.department-edit-modal-field input,
+.department-edit-modal-field select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+}
+
+.department-edit-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+.department-edit-modal-footer button {
+    width: auto;
+}
+
+.department-edit-modal-cancel {
+    background: #64748b;
+}
+
+.department-edit-modal-cancel:hover {
+    background: #475569;
+}
+
+
+/* =========================================================
+   DEPARTMENTS RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .departments-page
+    .search-toolbar-controls {
+        grid-template-columns:
+            1fr;
+    }
+
+    .departments-page-heading {
+        align-items:
+            flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .department-edit-modal-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .department-edit-modal-footer {
+        flex-direction:
+            column-reverse;
+    }
+
+    .department-edit-modal-footer
+    button,
+    .department-modal-footer
+    button {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   DEPARTMENT TABLE - COLUMN ALIGNMENT
+   ========================================================= */
+
+.departments-page table th:nth-child(2),
+.departments-page table td:nth-child(2) {
+    width: 130px;
+    min-width: 130px;
+    max-width: 130px;
+
+    text-align: center;
+}
+
+.departments-page table th:nth-child(3),
+.departments-page table td:nth-child(3) {
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
+
+    text-align: center;
+}
+
+.department-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+}
+
+.department-table-edit-button {
+    width: 76px;
+    min-width: 76px;
+
+    margin: 0;
+
+    padding: 10px 12px;
+}
+
+.departments-page .task-active-badge,
+.departments-page .task-inactive-badge {
+    margin: 0 auto;
+}
+
+/* =========================================================
+   TASK TABLE - FINAL COLUMN ALIGNMENT
+   ========================================================= */
+
+/* Başlık */
+.tasks-page table th:nth-child(1),
+.tasks-page table td:nth-child(1) {
+    text-align: left;
+}
+
+/* Durum */
+.tasks-page table th:nth-child(2),
+.tasks-page table td:nth-child(2) {
+    text-align: left;
+}
+
+/* Görev Aktifliği */
+.tasks-page table th:nth-child(3),
+.tasks-page table td:nth-child(3) {
+    text-align: center;
+}
+
+/* Öncelik */
+.tasks-page table th:nth-child(4),
+.tasks-page table td:nth-child(4) {
+    text-align: center;
+}
+
+/* Stajyer */
+.tasks-page table th:nth-child(5),
+.tasks-page table td:nth-child(5) {
+    text-align: left;
+}
+
+/* Son Tarih */
+.tasks-page table th:nth-child(6),
+.tasks-page table td:nth-child(6) {
+    text-align: left;
+}
+
+/* İşlemler */
+.tasks-page table th:nth-child(7),
+.tasks-page table td:nth-child(7) {
+    text-align: center;
+}
+
+
+/* =========================================================
+   CENTER BADGES INSIDE THEIR CELLS
+   ========================================================= */
+
+.tasks-page table td:nth-child(3) .task-active-badge,
+.tasks-page table td:nth-child(3) .task-inactive-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tasks-page table td:nth-child(4) .priority-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   ACTION BUTTON ALIGNMENT
+   ========================================================= */
+
+.tasks-page .task-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   STATUS CELL
+   ========================================================= */
+
+.tasks-page .task-status-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 5px;
+}
+
+
+/* =========================================================
+   VERTICAL ALIGNMENT
+   ========================================================= */
+
+.tasks-page .common-table th,
+.tasks-page .common-table td {
+    vertical-align: middle;
+}
+
+/* =========================================================
+   TASK TABLE - STATUS COLUMN TRUE CENTER
+   ========================================================= */
+
+.tasks-page table th:nth-child(2),
+.tasks-page table td:nth-child(2) {
+    text-align: center;
+}
+
+.tasks-page table td:nth-child(2) .task-status-cell {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+}
+
+.tasks-page table td:nth-child(2) .task-status-badge,
+.tasks-page table td:nth-child(2) .task-overdue-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* =========================================================
+   TASK TABLE - FINAL SPACING & COLUMN BALANCE
+   ========================================================= */
+
+.tasks-page .common-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+
+/* Başlık */
+.tasks-page .common-table th:nth-child(1),
+.tasks-page .common-table td:nth-child(1) {
+    width: 19%;
+
+    padding-left: 16px;
+    padding-right: 12px;
+
+    text-align: left;
+}
+
+
+/* Durum */
+.tasks-page .common-table th:nth-child(2),
+.tasks-page .common-table td:nth-child(2) {
+    width: 15%;
+
+    padding-left: 8px;
+    padding-right: 8px;
+
+    text-align: center;
+}
+
+
+/* Görev Aktifliği */
+.tasks-page .common-table th:nth-child(3),
+.tasks-page .common-table td:nth-child(3) {
+    width: 14%;
+
+    padding-left: 8px;
+    padding-right: 8px;
+
+    text-align: center;
+}
+
+
+/* Öncelik */
+.tasks-page .common-table th:nth-child(4),
+.tasks-page .common-table td:nth-child(4) {
+    width: 11%;
+
+    padding-left: 8px;
+    padding-right: 8px;
+
+    text-align: center;
+}
+
+
+/* Stajyer */
+.tasks-page .common-table th:nth-child(5),
+.tasks-page .common-table td:nth-child(5) {
+    width: 20%;
+
+    padding-left: 14px;
+    padding-right: 12px;
+
+    text-align: left;
+}
+
+
+/* Son Tarih */
+.tasks-page .common-table th:nth-child(6),
+.tasks-page .common-table td:nth-child(6) {
+    width: 12%;
+
+    padding-left: 8px;
+    padding-right: 8px;
+
+    text-align: left;
+}
+
+
+/* İşlemler */
+.tasks-page .common-table th:nth-child(7),
+.tasks-page .common-table td:nth-child(7) {
+    width: 9%;
+
+    padding-left: 8px;
+    padding-right: 12px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ROW HEIGHT
+   ========================================================= */
+
+.tasks-page .common-table th {
+    padding-top: 14px;
+    padding-bottom: 14px;
+
+    vertical-align: middle;
+}
+
+.tasks-page .common-table td {
+    padding-top: 13px;
+    padding-bottom: 13px;
+
+    vertical-align: middle;
+}
+
+
+/* =========================================================
+   BADGE ALIGNMENT
+   ========================================================= */
+
+.tasks-page .task-status-cell {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+}
+
+.tasks-page
+.common-table
+td:nth-child(3)
+.task-active-badge,
+.tasks-page
+.common-table
+td:nth-child(3)
+.task-inactive-badge,
+.tasks-page
+.common-table
+td:nth-child(4)
+.priority-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   INTERN INFO
+   ========================================================= */
+
+.tasks-page .task-intern-info {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.tasks-page .task-intern-name,
+.tasks-page .task-intern-email {
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+   ========================================================= */
+
+.tasks-page .task-table-actions {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tasks-page .task-edit-button {
+    width: 72px;
+    min-width: 72px;
+
+    padding: 9px 10px;
+
+    margin: 0;
+}
+
+/* =========================================================
+   TASK TABLE - STAJYER / SON TARİH GAP FIX
+   ========================================================= */
+
+.tasks-page .common-table {
+    table-layout: fixed;
+}
+
+/* Başlık */
+.tasks-page .common-table th:nth-child(1),
+.tasks-page .common-table td:nth-child(1) {
+    width: 18%;
+}
+
+/* Durum */
+.tasks-page .common-table th:nth-child(2),
+.tasks-page .common-table td:nth-child(2) {
+    width: 15%;
+}
+
+/* Görev Aktifliği */
+.tasks-page .common-table th:nth-child(3),
+.tasks-page .common-table td:nth-child(3) {
+    width: 14%;
+}
+
+/* Öncelik */
+.tasks-page .common-table th:nth-child(4),
+.tasks-page .common-table td:nth-child(4) {
+    width: 11%;
+}
+
+/* Stajyer - küçültüldü */
+.tasks-page .common-table th:nth-child(5),
+.tasks-page .common-table td:nth-child(5) {
+    width: 17%;
+
+    padding-left: 10px;
+    padding-right: 6px;
+}
+
+/* Son Tarih - biraz genişletildi ve sola yaklaştırıldı */
+.tasks-page .common-table th:nth-child(6),
+.tasks-page .common-table td:nth-child(6) {
+    width: 16%;
+
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+/* İşlemler */
+.tasks-page .common-table th:nth-child(7),
+.tasks-page .common-table td:nth-child(7) {
+    width: 9%;
+}
+
+/* Stajyer hücresinin iç boşluğunu azalt */
+.tasks-page .task-intern-info {
+    width: 100%;
+    max-width: 170px;
+}
+
+.tasks-page .task-intern-name,
+.tasks-page .task-intern-email {
+    max-width: 170px;
+}
+
+/* Son tarih hücresini sola yasla */
+.tasks-page .task-date-cell {
+    align-items: flex-start;
+}
+
+/* =========================================================
+   TASK TABLE - FINAL EQUAL SPACING
+   ========================================================= */
+
+
+/* TÜM BAŞLIK VE HÜCRELERDE AYNI YATAY BOŞLUK */
+.tasks-page .common-table th,
+.tasks-page .common-table td {
+    box-sizing: border-box;
+
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+
+    vertical-align: middle;
+}
+
+/* 1 - Başlık */
+.tasks-page .common-table th:nth-child(1),
+.tasks-page .common-table td:nth-child(1) {
+    width: 19% !important;
+    text-align: left;
+}
+
+/* 2 - Durum */
+.tasks-page .common-table th:nth-child(2),
+.tasks-page .common-table td:nth-child(2) {
+    width: 15% !important;
+    text-align: center;
+}
+
+/* 3 - Görev Aktifliği */
+.tasks-page .common-table th:nth-child(3),
+.tasks-page .common-table td:nth-child(3) {
+    width: 15% !important;
+    text-align: center;
+}
+
+/* 4 - Öncelik */
+.tasks-page .common-table th:nth-child(4),
+.tasks-page .common-table td:nth-child(4) {
+    width: 12% !important;
+    text-align: center;
+}
+
+/* 5 - Stajyer */
+.tasks-page .common-table th:nth-child(5),
+.tasks-page .common-table td:nth-child(5) {
+    width: 18% !important;
+    text-align: left;
+}
+
+/* 6 - Son Tarih */
+.tasks-page .common-table th:nth-child(6),
+.tasks-page .common-table td:nth-child(6) {
+    width: 12% !important;
+    text-align: left;
+}
+
+/* 7 - İşlemler */
+.tasks-page .common-table th:nth-child(7),
+.tasks-page .common-table td:nth-child(7) {
+    width: 9% !important;
+    text-align: center;
+}
+
+
+/* =========================================================
+   İÇERİKLERİ HÜCRELERİN ORTASINA OTURT
+   ========================================================= */
+
+
+.tasks-page .task-active-badge,
+.tasks-page .task-inactive-badge,
+.tasks-page .priority-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   STAJYER HÜCRESİ
+   ========================================================= */
+
+.tasks-page .task-intern-info {
+    width: 100%;
+    max-width: none;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+/* =========================================================
+   SON TARİH
+   ========================================================= */
+
+.tasks-page .task-date-cell {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 3px;
+}
+
+/* =========================================================
+   TASK TABLE - INTERN COLUMN NUDGE RIGHT
+   ========================================================= */
+
+.tasks-page .common-table th:nth-child(5),
+.tasks-page .common-table td:nth-child(5) {
+    padding-left: 24px !important;
+}
+
+/* =========================================================
+   DEPARTMENT TABLE - FINAL SPACING
+   ========================================================= */
+
+.departments-page .common-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* TÜM HÜCRELERDE AYNI YATAY BOŞLUK */
+.departments-page .common-table th,
+.departments-page .common-table td {
+    box-sizing: border-box;
+
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+
+    vertical-align: middle;
+}
+
+/* Departman */
+.departments-page .common-table th:nth-child(1),
+.departments-page .common-table td:nth-child(1) {
+    width: 25% !important;
+
+    text-align: left;
+}
+
+/* Departman Aktifliği */
+.departments-page .common-table th:nth-child(2),
+.departments-page .common-table td:nth-child(2) {
+    width: 25% !important;
+
+    text-align: center;
+}
+
+/* İşlemler */
+.departments-page .common-table th:nth-child(3),
+.departments-page .common-table td:nth-child(3) {
+    width: 50% !important;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ACTIVE BADGE ALIGNMENT
+   ========================================================= */
+
+.departments-page
+.common-table
+td:nth-child(2)
+.task-active-badge,
+.departments-page
+.common-table
+td:nth-child(2)
+.task-inactive-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   EDIT BUTTON ALIGNMENT
+   ========================================================= */
+
+.departments-page .department-table-actions {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.departments-page .department-table-edit-button {
+    width: 76px;
+    min-width: 76px;
+
+    margin: 0;
+
+    padding: 9px 10px;
+}
+
+/* =========================================================
+   INTERN DETAIL PAGE - CLEAN FINAL DESIGN
+   ========================================================= */
+
+
+.intern-detail-page-heading h2 {
+    margin: 18px 0 0;
+}
+
+
+/* =========================================================
+   SUMMARY CARD
+   ========================================================= */
+
+.intern-profile-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    box-sizing: border-box;
+
+    margin-bottom: 28px;
+    padding: 24px 26px;
+
+    background: #ffffff;
+
+    border: 1px solid #e7ebf1;
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 24px
+        rgba(15, 23, 42, 0.06);
+}
+
+
+.intern-profile-title-row {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 10px;
+}
+
+
+.intern-profile-edit-button {
+    width: auto;
+
+    flex: none;
+
+    margin: 0;
+
+    padding: 10px 18px;
+}
+
+
+/* =========================================================
+   TASK SECTION
+   ========================================================= */
+
+
+.intern-detail-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 16px;
+}
+
+
+.intern-detail-add-task-button {
+    width: auto;
+
+    flex: none;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   TASK TABLE CONTENT
+   ========================================================= */
+
+
+/* =========================================================
+   EDIT MODAL
+   ========================================================= */
+
+.intern-detail-edit-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    box-shadow: none;
+}
+
+.intern-detail-edit-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+
+.intern-detail-active-field {
+    grid-column: 1 / 2;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.intern-detail-edit-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding-top: 4px;
+}
+
+.intern-detail-edit-footer button {
+    width: auto;
+
+    margin: 0;
+}
+
+
+.intern-detail-save-button {
+    min-width: 185px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .intern-profile-summary {
+        flex-direction: column;
+        align-items: flex-start;
+
+        padding: 20px;
+    }
+
+    .intern-profile-edit-button {
+        width: 100%;
+    }
+
+    .intern-detail-section-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .intern-detail-add-task-button {
+        width: 100%;
+    }
+
+    .intern-detail-edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .intern-detail-active-field {
+        grid-column: auto;
+    }
+
+    .intern-detail-edit-footer {
+        flex-direction: column-reverse;
+    }
+
+    .intern-detail-edit-footer button {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   PROFILE PAGE - FINAL
+   ========================================================= */
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+
+    padding: 26px 30px;
+
+    background: #ffffff;
+
+    border-left: 3px solid #17398d;
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+
+/* =========================
+   AVATAR
+   ========================= */
+
+.profile-avatar {
+    width: 74px;
+    height: 74px;
+
+    min-width: 74px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #12368d;
+
+    font-size: 32px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 14px rgba(23, 57, 141, 0.18);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.profile-avatar:hover {
+    transform: translateY(-2px) scale(1.03);
+
+    box-shadow:
+        0 7px 18px rgba(23, 57, 141, 0.24);
+}
+
+.profile-avatar:disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+
+/* =========================
+   PROFILE INFORMATION
+   ========================= */
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 5px;
+}
+
+.profile-info h3 {
+    margin: 0 0 4px;
+
+    color: #17398d;
+
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.profile-info p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.profile-info p strong {
+    color: #334155;
+
+    font-weight: 700;
+}
+
+
+/* =========================
+   CHANGE PASSWORD
+   ========================= */
+
+.change-password-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 8px;
+
+    min-height: 34px;
+
+    padding: 7px 14px;
+
+    border-radius: 8px;
+
+    background: #edf2ff;
+
+    color: #17398d;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.change-password-link:hover {
+    background: #e2e9fb;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   PROFILE EDIT SECTION
+   ========================= */
+
+.profile-edit-section {
+    margin-top: 22px;
+
+    padding: 22px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.profile-edit-section h3 {
+    margin:
+        0
+        0
+        16px;
+
+    color: #17398d;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.profile-edit-section form {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr)
+        minmax(0, 1fr)
+        150px;
+
+    gap: 12px;
+
+    align-items: center;
+}
+
+.profile-edit-section input {
+    width: 100%;
+    height: 40px;
+
+    padding:
+        0
+        13px;
+
+    border: 1px solid #d9e1ec;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.profile-edit-section input:focus {
+    border-color: #17398d;
+
+    box-shadow:
+        0 0 0 3px rgba(23, 57, 141, 0.08);
+}
+
+.profile-edit-section form button {
+    width: 150px;
+    height: 40px;
+
+    padding:
+        0
+        18px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #17398d;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.profile-edit-section form button:hover:not(:disabled) {
+    background: #102e76;
+
+    transform: translateY(-1px);
+}
+
+.profile-edit-section form button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.65;
+}
+
+
+/* =========================
+   AVATAR SELECTOR
+   ========================= */
+
+.avatar-selector {
+    margin-top: 16px;
+
+    padding: 20px;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.avatar-selector h3 {
+    margin:
+        0
+        0
+        14px;
+
+    color: #17398d;
+
+    font-size: 16px;
+}
+
+.avatar-options {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+.avatar-option {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e0e7f1;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.avatar-option:hover:not(:disabled) {
+    transform: translateY(-2px);
+
+    border-color: #17398d;
+
+    background: #f6f8ff;
+}
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 900px) {
+    .profile-edit-section form {
+        grid-template-columns:
+            1fr
+            1fr;
+    }
+
+    .profile-edit-section form button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .profile-card {
+        align-items: flex-start;
+
+        gap: 16px;
+
+        padding: 22px;
+    }
+
+    .profile-avatar {
+        width: 64px;
+        height: 64px;
+
+        min-width: 64px;
+
+        font-size: 28px;
+    }
+
+    .profile-edit-section form {
+        grid-template-columns:
+            1fr;
+    }
+
+    .profile-edit-section form button {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   DASHBOARD STAT CARDS - FINAL LAYOUT
+   ========================================================= */
+
+.home-dashboard .stat-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    width: 100%;
+}
+
+.home-dashboard .stat-card {
+    width: 100%;
+    min-width: 0;
+    min-height: 96px;
+}
+
+
+/* 7 kart olduğunda son 3 kartı ortala */
+.home-dashboard .stat-grid > .stat-card:nth-last-child(3):nth-child(5) {
+    grid-column: 1 / 2;
+}
+
+
+/* =========================
+   TABLET
+   ========================= */
+
+@media (max-width: 1100px) {
+    .home-dashboard .stat-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================
+   SMALL TABLET
+   ========================= */
+
+@media (max-width: 800px) {
+    .home-dashboard .stat-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 520px) {
+    .home-dashboard .stat-grid {
+        grid-template-columns:
+            1fr;
+    }
+}
+
+/* =========================================================
+   LOGOUT CONFIRMATION
+   ========================================================= */
+
+.logout-confirm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 8px 6px 4px;
+
+    text-align: center;
+}
+
+.logout-confirm-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 14px;
+
+    border-radius: 50%;
+
+    background: #fff1f2;
+
+    color: #dc2626;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.logout-confirm h3 {
+    margin: 0 0 8px;
+
+    color: #1f2937;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.logout-confirm p {
+    max-width: 390px;
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.logout-confirm-actions {
+    width: 100%;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 24px;
+}
+
+.logout-cancel-button,
+.logout-confirm-button {
+    min-width: 120px;
+    height: 40px;
+
+    padding: 0 18px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.logout-cancel-button {
+    border: 1px solid #dbe2ec;
+
+    background: #ffffff;
+
+    color: #475569;
+}
+
+.logout-cancel-button:hover:not(:disabled) {
+    background: #f8fafc;
+}
+
+.logout-confirm-button {
+    border: none;
+
+    background: #dc2626;
+
+    color: #ffffff;
+}
+
+.logout-confirm-button:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+.logout-cancel-button:disabled,
+.logout-confirm-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.6;
+}
+
+@media (max-width: 520px) {
+    .logout-confirm-actions {
+        flex-direction: column-reverse;
+    }
+
+    .logout-cancel-button,
+    .logout-confirm-button {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   TABLE POLISH - INTERN / DEPARTMENT / TASK
+   Bu bloğu index.css dosyasının EN SONUNA ekleyin.
+   ========================================================= */
+
+/* Genel tablo görünümü */
+.tasks-page .table-wrapper,
+.interns-page .table-wrapper,
+.departments-page .table-wrapper {
+    overflow-x: auto;
+    padding: 0;
+    border: 1px solid #e7edf5;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 42, 122, 0.06);
+}
+
+.tasks-page .common-table,
+.interns-page .common-table,
+.departments-page .common-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+}
+
+/* Her sayfanın ihtiyacına göre minimum tablo genişliği */
+.tasks-page .common-table {
+    min-width: 1040px;
+}
+
+.interns-page .common-table {
+    min-width: 850px;
+}
+
+.departments-page .common-table {
+    min-width: 720px;
+}
+
+/* Başlık satırı */
+.tasks-page .common-table thead tr,
+.interns-page .common-table thead tr,
+.departments-page .common-table thead tr {
+    background: #f8fafc;
+}
+
+.tasks-page .common-table th,
+.interns-page .common-table th,
+.departments-page .common-table th {
+    padding: 15px 18px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Gövde hücreleri */
+.tasks-page .common-table td,
+.interns-page .common-table td,
+.departments-page .common-table td {
+    padding: 14px 18px;
+    color: #1e293b;
+    font-size: 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.tasks-page .common-table tbody tr,
+.interns-page .common-table tbody tr,
+.departments-page .common-table tbody tr {
+    transition:
+        background-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.tasks-page .common-table tbody tr:hover,
+.interns-page .common-table tbody tr:hover,
+.departments-page .common-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.tasks-page .common-table tbody tr:last-child td,
+.interns-page .common-table tbody tr:last-child td,
+.departments-page .common-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Aktif / pasif badge */
+.tasks-page .task-active-badge,
+.tasks-page .task-inactive-badge,
+.interns-page .task-active-badge,
+.interns-page .task-inactive-badge,
+.departments-page .task-active-badge,
+.departments-page .task-inactive-badge {
+    min-width: 72px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* İşlem kolonları - satır içinde yan yana ve taşmadan */
+.task-table-actions,
+.intern-table-actions,
+.department-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+/* İşlem butonlarının ortak ölçüsü */
+.task-table-actions button,
+.intern-table-actions button,
+.department-actions button,
+.intern-edit-link {
+    width: auto !important;
+    min-width: 82px;
+    height: 38px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: none;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    cursor: pointer;
+    transition:
+        background-color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+/* Düzenle butonları - üç sayfada aynı lacivert */
+.task-edit-button,
+.intern-edit-link,
+.department-edit-button {
+    background: #0f2a7a !important;
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.task-edit-button:hover,
+.intern-edit-link:hover,
+.department-edit-button:hover {
+    background: #173a9c !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(15, 42, 122, 0.16);
+}
+
+/* Pasif Et */
+.task-delete-button,
+.intern-delete-button,
+.department-delete-button {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+}
+
+.task-delete-button:hover,
+.intern-delete-button:hover,
+.department-delete-button:hover {
+    background: #b91c1c !important;
+    transform: translateY(-1px);
+}
+
+/* Aktif Et */
+.task-restore-button,
+.intern-restore-button,
+.department-restore-button {
+    background: #15803d !important;
+    color: #ffffff !important;
+}
+
+.task-restore-button:hover,
+.intern-restore-button:hover,
+.department-restore-button:hover {
+    background: #166534 !important;
+    transform: translateY(-1px);
+}
+
+/* Disabled edit */
+.task-edit-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* İşlemler kolonu için yeterli alan */
+.tasks-page .common-table th:last-child,
+.tasks-page .common-table td:last-child {
+    width: 190px;
+    min-width: 190px;
+}
+
+.interns-page .common-table th:last-child,
+.interns-page .common-table td:last-child {
+    width: 190px;
+    min-width: 190px;
+}
+
+.departments-page .common-table th:last-child,
+.departments-page .common-table td:last-child {
+    width: 200px;
+    min-width: 200px;
+}
+
+/* Task tablosu kolon dengesi */
+.tasks-page .common-table th:nth-child(1),
+.tasks-page .common-table td:nth-child(1) {
+    min-width: 190px;
+}
+
+.tasks-page .common-table th:nth-child(2),
+.tasks-page .common-table td:nth-child(2) {
+    min-width: 140px;
+}
+
+.tasks-page .common-table th:nth-child(3),
+.tasks-page .common-table td:nth-child(3) {
+    min-width: 130px;
+}
+
+.tasks-page .common-table th:nth-child(4),
+.tasks-page .common-table td:nth-child(4) {
+    min-width: 110px;
+}
+
+.tasks-page .common-table th:nth-child(5),
+.tasks-page .common-table td:nth-child(5) {
+    min-width: 165px;
+}
+
+.tasks-page .common-table th:nth-child(6),
+.tasks-page .common-table td:nth-child(6) {
+    min-width: 125px;
+}
+
+/* Stajyer tablosu kolon dengesi */
+.interns-page .common-table th:nth-child(1),
+.interns-page .common-table td:nth-child(1) {
+    min-width: 180px;
+}
+
+.interns-page .common-table th:nth-child(2),
+.interns-page .common-table td:nth-child(2) {
+    min-width: 210px;
+}
+
+.interns-page .common-table th:nth-child(3),
+.interns-page .common-table td:nth-child(3) {
+    min-width: 170px;
+}
+
+.interns-page .common-table th:nth-child(4),
+.interns-page .common-table td:nth-child(4) {
+    min-width: 150px;
+}
+
+/* Departman tablosu daha ferah */
+.departments-page .common-table th:nth-child(1),
+.departments-page .common-table td:nth-child(1) {
+    width: 45%;
+}
+
+.departments-page .common-table th:nth-child(2),
+.departments-page .common-table td:nth-child(2) {
+    width: 25%;
+}
+
+/* Pasif satırlar belirgin ama okunaklı */
+.intern-row-inactive,
+.inactive-row,
+.task-row-inactive {
+    background: #f8fafc;
+    opacity: 0.78;
+}
+
+/* Yatay scrollbar daha temiz */
+.tasks-page .table-wrapper::-webkit-scrollbar,
+.interns-page .table-wrapper::-webkit-scrollbar,
+.departments-page .table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tasks-page .table-wrapper::-webkit-scrollbar-track,
+.interns-page .table-wrapper::-webkit-scrollbar-track,
+.departments-page .table-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 999px;
+}
+
+.tasks-page .table-wrapper::-webkit-scrollbar-thumb,
+.interns-page .table-wrapper::-webkit-scrollbar-thumb,
+.departments-page .table-wrapper::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 999px;
+}
+
+/* Tablet / küçük ekran */
+@media (max-width: 900px) {
+    .tasks-page .common-table {
+        min-width: 1000px;
+    }
+
+    .interns-page .common-table {
+        min-width: 820px;
+    }
+
+    .departments-page .common-table {
+        min-width: 700px;
+    }
+
+    .task-table-actions,
+    .intern-table-actions,
+    .department-actions {
+        gap: 6px;
+    }
+
+    .task-table-actions button,
+    .intern-table-actions button,
+    .department-actions button,
+    .intern-edit-link {
+        min-width: 76px;
+        height: 36px;
+        padding: 0 11px;
+        font-size: 12px;
+    }
+}
+
+
+/* =========================================================
+   TASK TABLE - COLUMN BALANCE FIX
+   ========================================================= */
+
+.tasks-page .common-table {
+    min-width: 980px;
+    table-layout: fixed;
+}
+
+/* Başlık */
+.tasks-page .common-table th:nth-child(1),
+.tasks-page .common-table td:nth-child(1) {
+    width: 22%;
+    min-width: 0;
+}
+
+/* Durum */
+.tasks-page .common-table th:nth-child(2),
+.tasks-page .common-table td:nth-child(2) {
+    width: 14%;
+    min-width: 0;
+}
+
+/* Görev Aktifliği */
+.tasks-page .common-table th:nth-child(3),
+.tasks-page .common-table td:nth-child(3) {
+    width: 15%;
+    min-width: 0;
+}
+
+/* Öncelik */
+.tasks-page .common-table th:nth-child(4),
+.tasks-page .common-table td:nth-child(4) {
+    width: 11%;
+    min-width: 0;
+}
+
+/* Stajyer - sola gelsin */
+.tasks-page .common-table th:nth-child(5),
+.tasks-page .common-table td:nth-child(5) {
+    width: 17%;
+    min-width: 0;
+}
+
+/* Son Tarih */
+.tasks-page .common-table th:nth-child(6),
+.tasks-page .common-table td:nth-child(6) {
+    width: 12%;
+    min-width: 0;
+}
+
+/* İşlemler - biraz sola ve geniş */
+.tasks-page .common-table th:nth-child(7),
+.tasks-page .common-table td:nth-child(7) {
+    width: 180px;
+    min-width: 180px;
+}
+
+/* İşlemler sağa yapışmasın */
+.tasks-page .task-table-actions {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+/* Butonlar daha kompakt */
+.tasks-page .task-table-actions button {
+    min-width: 74px;
+    padding: 0 12px;
+}
+
+/* =========================================================
+   TASK TABLE - FINAL COLUMN FIT
+   ========================================================= */
+
+.tasks-page .common-table {
+    min-width: 920px;
+    table-layout: fixed;
+}
+
+/* Başlık */
+.tasks-page .common-table th:nth-child(1),
+.tasks-page .common-table td:nth-child(1) {
+    width: 21%;
+    min-width: 0;
+}
+
+/* Durum - sola ve daha dar */
+.tasks-page .common-table th:nth-child(2),
+.tasks-page .common-table td:nth-child(2) {
+    width: 13%;
+    min-width: 0;
+    padding-left: 8px;
+}
+
+/* Görev Aktifliği */
+.tasks-page .common-table th:nth-child(3),
+.tasks-page .common-table td:nth-child(3) {
+    width: 14%;
+    min-width: 0;
+}
+
+/* Öncelik */
+.tasks-page .common-table th:nth-child(4),
+.tasks-page .common-table td:nth-child(4) {
+    width: 10%;
+    min-width: 0;
+}
+
+/* Stajyer */
+
+
+/* Son Tarih */
+
+
+/* İşlemler */
+.tasks-page .common-table th:nth-child(7),
+.tasks-page .common-table td:nth-child(7) {
+    width: 165px;
+    min-width: 165px;
+}
+
+/* Hücreleri biraz sıkılaştır */
+.tasks-page .common-table th,
+.tasks-page .common-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* Action alanı */
+.tasks-page .task-table-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: nowrap;
+}
+
+/* Butonlar */
+.tasks-page .task-table-actions button {
+    min-width: 72px;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+/* =========================================================
+   DEPARTMENT TABLE - EQUAL 4 PART LAYOUT
+   ========================================================= */
+
+.departments-page .common-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+}
+
+/* Departman */
+.departments-page .common-table th:nth-child(1),
+.departments-page .common-table td:nth-child(1) {
+    width: 25%;
+}
+
+/* Departman Aktifliği */
+
+
+/* İşlemler toplamda %50 */
+.departments-page .common-table th:nth-child(3),
+.departments-page .common-table td:nth-child(3) {
+    width: 50%;
+}
+
+/* İşlem alanı iki eşit parçaya bölünsün */
+.departments-page .department-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    width: 100%;
+}
+
+/* İki buton da kendi yarısını doldursun */
+.departments-page .department-actions button {
+    width: 100% !important;
+    min-width: 0;
+    height: 38px;
+    padding: 0 12px;
+}
+
+/* Hücreler dengeli olsun */
+.departments-page .common-table th,
+.departments-page .common-table td {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+/* İşlemler başlığı da sola hizalı */
+.departments-page .common-table th:nth-child(3) {
+    text-align: left;
+}

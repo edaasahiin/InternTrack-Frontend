@@ -1,26 +1,49 @@
 interface AlertMessageProps {
     message: string;
+
     isError: boolean;
+
+    compact?: boolean;
 }
 
 function AlertMessage({
     message,
-    isError
+    isError,
+    compact = false
 }: AlertMessageProps) {
     if (!message) {
         return null;
     }
 
     return (
-        <p
-            style={{
-                marginTop: "10px",
-                fontWeight: "bold"
-            }}
+        <div
+            className={[
+                "alert-message",
+                isError
+                    ? "alert-message-error"
+                    : "alert-message-success",
+                compact
+                    ? "alert-message-compact"
+                    : ""
+            ]
+                .filter(Boolean)
+                .join(" ")}
+            role={
+                isError
+                    ? "alert"
+                    : "status"
+            }
         >
-            {isError ? "❌ " : "✅ "}
-            {message}
-        </p>
+            <span className="alert-message-icon">
+                {isError
+                    ? "✕"
+                    : "✓"}
+            </span>
+
+            <span className="alert-message-text">
+                {message}
+            </span>
+        </div>
     );
 }
 

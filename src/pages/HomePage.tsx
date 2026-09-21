@@ -1,6 +1,7 @@
 import {
     useEffect,
-    useState
+    useState,
+    type ReactNode
 } from "react";
 
 import {
@@ -24,7 +25,97 @@ import type {
     DashboardStats
 } from "../interfaces/dashboard";
 
-import sankoLogo from "../assets/sanko-logo.png";
+interface DashboardCardProps {
+    to: string;
+    icon: ReactNode;
+    value: number;
+    label: string;
+    className?: string;
+}
+
+interface QuickActionCardProps {
+    to: string;
+    icon: ReactNode;
+    title: string;
+    description: string;
+}
+
+const INITIAL_STATS:
+    DashboardStats = {
+        internCount: 0,
+        taskCount: 0,
+        toDoTaskCount: 0,
+        inProgressTaskCount: 0,
+        completedTaskCount: 0,
+        overdueTaskCount: 0,
+        departmentCount: 0
+    };
+
+function DashboardCard({
+    to,
+    icon,
+    value,
+    label,
+    className = ""
+}: DashboardCardProps) {
+    return (
+        <Link
+            to={to}
+            className={[
+                "stat-card",
+                className
+            ]
+                .filter(Boolean)
+                .join(" ")}
+        >
+            <div className="stat-icon">
+                {icon}
+            </div>
+
+            <div>
+                <strong>
+                    {value}
+                </strong>
+
+                <span>
+                    {label}
+                </span>
+            </div>
+        </Link>
+    );
+}
+
+function QuickActionCard({
+    to,
+    icon,
+    title,
+    description
+}: QuickActionCardProps) {
+    return (
+        <Link
+            to={to}
+            className="quick-action-card"
+        >
+            <div className="quick-action-icon">
+                {icon}
+            </div>
+
+            <div>
+                <strong>
+                    {title}
+                </strong>
+
+                <p>
+                    {description}
+                </p>
+            </div>
+
+            <span className="quick-action-arrow">
+                →
+            </span>
+        </Link>
+    );
+}
 
 function HomePage() {
     const { user } =
@@ -38,15 +129,9 @@ function HomePage() {
     const [
         stats,
         setStats
-    ] = useState<DashboardStats>({
-        internCount: 0,
-        taskCount: 0,
-        toDoTaskCount: 0,
-        inProgressTaskCount: 0,
-        completedTaskCount: 0,
-        overdueTaskCount: 0,
-        departmentCount: 0
-    });
+    ] = useState<DashboardStats>(
+        INITIAL_STATS
+    );
 
     const [
         isLoading,
@@ -82,255 +167,210 @@ function HomePage() {
         loadDashboard();
     }, []);
 
-    return (
-        <div>
-            <div className="hero">
-                <img
-                    src={sankoLogo}
-                    alt="SANKO Logo"
-                    className="company-logo"
-                />
+    const taskLabel =
+        canManage
+            ? "Toplam Görev"
+            : "Görevlerim";
 
+    const taskActionTitle =
+        canManage
+            ? "Görev Yönetimi"
+            : "Görevlerim";
+
+    const taskActionDescription =
+        canManage
+            ? "Görevleri görüntüle, oluştur ve durumlarını takip et."
+            : "Sana atanmış görevleri görüntüle ve durumlarını güncelle.";
+
+    return (
+        <div className="home-dashboard">
+            <section className="dashboard-welcome">
                 <div>
+                    <span className="welcome-eyebrow">
+                        Dashboard
+                    </span>
+
                     <h1>
-                        InternTrack
+                        Hoş geldin,{" "}
+                        {user?.name}
                     </h1>
 
                     <p>
                         {canManage
-                            ? "Stajyer, departman ve görev yönetimi için geliştirilen takip sistemi."
-                            : `Hoş geldin ${user?.name}. Görevlerini ve profilini buradan takip edebilirsin.`}
+                            ? "Stajyerlerin, görevlerin ve departmanların genel durumunu buradan takip edebilirsin."
+                            : "Görevlerinin güncel durumunu ve ilerlemeni buradan takip edebilirsin."}
                     </p>
                 </div>
-            </div>
 
-            <h2>
-                {canManage
-                    ? "Genel Durum"
-                    : "Görev Durumum"}
-            </h2>
+                <div className="welcome-role">
+                    <span>
+                        Kullanıcı Rolü
+                    </span>
+
+                    <strong>
+                        {user?.role}
+                    </strong>
+                </div>
+            </section>
 
             <AlertMessage
                 message={
                     message
                 }
-                isError={
-                    true
-                }
+                isError={true}
             />
 
             {isLoading ? (
                 <LoadingMessage />
             ) : (
-                <div className="dashboard">
-                    {canManage && (
-                        <Link
-                            to="/interns"
-                            className="dashboard-card-link"
-                        >
-                            <div className="dashboard-card">
-                                <h3>
-                                    {
+                <>
+                    <section className="dashboard-section">
+                        <div className="section-heading">
+                            <div>
+                                <span>
+                                    Genel Bakış
+                                </span>
+
+                                <h2>
+                                    Güncel Durum
+                                </h2>
+                            </div>
+
+                            <Link
+                                to="/tasks"
+                                className="section-link"
+                            >
+                                Tüm görevleri görüntüle →
+                            </Link>
+                        </div>
+
+                        <div className="stat-grid">
+                            {canManage && (
+                                <DashboardCard
+                                    to="/interns"
+                                    icon="♙"
+                                    value={
                                         stats.internCount
                                     }
-                                </h3>
+                                    label="Stajyer"
+                                />
+                            )}
 
-                                <p>
-                                    Stajyer
-                                </p>
-                            </div>
-                        </Link>
-                    )}
-
-                    <Link
-                        to="/tasks"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card">
-                            <h3>
-                                {
+                            <DashboardCard
+                                to="/tasks"
+                                icon="✓"
+                                value={
                                     stats.taskCount
                                 }
-                            </h3>
+                                label={
+                                    taskLabel
+                                }
+                            />
 
-                            <p>
-                                {canManage
-                                    ? "Toplam Görev"
-                                    : "Görevlerim"}
-                            </p>
-                        </div>
-                    </Link>
-
-                    <Link
-                        to="/tasks?filter=todo"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card">
-                            <h3>
-                                {
+                            <DashboardCard
+                                to="/tasks?filter=todo"
+                                icon="○"
+                                value={
                                     stats.toDoTaskCount
                                 }
-                            </h3>
+                                label="Yapılacak"
+                            />
 
-                            <p>
-                                Yapılacak Görev
-                            </p>
-                        </div>
-                    </Link>
-
-                    <Link
-                        to="/tasks?filter=progress"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card">
-                            <h3>
-                                {
+                            <DashboardCard
+                                to="/tasks?filter=progress"
+                                icon="◔"
+                                value={
                                     stats.inProgressTaskCount
                                 }
-                            </h3>
+                                label="Devam Eden"
+                            />
 
-                            <p>
-                                Devam Eden Görev
-                            </p>
-                        </div>
-                    </Link>
-
-                    <Link
-                        to="/tasks?filter=done"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card">
-                            <h3>
-                                {
+                            <DashboardCard
+                                to="/tasks?filter=done"
+                                icon="✓"
+                                value={
                                     stats.completedTaskCount
                                 }
-                            </h3>
+                                label="Tamamlanan"
+                                className="stat-card-success"
+                            />
 
-                            <p>
-                                Tamamlanan Görev
-                            </p>
-                        </div>
-                    </Link>
-
-                    <Link
-                        to="/tasks?filter=overdue"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card dashboard-card-overdue">
-                            <h3>
-                                {
+                            <DashboardCard
+                                to="/tasks?filter=overdue"
+                                icon="!"
+                                value={
                                     stats.overdueTaskCount
                                 }
-                            </h3>
+                                label="Geciken"
+                                className="stat-card-danger"
+                            />
 
-                            <p>
-                                Geciken Görev
-                            </p>
-                        </div>
-                    </Link>
-
-                    {canManage && (
-                        <Link
-                            to="/departments"
-                            className="dashboard-card-link"
-                        >
-                            <div className="dashboard-card">
-                                <h3>
-                                    {
+                            {canManage && (
+                                <DashboardCard
+                                    to="/departments"
+                                    icon="◫"
+                                    value={
                                         stats.departmentCount
                                     }
-                                </h3>
+                                    label="Departman"
+                                />
+                            )}
+                        </div>
+                    </section>
 
-                                <p>
-                                    Departman
-                                </p>
+                    <section className="dashboard-section">
+                        <div className="section-heading">
+                            <div>
+                                <span>
+                                    Hızlı İşlemler
+                                </span>
+
+                                <h2>
+                                    Kısayollar
+                                </h2>
                             </div>
-                        </Link>
-                    )}
-                </div>
+                        </div>
+
+                        <div className="quick-action-grid">
+                            <QuickActionCard
+                                to="/tasks"
+                                icon="✓"
+                                title={
+                                    taskActionTitle
+                                }
+                                description={
+                                    taskActionDescription
+                                }
+                            />
+
+                            {canManage && (
+                                <QuickActionCard
+                                    to="/interns"
+                                    icon="♙"
+                                    title="Stajyer Yönetimi"
+                                    description="Stajyerleri görüntüle, ekle ve bilgilerini düzenle."
+                                />
+                            )}
+
+                            {canManage && (
+                                <QuickActionCard
+                                    to="/departments"
+                                    icon="◫"
+                                    title="Departman Yönetimi"
+                                    description="Departmanları görüntüle ve organizasyon yapısını yönet."
+                                />
+                            )}
+
+                            <QuickActionCard
+                                to="/profile"
+                                icon="○"
+                                title="Profilim"
+                                description="Profil bilgilerini, avatarını ve şifreni yönet."
+                            />
+                        </div>
+                    </section>
+                </>
             )}
-
-            <h2>
-                {canManage
-                    ? "Yönetim"
-                    : "Hızlı Erişim"}
-            </h2>
-
-            <div className="dashboard">
-                {canManage && (
-                    <Link
-                        to="/interns"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card">
-                            <h3>
-                                Stajyerler
-                            </h3>
-
-                            <p>
-                                Stajyer ekleme,
-                                listeleme, düzenleme
-                                ve silme işlemleri.
-                            </p>
-                        </div>
-                    </Link>
-                )}
-
-                <Link
-                    to="/tasks"
-                    className="dashboard-card-link"
-                >
-                    <div className="dashboard-card">
-                        <h3>
-                            {canManage
-                                ? "Görevler"
-                                : "Görevlerim"}
-                        </h3>
-
-                        <p>
-                            {canManage
-                                ? "Görev oluşturma, durum güncelleme ve silme işlemleri."
-                                : "Sana atanmış görevleri görüntüle ve durumlarını takip et."}
-                        </p>
-                    </div>
-                </Link>
-
-                {canManage ? (
-                    <Link
-                        to="/departments"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card">
-                            <h3>
-                                Departmanlar
-                            </h3>
-
-                            <p>
-                                Departman ekleme,
-                                listeleme ve silme
-                                işlemleri.
-                            </p>
-                        </div>
-                    </Link>
-                ) : (
-                    <Link
-                        to="/profile"
-                        className="dashboard-card-link"
-                    >
-                        <div className="dashboard-card">
-                            <h3>
-                                Profilim
-                            </h3>
-
-                            <p>
-                                Profil bilgilerini,
-                                avatarını ve şifreni
-                                yönet.
-                            </p>
-                        </div>
-                    </Link>
-                )}
-            </div>
         </div>
     );
 }

@@ -44,29 +44,39 @@ function DepartmentForm({
                 handleSubmit
             }
         >
-            <input
-                type="text"
-                placeholder="Departman Adı"
-                value={name}
-                onChange={(event) =>
-                    setName(
-                        event.target.value
-                    )
-                }
-                autoFocus
-                required
-            />
+            <div className="department-modal-field">
+                <label
+                    htmlFor="department-name"
+                >
+                    Departman Adı
+                </label>
 
-            <button
-                type="submit"
-                disabled={
-                    isSubmitting
-                }
-            >
-                {isSubmitting
-                    ? "Ekleniyor..."
-                    : "Departman Ekle"}
-            </button>
+                <input
+                    id="department-name"
+                    type="text"
+                    placeholder="Departman adını yazın"
+                    value={name}
+                    onChange={(event) =>
+                        setName(
+                            event.target.value
+                        )
+                    }
+                    autoFocus
+                />
+            </div>
+
+            <div className="department-modal-footer">
+                <button
+                    type="submit"
+                    disabled={
+                        isSubmitting
+                    }
+                >
+                    {isSubmitting
+                        ? "Ekleniyor..."
+                        : "Departman Ekle"}
+                </button>
+            </div>
         </form>
     );
 }

@@ -20,6 +20,13 @@ import departmentService from "../services/departmentService";
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
 import TaskForm from "../components/TaskForm";
+import TaskList from "../components/TaskList";
+
+import type {
+    TaskFormData
+} from "../components/TaskForm";
+
+import Modal from "../components/common/Modal";
 
 import {
     getErrorMessage
@@ -28,6 +35,10 @@ import {
 import {
     isAdminOrHR
 } from "../utils/roleUtils";
+
+import {
+    createTaskUpdatePayload
+} from "../utils/taskMapper";
 
 import type {
     Intern,
@@ -39,8 +50,7 @@ import type {
 } from "../interfaces/department";
 
 import type {
-    TaskItem,
-    CreateTaskDto
+    TaskItem
 } from "../interfaces/task";
 
 function InternDetailPage() {
@@ -55,26 +65,29 @@ function InternDetailPage() {
             user?.role
         );
 
+    const isAdmin =
+        user?.role === "Admin";
+
     const [
         intern,
         setIntern
-    ] = useState<
-        Intern | null
-    >(null);
+    ] = useState<Intern | null>(
+        null
+    );
 
     const [
         tasks,
         setTasks
-    ] = useState<
-        TaskItem[]
-    >([]);
+    ] = useState<TaskItem[]>(
+        []
+    );
 
     const [
         departments,
         setDepartments
-    ] = useState<
-        Department[]
-    >([]);
+    ] = useState<Department[]>(
+        []
+    );
 
     const [
         name,
@@ -97,9 +110,26 @@ function InternDetailPage() {
     ] = useState(0);
 
     const [
-        isEditing,
-        setIsEditing
+        internIsActive,
+        setInternIsActive
+    ] = useState(true);
+
+    const [
+        showEditModal,
+        setShowEditModal
     ] = useState(false);
+
+    const [
+        showTaskModal,
+        setShowTaskModal
+    ] = useState(false);
+
+    const [
+        selectedTask,
+        setSelectedTask
+    ] = useState<TaskItem | null>(
+        null
+    );
 
     const [
         isUpdating,
@@ -107,8 +137,8 @@ function InternDetailPage() {
     ] = useState(false);
 
     const [
-        isAddingTask,
-        setIsAddingTask
+        isSubmittingTask,
+        setIsSubmittingTask
     ] = useState(false);
 
     const [
@@ -126,17 +156,64 @@ function InternDetailPage() {
         setIsError
     ] = useState(false);
 
+    const [
+        editMessage,
+        setEditMessage
+    ] = useState("");
+
+    const [
+        taskFormMessage,
+        setTaskFormMessage
+    ] = useState("");
+
+    async function getInternData(
+        internId: number
+    ) {
+        if (isAdmin) {
+            const allInterns =
+                await internService
+                    .getAllIncludingInactive();
+
+            return (
+                allInterns.find(
+                    (item) =>
+                        item.id ===
+                        internId
+                ) ?? null
+            );
+        }
+
+        return await internService
+            .getById(
+                internId
+            );
+    }
+
+    async function getTaskData() {
+        if (isAdmin) {
+            return await taskService
+                .getAllIncludingInactive();
+        }
+
+        return await taskService
+            .getAll();
+    }
+
     async function loadInternDetail(
         showLoading = true
     ) {
         if (!id) {
-            setIsError(true);
+            setIsError(
+                true
+            );
 
             setMessage(
                 "Stajyer bilgisi bulunamadı."
             );
 
-            setIsLoading(false);
+            setIsLoading(
+                false
+            );
 
             return;
         }
@@ -149,13 +226,17 @@ function InternDetailPage() {
                 internId
             )
         ) {
-            setIsError(true);
+            setIsError(
+                true
+            );
 
             setMessage(
                 "Geçersiz stajyer bilgisi."
             );
 
-            setIsLoading(false);
+            setIsLoading(
+                false
+            );
 
             return;
         }
@@ -172,12 +253,32 @@ function InternDetailPage() {
                 taskData
             ] =
                 await Promise.all([
-                    internService.getById(
+                    getInternData(
                         internId
                     ),
 
-                    taskService.getAll()
+                    getTaskData()
                 ]);
+
+            if (!internData) {
+                setIntern(
+                    null
+                );
+
+                setTasks(
+                    []
+                );
+
+                setIsError(
+                    true
+                );
+
+                setMessage(
+                    "Stajyer bulunamadı."
+                );
+
+                return;
+            }
 
             const internTasks =
                 taskData.filter(
@@ -210,6 +311,10 @@ function InternDetailPage() {
                 internData.departmentId
             );
 
+            setInternIsActive(
+                internData.isActive
+            );
+
             if (
                 canEditIntern
             ) {
@@ -218,11 +323,14 @@ function InternDetailPage() {
                         .getAll();
 
                 setDepartments(
-                    departmentData ?? []
+                    departmentData ??
+                    []
                 );
             }
         } catch (error) {
-            setIsError(true);
+            setIsError(
+                true
+            );
 
             setMessage(
                 getErrorMessage(
@@ -245,7 +353,7 @@ function InternDetailPage() {
         canEditIntern
     ]);
 
-    function handleEditClick() {
+    function openEditModal() {
         if (!intern) {
             return;
         }
@@ -266,37 +374,67 @@ function InternDetailPage() {
             intern.departmentId
         );
 
-        setMessage("");
-        setIsError(false);
+        setInternIsActive(
+            intern.isActive
+        );
 
-        setIsEditing(
+        setEditMessage("");
+
+        setShowEditModal(
             true
         );
     }
 
-    function handleCancelEdit() {
-        if (intern) {
-            setName(
-                intern.name
-            );
-
-            setSurname(
-                intern.surname
-            );
-
-            setEmail(
-                intern.email
-            );
-
-            setDepartmentId(
-                intern.departmentId
-            );
+    function closeEditModal() {
+        if (isUpdating) {
+            return;
         }
 
-        setMessage("");
-        setIsError(false);
+        setEditMessage("");
 
-        setIsEditing(
+        setShowEditModal(
+            false
+        );
+    }
+
+    function openCreateTaskModal() {
+        setSelectedTask(
+            null
+        );
+
+        setTaskFormMessage("");
+
+        setShowTaskModal(
+            true
+        );
+    }
+
+    function openEditTaskModal(
+        task: TaskItem
+    ) {
+        setSelectedTask(
+            task
+        );
+
+        setTaskFormMessage("");
+
+        setShowTaskModal(
+            true
+        );
+    }
+
+    function closeTaskModal() {
+        if (isSubmittingTask) {
+            return;
+        }
+
+        setSelectedTask(
+            null
+        );
+
+        setTaskFormMessage("");
+
+        setShowTaskModal(
             false
         );
     }
@@ -307,7 +445,10 @@ function InternDetailPage() {
     ) {
         event.preventDefault();
 
-        if (!id) {
+        if (
+            !id ||
+            !intern
+        ) {
             return;
         }
 
@@ -322,9 +463,45 @@ function InternDetailPage() {
             return;
         }
 
-        setMessage("");
-        setIsError(false);
-        setIsUpdating(true);
+        if (!name.trim()) {
+            setEditMessage(
+                "Stajyer adı zorunludur."
+            );
+
+            return;
+        }
+
+        if (!surname.trim()) {
+            setEditMessage(
+                "Stajyer soyadı zorunludur."
+            );
+
+            return;
+        }
+
+        if (!email.trim()) {
+            setEditMessage(
+                "E-posta adresi zorunludur."
+            );
+
+            return;
+        }
+
+        if (
+            departmentId <= 0
+        ) {
+            setEditMessage(
+                "Lütfen bir departman seçin."
+            );
+
+            return;
+        }
+
+        setEditMessage("");
+
+        setIsUpdating(
+            true
+        );
 
         const dto:
             UpdateInternDto = {
@@ -341,28 +518,63 @@ function InternDetailPage() {
             };
 
         try {
+            if (
+                isAdmin &&
+                !intern.isActive
+            ) {
+                await internService
+                    .restore(
+                        internId
+                    );
+            }
+
             const data =
-                await internService.update(
-                    internId,
-                    dto
-                );
+                await internService
+                    .update(
+                        internId,
+                        dto
+                    );
+
+            if (
+                isAdmin &&
+                !internIsActive
+            ) {
+                await internService
+                    .delete(
+                        internId
+                    );
+            }
 
             await loadInternDetail(
                 false
             );
 
-            setIsEditing(
+            setShowEditModal(
                 false
             );
 
-            setMessage(
-                data?.message ||
-                "Stajyer bilgileri başarıyla güncellendi."
+            setIsError(
+                false
             );
-        } catch (error) {
-            setIsError(true);
 
-            setMessage(
+            if (
+                isAdmin &&
+                intern.isActive !==
+                    internIsActive
+            ) {
+                setMessage(
+                    internIsActive
+                        ? "Stajyer bilgileri güncellendi ve stajyer aktif hale getirildi."
+                        : "Stajyer bilgileri güncellendi ve stajyer pasif hale getirildi."
+                );
+            } else {
+                setMessage(
+                    data?.message ||
+                    "Stajyer bilgileri başarıyla güncellendi."
+                );
+            }
+        } catch (error) {
+            setEditMessage(
                 getErrorMessage(
                     error
                 )
@@ -375,19 +587,34 @@ function InternDetailPage() {
     }
 
     async function handleAddTask(
-        newTask: CreateTaskDto
+        newTask: TaskFormData
     ) {
-        setMessage("");
-        setIsError(false);
-        setIsAddingTask(true);
+        setTaskFormMessage("");
+
+        setIsSubmittingTask(
+            true
+        );
 
         try {
             const data =
-                await taskService.create(
-                    newTask
-                );
+                await taskService
+                    .create(
+                        newTask
+                    );
 
             await loadInternDetail(
+                false
+            );
+
+            setShowTaskModal(
+                false
+            );
+
+            setSelectedTask(
+                null
+            );
+
+            setIsError(
                 false
             );
 
@@ -396,15 +623,73 @@ function InternDetailPage() {
                 "Görev başarıyla eklendi."
             );
         } catch (error) {
-            setIsError(true);
-
-            setMessage(
+            setTaskFormMessage(
                 getErrorMessage(
                     error
                 )
             );
         } finally {
-            setIsAddingTask(
+            setIsSubmittingTask(
+                false
+            );
+        }
+    }
+
+    async function handleUpdateTask(
+        updatedTask: TaskFormData
+    ) {
+        if (!selectedTask) {
+            return;
+        }
+
+        setTaskFormMessage("");
+
+        setIsSubmittingTask(
+            true
+        );
+
+        const updateDto =
+            createTaskUpdatePayload(
+                updatedTask,
+                isAdmin
+            );
+
+        try {
+            const data =
+                await taskService
+                    .update(
+                        selectedTask.id,
+                        updateDto
+                    );
+
+            await loadInternDetail(
+                false
+            );
+
+            setShowTaskModal(
+                false
+            );
+
+            setSelectedTask(
+                null
+            );
+
+            setIsError(
+                false
+            );
+
+            setMessage(
+                data?.message ||
+                "Görev başarıyla güncellendi."
+            );
+        } catch (error) {
+            setTaskFormMessage(
+                getErrorMessage(
+                    error
+                )
+            );
+        } finally {
+            setIsSubmittingTask(
                 false
             );
         }
@@ -417,7 +702,7 @@ function InternDetailPage() {
     }
 
     return (
-        <div>
+        <div className="intern-detail-page">
             <Link
                 to="/interns"
                 className="detail-back-link"
@@ -425,9 +710,11 @@ function InternDetailPage() {
                 ← Stajyerlere Dön
             </Link>
 
-            <h2>
-                Stajyer Detayı
-            </h2>
+            <div className="intern-detail-page-heading">
+                <h2>
+                    Stajyer Detayı
+                </h2>
+            </div>
 
             <AlertMessage
                 message={
@@ -440,56 +727,138 @@ function InternDetailPage() {
 
             {intern && (
                 <>
-                    <div className="intern-detail-card">
-                        <h3>
-                            {intern.name}{" "}
-                            {intern.surname}
-                        </h3>
+                    <section className="intern-profile-summary">
+                        <div className="intern-profile-summary-main">
+                            <div className="intern-profile-avatar">
+                                {intern.avatar ||
+                                intern.name
+                                    .charAt(0)
+                                    .toUpperCase()}
+                            </div>
 
-                        <p>
-                            <strong>
-                                Email:
-                            </strong>{" "}
-                            {intern.email}
-                        </p>
+                            <div>
+                                <div className="intern-profile-title-row">
+                                    <h3>
+                                        {intern.name}{" "}
+                                        {intern.surname}
+                                    </h3>
 
-                        <p>
-                            <strong>
-                                Departman:
-                            </strong>{" "}
-                            {intern.department
-                                ?.name ||
-                                "Belirtilmemiş"}
-                        </p>
+                                    <span
+                                        className={
+                                            intern.isActive
+                                                ? "task-active-badge"
+                                                : "task-inactive-badge"
+                                        }
+                                    >
+                                        {intern.isActive
+                                            ? "Aktif"
+                                            : "Pasif"}
+                                    </span>
+                                </div>
 
-                        {canEditIntern &&
-                            !isEditing && (
-                                <button
-                                    type="button"
-                                    onClick={
-                                        handleEditClick
-                                    }
-                                >
-                                    Stajyeri Düzenle
-                                </button>
-                            )}
-                    </div>
+                                <div className="intern-profile-meta">
+                                    <span>
+                                        <strong>
+                                            E-posta
+                                        </strong>
 
-                    {canEditIntern &&
-                        isEditing && (
-                            <div className="intern-edit-section">
-                                <h3>
-                                    Stajyer Bilgilerini Düzenle
-                                </h3>
+                                        {intern.email}
+                                    </span>
 
-                                <form
-                                    onSubmit={
-                                        handleUpdateSubmit
-                                    }
-                                >
+                                    <span>
+                                        <strong>
+                                            Departman
+                                        </strong>
+
+                                        {intern.department
+                                            ?.name ||
+                                            "Belirtilmemiş"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {canEditIntern && (
+                            <button
+                                type="button"
+                                className="intern-profile-edit-button"
+                                onClick={
+                                    openEditModal
+                                }
+                            >
+                                Düzenle
+                            </button>
+                        )}
+                    </section>
+
+                    <section className="intern-detail-tasks-section">
+                        <div className="intern-detail-section-heading">
+                            <h3>
+                                Görevler
+                            </h3>
+
+                            {canEditIntern &&
+                                intern.isActive && (
+                                    <button
+                                        type="button"
+                                        className="intern-detail-add-task-button"
+                                        onClick={
+                                            openCreateTaskModal
+                                        }
+                                    >
+                                        + Görev Ekle
+                                    </button>
+                                )}
+                        </div>
+
+                        <TaskList
+                            tasks={
+                                tasks
+                            }
+                            canManageTasks={
+                                canEditIntern
+                            }
+                            onEdit={
+                                openEditTaskModal
+                            }
+                        />
+                    </section>
+
+                    <Modal
+                        isOpen={
+                            showEditModal
+                        }
+                        title="Stajyeri Düzenle"
+                        onClose={
+                            closeEditModal
+                        }
+                    >
+                        <AlertMessage
+                            message={
+                                editMessage
+                            }
+                            isError={true}
+                            compact
+                        />
+
+                        <form
+                            className="intern-detail-edit-form"
+                            onSubmit={
+                                handleUpdateSubmit
+                            }
+                            noValidate
+                        >
+                            <div className="intern-detail-edit-grid">
+                                <div className="intern-detail-form-field">
+                                    <label
+                                        htmlFor="intern-edit-name"
+                                    >
+                                        Ad
+                                    </label>
+
                                     <input
+                                        id="intern-edit-name"
                                         type="text"
-                                        placeholder="Ad"
                                         value={
                                             name
                                         }
@@ -500,13 +869,19 @@ function InternDetailPage() {
                                                     .value
                                             )
                                         }
-                                        required
-                                        minLength={2}
                                     />
+                                </div>
+
+                                <div className="intern-detail-form-field">
+                                    <label
+                                        htmlFor="intern-edit-surname"
+                                    >
+                                        Soyad
+                                    </label>
 
                                     <input
+                                        id="intern-edit-surname"
                                         type="text"
-                                        placeholder="Soyad"
                                         value={
                                             surname
                                         }
@@ -517,13 +892,19 @@ function InternDetailPage() {
                                                     .value
                                             )
                                         }
-                                        required
-                                        minLength={2}
                                     />
+                                </div>
+
+                                <div className="intern-detail-form-field">
+                                    <label
+                                        htmlFor="intern-edit-email"
+                                    >
+                                        E-posta
+                                    </label>
 
                                     <input
+                                        id="intern-edit-email"
                                         type="email"
-                                        placeholder="Email"
                                         value={
                                             email
                                         }
@@ -534,10 +915,18 @@ function InternDetailPage() {
                                                     .value
                                             )
                                         }
-                                        required
                                     />
+                                </div>
+
+                                <div className="intern-detail-form-field">
+                                    <label
+                                        htmlFor="intern-edit-department"
+                                    >
+                                        Departman
+                                    </label>
 
                                     <select
+                                        id="intern-edit-department"
                                         value={
                                             departmentId
                                         }
@@ -550,7 +939,6 @@ function InternDetailPage() {
                                                 )
                                             )
                                         }
-                                        required
                                     >
                                         <option value={0}>
                                             Departman Seç
@@ -575,97 +963,123 @@ function InternDetailPage() {
                                             )
                                         )}
                                     </select>
+                                </div>
 
-                                    <button
-                                        type="submit"
-                                        disabled={
-                                            isUpdating
-                                        }
-                                    >
-                                        {isUpdating
-                                            ? "Güncelleniyor..."
-                                            : "Kaydet"}
-                                    </button>
+                                {isAdmin && (
+                                    <div className="intern-detail-form-field intern-detail-active-field">
+                                        <label
+                                            htmlFor="intern-edit-active"
+                                        >
+                                            Stajyer Aktifliği
+                                        </label>
 
-                                    <button
-                                        type="button"
-                                        onClick={
-                                            handleCancelEdit
-                                        }
-                                        disabled={
-                                            isUpdating
-                                        }
-                                    >
-                                        İptal
-                                    </button>
-                                </form>
+                                        <select
+                                            id="intern-edit-active"
+                                            value={
+                                                internIsActive
+                                                    ? "active"
+                                                    : "inactive"
+                                            }
+                                            onChange={(event) =>
+                                                setInternIsActive(
+                                                    event
+                                                        .target
+                                                        .value ===
+                                                        "active"
+                                                )
+                                            }
+                                        >
+                                            <option value="active">
+                                                Aktif
+                                            </option>
+
+                                            <option value="inactive">
+                                                Pasif
+                                            </option>
+                                        </select>
+                                    </div>
+                                )}
                             </div>
-                        )}
 
-                    {canEditIntern && (
-                        <div className="intern-task-form-section">
-                            <h3>
-                                Görev Ekle
-                            </h3>
-
-                            <TaskForm
-                                interns={[]}
-                                canAssignIntern={
-                                    true
-                                }
-                                fixedInternId={
-                                    intern.id
-                                }
-                                isSubmitting={
-                                    isAddingTask
-                                }
-                                onSubmit={
-                                    handleAddTask
-                                }
-                            />
-                        </div>
-                    )}
-
-                    <h3>
-                        Görevleri
-                    </h3>
-
-                    {tasks.length === 0 ? (
-                        <p>
-                            Bu stajyere atanmış görev yok.
-                        </p>
-                    ) : (
-                        tasks.map(
-                            (task) => (
-                                <div
-                                    className="task-card"
-                                    key={
-                                        task.id
+                            <div className="intern-detail-edit-footer">
+                                <button
+                                    type="button"
+                                    className="intern-detail-cancel-button"
+                                    disabled={
+                                        isUpdating
+                                    }
+                                    onClick={
+                                        closeEditModal
                                     }
                                 >
-                                    <strong>
-                                        {
-                                            task.title
-                                        }
-                                    </strong>
+                                    İptal
+                                </button>
 
-                                    {" - "}
-
-                                    {
-                                        task.status
+                                <button
+                                    type="submit"
+                                    className="intern-detail-save-button"
+                                    disabled={
+                                        isUpdating
                                     }
+                                >
+                                    {isUpdating
+                                        ? "Güncelleniyor..."
+                                        : "Değişiklikleri Kaydet"}
+                                </button>
+                            </div>
+                        </form>
+                    </Modal>
 
-                                    {task.description && (
-                                        <p>
-                                            {
-                                                task.description
-                                            }
-                                        </p>
-                                    )}
-                                </div>
-                            )
-                        )
-                    )}
+                    <Modal
+                        isOpen={
+                            showTaskModal
+                        }
+                        title={
+                            selectedTask
+                                ? "Görevi Düzenle"
+                                : "Görev Ekle"
+                        }
+                        onClose={
+                            closeTaskModal
+                        }
+                    >
+                        <AlertMessage
+                            message={
+                                taskFormMessage
+                            }
+                            isError={true}
+                            compact
+                        />
+
+                        <TaskForm
+                            interns={[]}
+                            canAssignIntern={
+                                true
+                            }
+                            fixedInternId={
+                                intern.id
+                            }
+                            canChangeActive={
+                                isAdmin
+                            }
+                            isSubmitting={
+                                isSubmittingTask
+                            }
+                            mode={
+                                selectedTask
+                                    ? "edit"
+                                    : "create"
+                            }
+                            initialTask={
+                                selectedTask
+                            }
+                            onSubmit={
+                                selectedTask
+                                    ? handleUpdateTask
+                                    : handleAddTask
+                            }
+                        />
+                    </Modal>
                 </>
             )}
         </div>

@@ -13,7 +13,6 @@ import type {
 
 interface InternFormProps {
     departments: Department[];
-
     isSubmitting: boolean;
 
     onSubmit: (
@@ -56,19 +55,12 @@ function InternForm({
     ) {
         event.preventDefault();
 
-        const newIntern:
+        const intern:
             CreateInternDto = {
-                name:
-                    name.trim(),
-
-                surname:
-                    surname.trim(),
-
-                email:
-                    email.trim(),
-
+                name: name.trim(),
+                surname: surname.trim(),
+                email: email.trim(),
                 password,
-
                 departmentId:
                     Number(
                         departmentId
@@ -76,7 +68,7 @@ function InternForm({
             };
 
         await onSubmit(
-            newIntern
+            intern
         );
     }
 
@@ -92,9 +84,7 @@ function InternForm({
                 value={name}
                 onChange={(event) =>
                     setName(
-                        event
-                            .target
-                            .value
+                        event.target.value
                     )
                 }
                 required
@@ -106,9 +96,7 @@ function InternForm({
                 value={surname}
                 onChange={(event) =>
                     setSurname(
-                        event
-                            .target
-                            .value
+                        event.target.value
                     )
                 }
                 required
@@ -120,9 +108,7 @@ function InternForm({
                 value={email}
                 onChange={(event) =>
                     setEmail(
-                        event
-                            .target
-                            .value
+                        event.target.value
                     )
                 }
                 required
@@ -134,9 +120,7 @@ function InternForm({
                 value={password}
                 onChange={(event) =>
                     setPassword(
-                        event
-                            .target
-                            .value
+                        event.target.value
                     )
                 }
                 required
@@ -149,9 +133,7 @@ function InternForm({
                 }
                 onChange={(event) =>
                     setDepartmentId(
-                        event
-                            .target
-                            .value
+                        event.target.value
                     )
                 }
                 required
@@ -161,9 +143,7 @@ function InternForm({
                 </option>
 
                 {departments.map(
-                    (
-                        department
-                    ) => (
+                    (department) => (
                         <option
                             key={
                                 department.id

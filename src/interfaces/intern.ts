@@ -1,4 +1,6 @@
-import type { Department } from "./department";
+import type {
+    Department
+} from "./department";
 
 export interface Intern {
     id: number;
@@ -8,6 +10,8 @@ export interface Intern {
     departmentId: number;
     department?: Department | null;
     userId: number;
+    avatar?: string | null;
+    isActive: boolean;
 }
 
 export interface CreateInternDto {

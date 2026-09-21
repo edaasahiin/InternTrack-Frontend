@@ -1,4 +1,6 @@
-import type { Intern } from "./intern";
+import type {
+    Intern
+} from "./intern";
 
 export interface TaskItem {
     id: number;
@@ -13,6 +15,7 @@ export interface TaskItem {
     canInternDeleteWhenCompleted: boolean;
     createdAt: string;
     completedAt?: string | null;
+    isActive: boolean;
 }
 
 export interface CreateTaskDto {
@@ -33,4 +36,5 @@ export interface UpdateTaskDto {
     dueDate?: string | null;
     internId: number;
     canInternDeleteWhenCompleted: boolean;
+    isActive?: boolean;
 }

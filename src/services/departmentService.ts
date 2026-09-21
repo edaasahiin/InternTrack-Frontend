@@ -5,22 +5,25 @@ import type {
     CreateDepartmentDto
 } from "../interfaces/department";
 
-interface MessageResponse {
-    message?: string;
-}
+import type {
+    MessageResponse
+} from "../interfaces/common";
 
 const departmentService = {
     getAll(): Promise<Department[]> {
-        return apiService.get<
-            Department[]
-        >(
+        return apiService.get<Department[]>(
             "/departments"
         );
     },
 
+    getAllIncludingInactive(): Promise<Department[]> {
+        return apiService.get<Department[]>(
+            "/departments/all"
+        );
+    },
+
     create(
-        department:
-            CreateDepartmentDto
+        department: CreateDepartmentDto
     ): Promise<MessageResponse> {
         return apiService.post<
             MessageResponse,
@@ -33,8 +36,7 @@ const departmentService = {
 
     update(
         id: number,
-        department:
-            CreateDepartmentDto
+        department: CreateDepartmentDto
     ): Promise<MessageResponse> {
         return apiService.put<
             MessageResponse,
@@ -50,6 +52,14 @@ const departmentService = {
     ): Promise<void> {
         return apiService.delete<void>(
             `/departments/${id}`
+        );
+    },
+
+    restore(
+        id: number
+    ): Promise<MessageResponse> {
+        return apiService.patch<MessageResponse>(
+            `/departments/${id}/restore`
         );
     }
 };

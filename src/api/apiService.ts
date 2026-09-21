@@ -1,20 +1,12 @@
-import type {
-    AxiosRequestConfig
-} from "axios";
-
 import axiosClient from "./axiosClient";
 
 const apiService = {
-    async get<TResponse>(
-        endpoint: string,
-        config?: AxiosRequestConfig
-    ): Promise<TResponse> {
+    async get<T>(
+        url: string
+    ): Promise<T> {
         const response =
-            await axiosClient.get<
-                TResponse
-            >(
-                endpoint,
-                config
+            await axiosClient.get<T>(
+                url
             );
 
         return response.data;
@@ -22,19 +14,15 @@ const apiService = {
 
     async post<
         TResponse,
-        TBody = unknown
+        TRequest = unknown
     >(
-        endpoint: string,
-        body?: TBody,
-        config?: AxiosRequestConfig
+        url: string,
+        data?: TRequest
     ): Promise<TResponse> {
         const response =
-            await axiosClient.post<
-                TResponse
-            >(
-                endpoint,
-                body,
-                config
+            await axiosClient.post<TResponse>(
+                url,
+                data
             );
 
         return response.data;
@@ -42,34 +30,42 @@ const apiService = {
 
     async put<
         TResponse,
-        TBody = unknown
+        TRequest = unknown
     >(
-        endpoint: string,
-        body: TBody,
-        config?: AxiosRequestConfig
+        url: string,
+        data?: TRequest
     ): Promise<TResponse> {
         const response =
-            await axiosClient.put<
-                TResponse
-            >(
-                endpoint,
-                body,
-                config
+            await axiosClient.put<TResponse>(
+                url,
+                data
+            );
+
+        return response.data;
+    },
+
+    async patch<
+        TResponse,
+        TRequest = unknown
+    >(
+        url: string,
+        data?: TRequest
+    ): Promise<TResponse> {
+        const response =
+            await axiosClient.patch<TResponse>(
+                url,
+                data
             );
 
         return response.data;
     },
 
     async delete<TResponse>(
-        endpoint: string,
-        config?: AxiosRequestConfig
+        url: string
     ): Promise<TResponse> {
         const response =
-            await axiosClient.delete<
-                TResponse
-            >(
-                endpoint,
-                config
+            await axiosClient.delete<TResponse>(
+                url
             );
 
         return response.data;

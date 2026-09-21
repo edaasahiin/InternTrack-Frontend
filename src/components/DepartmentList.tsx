@@ -1,27 +1,25 @@
-import {
-    useState
-} from "react";
+import Table from "./common/Table";
+
+import type {
+    TableColumn
+} from "./common/Table";
 
 import type {
     Department
 } from "../interfaces/department";
 
 interface DepartmentListProps {
-    departments:
-        Department[];
+    departments: Department[];
 
-    canManage:
-        boolean;
+    canManage: boolean;
 
-    isUpdating:
-        boolean;
+    canToggleActive: boolean;
 
-    onUpdate: (
-        department: Department,
-        newName: string
-    ) => Promise<boolean>;
+    onEdit: (
+        department: Department
+    ) => void;
 
-    onDelete: (
+    onToggleActive: (
         department: Department
     ) => Promise<void> | void;
 }
@@ -29,73 +27,100 @@ interface DepartmentListProps {
 function DepartmentList({
     departments,
     canManage,
-    isUpdating,
-    onUpdate,
-    onDelete
+    canToggleActive,
+    onEdit,
+    onToggleActive
 }: DepartmentListProps) {
-    const [
-        editingDepartmentId,
-        setEditingDepartmentId
-    ] = useState<number | null>(
-        null
-    );
+    const columns:
+        TableColumn<Department>[] = [
+        {
+            key: "name",
 
-    const [
-        editingName,
-        setEditingName
-    ] = useState("");
+            header: "Departman",
 
-    function startEditing(
-        department: Department
-    ) {
-        setEditingDepartmentId(
-            department.id
-        );
+            render: (
+                department
+            ) => (
+                <strong>
+                    {
+                        department.name
+                    }
+                </strong>
+            )
+        },
 
-        setEditingName(
-            department.name
-        );
-    }
+        {
+            key: "activeStatus",
 
-    function cancelEditing() {
-        setEditingDepartmentId(
-            null
-        );
+            header:
+                "Departman Aktifliği",
 
-        setEditingName("");
-    }
+            render: (
+                department
+            ) => (
+                <span
+                    className={
+                        department.isActive
+                            ? "task-active-badge"
+                            : "task-inactive-badge"
+                    }
+                >
+                    {
+                        department.isActive
+                            ? "Aktif"
+                            : "Pasif"
+                    }
+                </span>
+            )
+        },
 
-    async function saveDepartment(
-        department: Department
-    ) {
-        const trimmedName =
-            editingName.trim();
+        {
+            key: "actions",
 
-        if (!trimmedName) {
-            return;
+            header: "İşlemler",
+
+            render: (
+                department
+            ) =>
+                canManage ? (
+                    <div className="department-actions">
+                        <button
+                            type="button"
+                            className="department-edit-button"
+                            onClick={() =>
+                                onEdit(
+                                    department
+                                )
+                            }
+                        >
+                            Düzenle
+                        </button>
+
+                        {canToggleActive && (
+                            <button
+                                type="button"
+                                className={
+                                    department.isActive
+                                        ? "department-delete-button"
+                                        : "department-restore-button"
+                                }
+                                onClick={() =>
+                                    onToggleActive(
+                                        department
+                                    )
+                                }
+                            >
+                                {department.isActive
+                                    ? "Pasif Et"
+                                    : "Aktif Et"}
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    "-"
+                )
         }
-
-        const success =
-            await onUpdate(
-                department,
-                trimmedName
-            );
-
-        if (success) {
-            cancelEditing();
-        }
-    }
-
-    if (
-        departments.length ===
-        0
-    ) {
-        return (
-            <p>
-                Departman bulunamadı.
-            </p>
-        );
-    }
+    ];
 
     return (
         <div>
@@ -103,127 +128,27 @@ function DepartmentList({
                 Departman Listesi
             </h3>
 
-            {departments.map(
-                (department) => {
-                    const isEditing =
-                        editingDepartmentId ===
-                        department.id;
-
-                    return (
-                        <div
-                            className="department-card"
-                            key={
-                                department.id
-                            }
-                        >
-                            {isEditing ? (
-                                <input
-                                    className="department-edit-input"
-                                    type="text"
-                                    value={
-                                        editingName
-                                    }
-                                    onChange={(event) =>
-                                        setEditingName(
-                                            event
-                                                .target
-                                                .value
-                                        )
-                                    }
-                                    onKeyDown={(event) => {
-                                        if (
-                                            event.key ===
-                                            "Enter"
-                                        ) {
-                                            saveDepartment(
-                                                department
-                                            );
-                                        }
-
-                                        if (
-                                            event.key ===
-                                            "Escape"
-                                        ) {
-                                            cancelEditing();
-                                        }
-                                    }}
-                                    autoFocus
-                                />
-                            ) : (
-                                <span>
-                                    {
-                                        department.name
-                                    }
-                                </span>
-                            )}
-
-                            {canManage && (
-                                <div className="department-actions">
-                                    {isEditing ? (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="department-save-button"
-                                                disabled={
-                                                    isUpdating
-                                                }
-                                                onClick={() =>
-                                                    saveDepartment(
-                                                        department
-                                                    )
-                                                }
-                                            >
-                                                {isUpdating
-                                                    ? "Kaydediliyor..."
-                                                    : "Kaydet"}
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="department-cancel-button"
-                                                disabled={
-                                                    isUpdating
-                                                }
-                                                onClick={
-                                                    cancelEditing
-                                                }
-                                            >
-                                                İptal
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="department-edit-button"
-                                                onClick={() =>
-                                                    startEditing(
-                                                        department
-                                                    )
-                                                }
-                                            >
-                                                Düzenle
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="department-delete-button"
-                                                onClick={() =>
-                                                    onDelete(
-                                                        department
-                                                    )
-                                                }
-                                            >
-                                                Sil
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    );
+            <Table
+                data={
+                    departments
                 }
-            )}
+                columns={
+                    columns
+                }
+                getRowKey={(
+                    department
+                ) =>
+                    department.id
+                }
+                emptyMessage="Departman bulunamadı."
+                rowClassName={(
+                    department
+                ) =>
+                    department.isActive
+                        ? ""
+                        : "inactive-row"
+                }
+            />
         </div>
     );
 }

@@ -9,6 +9,9 @@ import type {
     UpdateProfileDto
 } from "../interfaces/auth";
 
+const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL;
+
 const authService = {
     getCurrentUser(): Promise<AuthUser> {
         return apiService.get<AuthUser>(
@@ -76,10 +79,25 @@ const authService = {
         );
     },
 
-    logout(): Promise<void> {
-        return apiService.post<void>(
-            "/auth/logout"
-        );
+    async logout(): Promise<void> {
+        const response =
+            await fetch(
+                `${API_BASE_URL}/auth/logout`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Çıkış işlemi gerçekleştirilemedi."
+            );
+        }
     }
 };
 

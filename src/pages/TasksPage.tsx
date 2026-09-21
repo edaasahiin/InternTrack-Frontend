@@ -8,6 +8,11 @@ import {
 } from "react-router-dom";
 
 import TaskForm from "../components/TaskForm";
+
+import type {
+    TaskFormData
+} from "../components/TaskForm";
+
 import TaskList from "../components/TaskList";
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
@@ -27,13 +32,26 @@ import {
 } from "../utils/roleUtils";
 
 import {
+    matchesActiveFilter,
+    normalizeSearchText,
+    shouldIncludeInactive,
+    type ActiveFilter
+} from "../utils/activeFilter";
+
+import {
+    isTaskOverdue
+} from "../utils/taskUtils";
+
+import {
+    createTaskUpdatePayload
+} from "../utils/taskMapper";
+
+import {
     getErrorMessage
 } from "../utils/getErrorMessage";
 
 import type {
-    TaskItem,
-    CreateTaskDto,
-    UpdateTaskDto
+    TaskItem
 } from "../interfaces/task";
 
 import type {
@@ -70,6 +88,13 @@ function TasksPage() {
     );
 
     const [
+        activeFilter,
+        setActiveFilter
+    ] = useState<ActiveFilter>(
+        "Active"
+    );
+
+    const [
         searchText,
         setSearchText
     ] = useState("");
@@ -100,9 +125,21 @@ function TasksPage() {
     ] = useState(false);
 
     const [
+        formMessage,
+        setFormMessage
+    ] = useState("");
+
+    const [
         showTaskForm,
         setShowTaskForm
     ] = useState(false);
+
+    const [
+        selectedTask,
+        setSelectedTask
+    ] = useState<TaskItem | null>(
+        null
+    );
 
     const [
         isCelebrating,
@@ -117,74 +154,13 @@ function TasksPage() {
             user?.role
         );
 
-    function parseDateTime(
-        value: string
-    ) {
-        const hasTimezone =
-            value.endsWith("Z") ||
-            /[+-]\d{2}:\d{2}$/.test(
-                value
-            );
-
-        return new Date(
-            hasTimezone
-                ? value
-                : `${value}Z`
-        );
-    }
-
-    function isOverdue(
-        task: TaskItem
-    ) {
-        if (
-            !task.dueDate ||
-            task.status === "Done"
-        ) {
-            return false;
-        }
-
-        return (
-            parseDateTime(
-                task.dueDate
-            ).getTime() <
-            Date.now()
-        );
-    }
-
-    function createUpdateDto(
-        task: TaskItem,
-        changes: Partial<
-            UpdateTaskDto
-        > = {}
-    ): UpdateTaskDto {
-        return {
-            title:
-                task.title,
-
-            description:
-                task.description,
-
-            status:
-                task.status,
-
-            priority:
-                task.priority,
-
-            dueDate:
-                task.dueDate,
-
-            internId:
-                task.internId,
-
-            canInternDeleteWhenCompleted:
-                task.canInternDeleteWhenCompleted,
-
-            ...changes
-        };
-    }
+    const isAdmin =
+        user?.role === "Admin";
 
     async function loadTasks(
-        showLoading = true
+        showLoading = true,
+        selectedActiveFilter =
+            activeFilter
     ) {
         if (showLoading) {
             setIsLoading(
@@ -192,9 +168,22 @@ function TasksPage() {
             );
         }
 
+        setMessage("");
+        setIsError(false);
+
         try {
+            const includeInactive =
+                shouldIncludeInactive(
+                    isAdmin,
+                    selectedActiveFilter
+                );
+
             const data =
-                await taskService.getAll();
+                includeInactive
+                    ? await taskService
+                        .getAllIncludingInactive()
+                    : await taskService
+                        .getAll();
 
             setTasks(
                 data ?? []
@@ -225,9 +214,6 @@ function TasksPage() {
             true
         );
 
-        setMessage("");
-        setIsError(false);
-
         try {
             const data =
                 await internService.getAll();
@@ -236,9 +222,7 @@ function TasksPage() {
                 data ?? []
             );
         } catch (error) {
-            setIsError(true);
-
-            setMessage(
+            setFormMessage(
                 getErrorMessage(
                     error
                 )
@@ -250,9 +234,50 @@ function TasksPage() {
         }
     }
 
+    async function handleActiveFilterChange(
+        newFilter: ActiveFilter
+    ) {
+        setActiveFilter(
+            newFilter
+        );
+
+        await loadTasks(
+            true,
+            newFilter
+        );
+    }
+
     async function openTaskForm() {
         setMessage("");
         setIsError(false);
+        setFormMessage("");
+
+        setSelectedTask(
+            null
+        );
+
+        setShowTaskForm(
+            true
+        );
+
+        if (
+            canManageTasks &&
+            interns.length === 0
+        ) {
+            await loadInterns();
+        }
+    }
+
+    async function openEditTask(
+        task: TaskItem
+    ) {
+        setMessage("");
+        setIsError(false);
+        setFormMessage("");
+
+        setSelectedTask(
+            task
+        );
 
         setShowTaskForm(
             true
@@ -270,14 +295,22 @@ function TasksPage() {
         setShowTaskForm(
             false
         );
+
+        setSelectedTask(
+            null
+        );
+
+        setFormMessage("");
     }
 
     async function handleAddTask(
-        newTask: CreateTaskDto
+        newTask: TaskFormData
     ) {
-        setMessage("");
-        setIsError(false);
-        setIsSubmitting(true);
+        setFormMessage("");
+
+        setIsSubmitting(
+            true
+        );
 
         try {
             const data =
@@ -289,16 +322,16 @@ function TasksPage() {
                 false
             );
 
+            closeTaskForm();
+
+            setIsError(false);
+
             setMessage(
                 data?.message ||
                 "Görev başarıyla eklendi."
             );
-
-            closeTaskForm();
         } catch (error) {
-            setIsError(true);
-
-            setMessage(
+            setFormMessage(
                 getErrorMessage(
                     error
                 )
@@ -310,81 +343,52 @@ function TasksPage() {
         }
     }
 
-    async function handleDeleteTask(
-        task: TaskItem
+    async function handleUpdateTask(
+        updatedTask: TaskFormData
     ) {
-        setMessage("");
-        setIsError(false);
-
-        try {
-            await taskService.delete(
-                task.id
-            );
-
-            await loadTasks(
-                false
-            );
-
-            setMessage(
-                "Görev başarıyla silindi."
-            );
-        } catch (error) {
-            setIsError(true);
-
-            setMessage(
-                getErrorMessage(
-                    error
-                )
-            );
+        if (!selectedTask) {
+            return;
         }
-    }
 
-    async function handleStatusChange(
-        task: TaskItem,
-        newStatus: string
-    ) {
-        setMessage("");
-        setIsError(false);
+        setFormMessage("");
 
-        const updatedTask =
-            createUpdateDto(
-                task,
-                {
-                    status:
-                        newStatus
-                }
+        setIsSubmitting(
+            true
+        );
+
+        const updateDto =
+            createTaskUpdatePayload(
+                updatedTask,
+                isAdmin
             );
 
         try {
+            const oldStatus =
+                selectedTask.status;
+
             const data =
                 await taskService.update(
-                    task.id,
-                    updatedTask
+                    selectedTask.id,
+                    updateDto
                 );
 
             await loadTasks(
                 false
             );
 
-            if (
-                newStatus ===
-                "InProgress"
-            ) {
-                setMessage(
-                    data?.message ||
-                    "Görev başlatıldı."
-                );
-            }
+            closeTaskForm();
+
+            setIsError(false);
+
+            setMessage(
+                data?.message ||
+                "Görev başarıyla güncellendi."
+            );
 
             if (
-                newStatus ===
-                "Done"
+                oldStatus !== "Done" &&
+                updatedTask.status === "Done"
             ) {
-                setMessage(
-                    data?.message ||
-                    "Görev tamamlandı."
-                );
-
                 setIsCelebrating(
                     true
                 );
@@ -399,38 +403,39 @@ function TasksPage() {
                 );
             }
         } catch (error) {
-            setIsError(true);
-
-            setMessage(
+            setFormMessage(
                 getErrorMessage(
                     error
                 )
             );
+        } finally {
+            setIsSubmitting(
+                false
+            );
         }
     }
 
-    async function handlePriorityChange(
-        task: TaskItem,
-        newPriority: string
+    async function handleToggleTaskActive(
+        task: TaskItem
     ) {
+        if (!isAdmin) {
+            return;
+        }
+
         setMessage("");
         setIsError(false);
 
-        const updatedTask =
-            createUpdateDto(
-                task,
-                {
-                    priority:
-                        newPriority
-                }
-            );
-
         try {
             const data =
-                await taskService.update(
-                    task.id,
-                    updatedTask
-                );
+                task.isActive
+                    ? await taskService
+                        .delete(
+                            task.id
+                        )
+                    : await taskService
+                        .restore(
+                            task.id
+                        );
 
             await loadTasks(
                 false
@@ -438,56 +443,11 @@ function TasksPage() {
 
             setMessage(
                 data?.message ||
-                "Görev önceliği güncellendi."
-            );
-        } catch (error) {
-            setIsError(true);
-
-            setMessage(
-                getErrorMessage(
-                    error
+                (
+                    task.isActive
+                        ? "Görev pasif hale getirildi."
+                        : "Görev tekrar aktif hale getirildi."
                 )
-            );
-        }
-    }
-
-    async function handleDueDateChange(
-        task: TaskItem,
-        newDueDate: string
-    ) {
-        setMessage("");
-        setIsError(false);
-
-        const dueDateUtc =
-            newDueDate
-                ? new Date(
-                    newDueDate
-                ).toISOString()
-                : null;
-
-        const updatedTask =
-            createUpdateDto(
-                task,
-                {
-                    dueDate:
-                        dueDateUtc
-                }
-            );
-
-        try {
-            const data =
-                await taskService.update(
-                    task.id,
-                    updatedTask
-                );
-
-            await loadTasks(
-                false
-            );
-
-            setMessage(
-                data?.message ||
-                "Son teslim tarihi güncellendi."
             );
         } catch (error) {
             setIsError(true);
@@ -585,20 +545,22 @@ function TasksPage() {
         isLoading
     ]);
 
+    const normalizedSearch =
+        normalizeSearchText(
+            searchText
+        );
+
     const filteredTasks =
         tasks.filter(
             (task) => {
                 let matchesStatus =
                     true;
 
-                if (
-                    filter ===
-                    "ToDo"
-                ) {
+                if (filter === "ToDo") {
                     matchesStatus =
                         task.status ===
                             "ToDo" &&
-                        !isOverdue(
+                        !isTaskOverdue(
                             task
                         );
                 } else if (
@@ -608,12 +570,11 @@ function TasksPage() {
                     matchesStatus =
                         task.status ===
                             "InProgress" &&
-                        !isOverdue(
+                        !isTaskOverdue(
                             task
                         );
                 } else if (
-                    filter ===
-                    "Done"
+                    filter === "Done"
                 ) {
                     matchesStatus =
                         task.status ===
@@ -623,26 +584,33 @@ function TasksPage() {
                     "Overdue"
                 ) {
                     matchesStatus =
-                        isOverdue(
+                        isTaskOverdue(
                             task
                         );
                 }
-
-                const search =
-                    searchText
-                        .trim()
-                        .toLowerCase();
 
                 const matchesSearch =
                     task.title
                         .toLowerCase()
                         .includes(
-                            search
+                            normalizedSearch
+                        ) ||
+                    (
+                        task.description ??
+                        ""
+                    )
+                        .toLowerCase()
+                        .includes(
+                            normalizedSearch
                         );
 
                 return (
                     matchesStatus &&
-                    matchesSearch
+                    matchesSearch &&
+                    matchesActiveFilter(
+                        task.isActive,
+                        activeFilter
+                    )
                 );
             }
         );
@@ -662,86 +630,114 @@ function TasksPage() {
                         <div className="celebration-subtitle">
                             Harika iş! ✨
                         </div>
-
-                        <span className="celebration-confetti celebration-confetti-1">
-                            🎉
-                        </span>
-
-                        <span className="celebration-confetti celebration-confetti-2">
-                            ✨
-                        </span>
-
-                        <span className="celebration-confetti celebration-confetti-3">
-                            ⭐
-                        </span>
-
-                        <span className="celebration-confetti celebration-confetti-4">
-                            🎊
-                        </span>
-
-                        <span className="celebration-confetti celebration-confetti-5">
-                            🌟
-                        </span>
-
-                        <span className="celebration-confetti celebration-confetti-6">
-                            ✨
-                        </span>
                     </div>
                 </div>
             )}
 
-            <h2>
-                {canManageTasks
-                    ? "Görevler"
-                    : "Görevlerim"}
-            </h2>
+            <div className="tasks-page-heading">
+                <h2>
+                    {canManageTasks
+                        ? "Görevler"
+                        : "Görevlerim"}
+                </h2>
+
+                <button
+                    type="button"
+                    className="tasks-page-add-button"
+                    onClick={
+                        openTaskForm
+                    }
+                >
+                    + Görev Ekle
+                </button>
+            </div>
 
             <SearchToolbar
                 title="Görev Ara"
                 searchValue={
                     searchText
                 }
-                searchPlaceholder="Görev başlığı yazın"
+                searchPlaceholder="Görev başlığı veya açıklama yazın"
                 onSearchChange={
                     setSearchText
                 }
-                addButtonText="+ Görev Ekle"
-                onAdd={
-                    openTaskForm
-                }
+                showAddButton={false}
             >
-                <select
-                    id="task-filter"
-                    value={
-                        filter
-                    }
-                    onChange={(event) =>
-                        handleFilterChange(
-                            event.target
-                                .value as TaskFilter
-                        )
-                    }
-                >
-                    <option value="All">
-                        Tümü
-                    </option>
+                <div className="task-toolbar-filter">
+                    <label
+                        htmlFor="task-filter"
+                    >
+                        Durum
+                    </label>
 
-                    <option value="ToDo">
-                        Yapılacak
-                    </option>
+                    <select
+                        id="task-filter"
+                        value={
+                            filter
+                        }
+                        onChange={(event) =>
+                            handleFilterChange(
+                                event.target
+                                    .value as TaskFilter
+                            )
+                        }
+                    >
+                        <option value="All">
+                            Tümü
+                        </option>
 
-                    <option value="InProgress">
-                        Devam Ediyor
-                    </option>
+                        <option value="ToDo">
+                            Yapılacak
+                        </option>
 
-                    <option value="Done">
-                        Tamamlandı
-                    </option>
+                        <option value="InProgress">
+                            Devam Ediyor
+                        </option>
 
-                    <option value="Overdue">
-                        Geciken
-                    </option>
-                </select>
+                        <option value="Done">
+                            Tamamlandı
+                        </option>
+
+                        <option value="Overdue">
+                            Geciken
+                        </option>
+                    </select>
+                </div>
+
+                {isAdmin && (
+                    <div className="task-toolbar-filter">
+                        <label
+                            htmlFor="task-active-filter"
+                        >
+                            Görev Aktifliği
+                        </label>
+
+                        <select
+                            id="task-active-filter"
+                            value={
+                                activeFilter
+                            }
+                            onChange={(event) =>
+                                handleActiveFilterChange(
+                                    event.target
+                                        .value as ActiveFilter
+                                )
+                            }
+                        >
+                            <option value="Active">
+                                Aktifler
+                            </option>
+
+                            <option value="Inactive">
+                                Pasifler
+                            </option>
+
+                            <option value="All">
+                                Tümü
+                            </option>
+                        </select>
+                    </div>
+                )}
             </SearchToolbar>
 
             <AlertMessage
@@ -764,20 +760,17 @@ function TasksPage() {
                         tasks={
                             filteredTasks
                         }
-                        canDelete={
+                        canManageTasks={
                             canManageTasks
                         }
-                        onDelete={
-                            handleDeleteTask
+                        canToggleActive={
+                            isAdmin
                         }
-                        onStatusChange={
-                            handleStatusChange
+                        onEdit={
+                            openEditTask
                         }
-                        onPriorityChange={
-                            handlePriorityChange
-                        }
-                        onDueDateChange={
-                            handleDueDateChange
+                        onToggleActive={
+                            handleToggleTaskActive
                         }
                     />
                 )}
@@ -787,11 +780,23 @@ function TasksPage() {
                 isOpen={
                     showTaskForm
                 }
-                title="Görev Ekle"
+                title={
+                    selectedTask
+                        ? "Görevi Düzenle"
+                        : "Görev Ekle"
+                }
                 onClose={
                     closeTaskForm
                 }
             >
+                <AlertMessage
+                    message={
+                        formMessage
+                    }
+                    isError={true}
+                    compact
+                />
+
                 {isLoadingInterns ? (
                     <LoadingMessage />
                 ) : (
@@ -802,11 +807,24 @@ function TasksPage() {
                         canAssignIntern={
                             canManageTasks
                         }
+                        canChangeActive={
+                            isAdmin
+                        }
                         isSubmitting={
                             isSubmitting
                         }
+                        mode={
+                            selectedTask
+                                ? "edit"
+                                : "create"
+                        }
+                        initialTask={
+                            selectedTask
+                        }
                         onSubmit={
-                            handleAddTask
+                            selectedTask
+                                ? handleUpdateTask
+                                : handleAddTask
                         }
                     />
                 )}

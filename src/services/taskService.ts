@@ -6,16 +6,20 @@ import type {
     UpdateTaskDto
 } from "../interfaces/task";
 
-interface MessageResponse {
-    message?: string;
-}
+import type {
+    MessageResponse
+} from "../interfaces/common";
 
 const taskService = {
     getAll(): Promise<TaskItem[]> {
-        return apiService.get<
-            TaskItem[]
-        >(
+        return apiService.get<TaskItem[]>(
             "/tasks"
+        );
+    },
+
+    getAllIncludingInactive(): Promise<TaskItem[]> {
+        return apiService.get<TaskItem[]>(
+            "/tasks/all"
         );
     },
 
@@ -49,6 +53,14 @@ const taskService = {
     ): Promise<void> {
         return apiService.delete<void>(
             `/tasks/${id}`
+        );
+    },
+
+    restore(
+        id: number
+    ): Promise<MessageResponse> {
+        return apiService.patch<MessageResponse>(
+            `/tasks/${id}/restore`
         );
     }
 };
