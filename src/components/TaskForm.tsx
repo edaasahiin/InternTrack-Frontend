@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import ErrorModal from "./ErrorModal";
+import { parseDateTime } from "../utils/taskUtils";
 
 import type {
     CreateTaskDto,
@@ -48,16 +49,8 @@ function toDateTimeLocalValue(
         return "";
     }
 
-    const hasTimezone =
-        value.endsWith("Z") ||
-        /[+-]\d{2}:\d{2}$/.test(value);
-
     const date =
-        new Date(
-            hasTimezone
-                ? value
-                : `${value}Z`
-        );
+        parseDateTime(value);
 
     const offset =
         date.getTimezoneOffset();

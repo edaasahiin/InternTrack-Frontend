@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 
 import authService from "../services/authService";
+import type { ApiError } from "../api/axiosClient";
 import departmentService from "../services/departmentService";
 
 import type {
@@ -23,11 +24,6 @@ import type {
 import sankoLogo from "../assets/sanko-logo.png";
 
 import "./LoginPage.css";
-
-interface ApiError extends Error {
-    status?: number;
-    data?: unknown;
-}
 
 function RegisterPage() {
     const [

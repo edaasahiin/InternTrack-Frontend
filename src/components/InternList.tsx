@@ -3,6 +3,7 @@ import {
 } from "react-router-dom";
 
 import Table from "./common/Table";
+import { getTextPreview } from "../utils/taskUtils";
 
 import type {
     TableColumn
@@ -27,27 +28,6 @@ function InternList({
     canToggleActive,
     onToggleActive
 }: InternListProps) {
-    function getPreview(
-        value?: string | null,
-        maxLength = 22
-    ) {
-        if (!value) {
-            return "-";
-        }
-
-        if (
-            value.length <=
-            maxLength
-        ) {
-            return value;
-        }
-
-        return `${value.slice(
-            0,
-            maxLength
-        )}...`;
-    }
-
     const columns:
         TableColumn<Intern>[] = [
             {
@@ -66,7 +46,7 @@ function InternList({
                                 fullName
                             }
                         >
-                            {getPreview(
+                            {getTextPreview(
                                 fullName,
                                 22
                             )}
@@ -87,7 +67,7 @@ function InternList({
                             intern.email
                         }
                     >
-                        {getPreview(
+                        {getTextPreview(
                             intern.email,
                             26
                         )}
@@ -109,7 +89,7 @@ function InternList({
                             ""
                         }
                     >
-                        {getPreview(
+                        {getTextPreview(
                             intern.department
                                 ?.name,
                             22

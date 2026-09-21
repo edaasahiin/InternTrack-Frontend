@@ -1,5 +1,4 @@
 import axios, {
-    type AxiosError,
     type InternalAxiosRequestConfig
 } from "axios";
 
@@ -30,7 +29,7 @@ interface RetryRequestConfig
 function createApiError(
     error: unknown
 ): ApiError {
-    if (!axios.isAxiosError(error)) {
+    if (!axios.isAxiosError<ApiErrorData>(error)) {
         return createError(
             "Beklenmeyen bir hata oluştu.",
             0,
@@ -38,14 +37,11 @@ function createApiError(
         );
     }
 
-    const axiosError =
-        error as AxiosError<ApiErrorData>;
-
     const status =
-        axiosError.response?.status ?? 0;
+        error.response?.status ?? 0;
 
     const data =
-        axiosError.response?.data ?? null;
+        error.response?.data ?? null;
 
     const message =
         data?.message ??
