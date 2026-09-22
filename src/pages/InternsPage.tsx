@@ -10,6 +10,7 @@ import LoadingMessage from "../components/LoadingMessage";
 
 import Modal from "../components/common/Modal";
 import SearchToolbar from "../components/common/SearchToolbar";
+import ActiveFilterSelect from "../components/common/ActiveFilterSelect";
 
 import internService from "../services/internService";
 import departmentService from "../services/departmentService";
@@ -128,11 +129,7 @@ function InternsPage() {
                 );
 
             const data =
-                includeInactive
-                    ? await internService
-                        .getAllIncludingInactive()
-                    : await internService
-                        .getAll();
+                await internService.getAll(includeInactive);
 
             setInterns(
                 data ?? []
@@ -381,41 +378,15 @@ function InternsPage() {
                 onSearchChange={
                     setSearchText
                 }
-                showAddButton={false}
             >
                 {isAdmin && (
-                    <div className="intern-toolbar-filter">
-                        <label
-                            htmlFor="intern-active-filter"
-                        >
-                            Stajyer Aktifliği
-                        </label>
-
-                        <select
-                            id="intern-active-filter"
-                            value={
-                                activeFilter
-                            }
-                            onChange={(event) =>
-                                handleActiveFilterChange(
-                                    event.target
-                                        .value as ActiveFilter
-                                )
-                            }
-                        >
-                            <option value="Active">
-                                Aktifler
-                            </option>
-
-                            <option value="Inactive">
-                                Pasifler
-                            </option>
-
-                            <option value="All">
-                                Tümü
-                            </option>
-                        </select>
-                    </div>
+                    <ActiveFilterSelect
+                        id="intern-active-filter"
+                        label="Stajyer Aktifliği"
+                        className="intern-toolbar-filter"
+                        value={activeFilter}
+                        onChange={handleActiveFilterChange}
+                    />
                 )}
             </SearchToolbar>
 

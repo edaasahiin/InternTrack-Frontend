@@ -5,6 +5,12 @@ import axios, {
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL;
 
+if (!API_BASE_URL) {
+    throw new Error(
+        "VITE_API_BASE_URL is not configured."
+    );
+}
+
 const AUTH_ENDPOINTS_WITHOUT_REFRESH = [
     "/auth/login",
     "/auth/refresh",
@@ -63,13 +69,10 @@ function createError(
     status: number,
     data: ApiErrorData | null
 ): ApiError {
-    const error =
-        new Error(message) as ApiError;
-
-    error.status = status;
-    error.data = data;
-
-    return error;
+    return Object.assign(new Error(message), {
+        status,
+        data
+    });
 }
 
 function isRefreshExcludedEndpoint(
@@ -143,10 +146,8 @@ axiosClient.interceptors.response.use(
             );
         }
 
-        const originalRequest =
-            error.config as
-                | RetryRequestConfig
-                | undefined;
+        const originalRequest: RetryRequestConfig | undefined =
+            error.config;
 
         const status =
             error.response?.status;

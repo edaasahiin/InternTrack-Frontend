@@ -11,15 +11,9 @@ import type {
 } from "../interfaces/common";
 
 const taskService = {
-    getAll(): Promise<TaskItem[]> {
+    getAll(includeInactive = false): Promise<TaskItem[]> {
         return apiService.get<TaskItem[]>(
-            "/tasks"
-        );
-    },
-
-    getAllIncludingInactive(): Promise<TaskItem[]> {
-        return apiService.get<TaskItem[]>(
-            "/tasks/all"
+            includeInactive ? "/tasks/all" : "/tasks"
         );
     },
 

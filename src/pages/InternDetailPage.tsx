@@ -22,11 +22,8 @@ import LoadingMessage from "../components/LoadingMessage";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 
-import type {
-    TaskFormData
-} from "../components/TaskForm";
-
 import Modal from "../components/common/Modal";
+import ActiveStatusBadge from "../components/common/ActiveStatusBadge";
 
 import {
     getErrorMessage
@@ -50,7 +47,8 @@ import type {
 } from "../interfaces/department";
 
 import type {
-    TaskItem
+    TaskItem,
+    TaskFormData
 } from "../interfaces/task";
 
 function InternDetailPage() {
@@ -172,7 +170,7 @@ function InternDetailPage() {
         if (isAdmin) {
             const allInterns =
                 await internService
-                    .getAllIncludingInactive();
+                    .getAll(true);
 
             return (
                 allInterns.find(
@@ -187,16 +185,6 @@ function InternDetailPage() {
             .getById(
                 internId
             );
-    }
-
-    async function getTaskData() {
-        if (isAdmin) {
-            return await taskService
-                .getAllIncludingInactive();
-        }
-
-        return await taskService
-            .getAll();
     }
 
     async function loadInternDetail(
@@ -257,7 +245,7 @@ function InternDetailPage() {
                         internId
                     ),
 
-                    getTaskData()
+                    taskService.getAll(isAdmin)
                 ]);
 
             if (!internData) {
@@ -743,17 +731,7 @@ function InternDetailPage() {
                                         {intern.surname}
                                     </h3>
 
-                                    <span
-                                        className={
-                                            intern.isActive
-                                                ? "task-active-badge"
-                                                : "task-inactive-badge"
-                                        }
-                                    >
-                                        {intern.isActive
-                                            ? "Aktif"
-                                            : "Pasif"}
-                                    </span>
+                                    <ActiveStatusBadge isActive={intern.isActive} />
                                 </div>
 
                                 <div className="intern-profile-meta">

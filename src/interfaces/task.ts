@@ -28,13 +28,8 @@ export interface CreateTaskDto {
     canInternDeleteWhenCompleted: boolean;
 }
 
-export interface UpdateTaskDto {
-    title: string;
-    description?: string | null;
-    status: string;
-    priority: string;
-    dueDate?: string | null;
-    internId: number;
-    canInternDeleteWhenCompleted: boolean;
+export interface UpdateTaskDto extends CreateTaskDto {
     isActive?: boolean;
 }
+
+export type TaskFormData = UpdateTaskDto;

@@ -1,8 +1,5 @@
 import type {
-    TaskFormData
-} from "../components/TaskForm";
-
-import type {
+    TaskFormData,
     UpdateTaskDto
 } from "../interfaces/task";
 

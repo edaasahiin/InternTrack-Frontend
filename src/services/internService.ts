@@ -11,15 +11,9 @@ import type {
 } from "../interfaces/common";
 
 const internService = {
-    getAll(): Promise<Intern[]> {
+    getAll(includeInactive = false): Promise<Intern[]> {
         return apiService.get<Intern[]>(
-            "/interns"
-        );
-    },
-
-    getAllIncludingInactive(): Promise<Intern[]> {
-        return apiService.get<Intern[]>(
-            "/interns/all"
+            includeInactive ? "/interns/all" : "/interns"
         );
     },
 

@@ -1,3 +1,4 @@
+import ActiveStatusBadge from "./common/ActiveStatusBadge";
 import Table from "./common/Table";
 
 import type {
@@ -58,19 +59,7 @@ function DepartmentList({
             render: (
                 department
             ) => (
-                <span
-                    className={
-                        department.isActive
-                            ? "task-active-badge"
-                            : "task-inactive-badge"
-                    }
-                >
-                    {
-                        department.isActive
-                            ? "Aktif"
-                            : "Pasif"
-                    }
-                </span>
+                <ActiveStatusBadge isActive={department.isActive} />
             )
         },
 

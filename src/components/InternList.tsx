@@ -3,6 +3,7 @@ import {
 } from "react-router-dom";
 
 import Table from "./common/Table";
+import ActiveStatusBadge from "./common/ActiveStatusBadge";
 import { getTextPreview } from "../utils/taskUtils";
 
 import type {
@@ -104,17 +105,7 @@ function InternList({
                 header: "Stajyer Aktifliği",
 
                 render: (intern) => (
-                    <span
-                        className={
-                            intern.isActive
-                                ? "task-active-badge"
-                                : "task-inactive-badge"
-                        }
-                    >
-                        {intern.isActive
-                            ? "Aktif"
-                            : "Pasif"}
-                    </span>
+                    <ActiveStatusBadge isActive={intern.isActive} />
                 )
             },
 

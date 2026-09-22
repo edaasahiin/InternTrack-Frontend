@@ -13,12 +13,6 @@ interface SearchToolbarProps {
         value: string
     ) => void;
 
-    addButtonText?: string;
-
-    onAdd?: () => void;
-
-    showAddButton?: boolean;
-
     children?: ReactNode;
 }
 
@@ -27,34 +21,10 @@ function SearchToolbar({
     searchValue,
     searchPlaceholder,
     onSearchChange,
-    addButtonText,
-    onAdd,
-    showAddButton = true,
     children
 }: SearchToolbarProps) {
-    const shouldShowAddButton =
-        showAddButton &&
-        addButtonText &&
-        onAdd;
-
     return (
         <div className="search-toolbar">
-            {shouldShowAddButton && (
-                <div className="search-toolbar-header">
-                    <div />
-
-                    <button
-                        type="button"
-                        className="search-toolbar-add-button"
-                        onClick={
-                            onAdd
-                        }
-                    >
-                        {addButtonText}
-                    </button>
-                </div>
-            )}
-
             <div className="search-toolbar-controls">
                 <div className="search-toolbar-search-field">
                     <label

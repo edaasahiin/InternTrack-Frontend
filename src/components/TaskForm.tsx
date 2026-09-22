@@ -8,7 +8,7 @@ import ErrorModal from "./ErrorModal";
 import { parseDateTime } from "../utils/taskUtils";
 
 import type {
-    CreateTaskDto,
+    TaskFormData,
     TaskItem
 } from "../interfaces/task";
 
@@ -19,11 +19,6 @@ import type {
 type TaskFormMode =
     | "create"
     | "edit";
-
-export interface TaskFormData
-    extends CreateTaskDto {
-    isActive?: boolean;
-}
 
 interface TaskFormProps {
     interns: Intern[];

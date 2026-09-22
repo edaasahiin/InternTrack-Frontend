@@ -8,17 +8,13 @@ import {
 } from "react-router-dom";
 
 import TaskForm from "../components/TaskForm";
-
-import type {
-    TaskFormData
-} from "../components/TaskForm";
-
 import TaskList from "../components/TaskList";
 import AlertMessage from "../components/AlertMessage";
 import LoadingMessage from "../components/LoadingMessage";
 
 import Modal from "../components/common/Modal";
 import SearchToolbar from "../components/common/SearchToolbar";
+import ActiveFilterSelect from "../components/common/ActiveFilterSelect";
 
 import taskService from "../services/taskService";
 import internService from "../services/internService";
@@ -39,8 +35,10 @@ import {
 } from "../utils/activeFilter";
 
 import {
-    isTaskOverdue
-} from "../utils/taskUtils";
+    getDashboardTaskFilter,
+    matchesTaskFilter,
+    type TaskFilter
+} from "../utils/taskFilters";
 
 import {
     createTaskUpdatePayload
@@ -51,19 +49,13 @@ import {
 } from "../utils/getErrorMessage";
 
 import type {
-    TaskItem
+    TaskItem,
+    TaskFormData
 } from "../interfaces/task";
 
 import type {
     Intern
 } from "../interfaces/intern";
-
-type TaskFilter =
-    | "All"
-    | "ToDo"
-    | "InProgress"
-    | "Done"
-    | "Overdue";
 
 function TasksPage() {
     const [
@@ -179,11 +171,7 @@ function TasksPage() {
                 );
 
             const data =
-                includeInactive
-                    ? await taskService
-                        .getAllIncludingInactive()
-                    : await taskService
-                        .getAll();
+                await taskService.getAll(includeInactive);
 
             setTasks(
                 data ?? []
@@ -460,14 +448,6 @@ function TasksPage() {
         }
     }
 
-    function handleFilterChange(
-        newFilter: TaskFilter
-    ) {
-        setFilter(
-            newFilter
-        );
-    }
-
     useEffect(() => {
         loadTasks();
     }, []);
@@ -478,39 +458,7 @@ function TasksPage() {
                 "filter"
             );
 
-        if (
-            dashboardFilter ===
-            "todo"
-        ) {
-            setFilter(
-                "ToDo"
-            );
-        } else if (
-            dashboardFilter ===
-            "progress"
-        ) {
-            setFilter(
-                "InProgress"
-            );
-        } else if (
-            dashboardFilter ===
-            "done"
-        ) {
-            setFilter(
-                "Done"
-            );
-        } else if (
-            dashboardFilter ===
-            "overdue"
-        ) {
-            setFilter(
-                "Overdue"
-            );
-        } else {
-            setFilter(
-                "All"
-            );
-        }
+        setFilter(getDashboardTaskFilter(dashboardFilter));
 
         if (!dashboardFilter) {
             return;
@@ -553,41 +501,8 @@ function TasksPage() {
     const filteredTasks =
         tasks.filter(
             (task) => {
-                let matchesStatus =
-                    true;
-
-                if (filter === "ToDo") {
-                    matchesStatus =
-                        task.status ===
-                            "ToDo" &&
-                        !isTaskOverdue(
-                            task
-                        );
-                } else if (
-                    filter ===
-                    "InProgress"
-                ) {
-                    matchesStatus =
-                        task.status ===
-                            "InProgress" &&
-                        !isTaskOverdue(
-                            task
-                        );
-                } else if (
-                    filter === "Done"
-                ) {
-                    matchesStatus =
-                        task.status ===
-                        "Done";
-                } else if (
-                    filter ===
-                    "Overdue"
-                ) {
-                    matchesStatus =
-                        isTaskOverdue(
-                            task
-                        );
-                }
+                const matchesStatus =
+                    matchesTaskFilter(task, filter);
 
                 const matchesSearch =
                     task.title
@@ -661,7 +576,6 @@ function TasksPage() {
                 onSearchChange={
                     setSearchText
                 }
-                showAddButton={false}
             >
                 <div className="task-toolbar-filter">
                     <label
@@ -676,7 +590,7 @@ function TasksPage() {
                             filter
                         }
                         onChange={(event) =>
-                            handleFilterChange(
+                            setFilter(
                                 event.target
                                     .value as TaskFilter
                             )
@@ -705,38 +619,13 @@ function TasksPage() {
                 </div>
 
                 {isAdmin && (
-                    <div className="task-toolbar-filter">
-                        <label
-                            htmlFor="task-active-filter"
-                        >
-                            Görev Aktifliği
-                        </label>
-
-                        <select
-                            id="task-active-filter"
-                            value={
-                                activeFilter
-                            }
-                            onChange={(event) =>
-                                handleActiveFilterChange(
-                                    event.target
-                                        .value as ActiveFilter
-                                )
-                            }
-                        >
-                            <option value="Active">
-                                Aktifler
-                            </option>
-
-                            <option value="Inactive">
-                                Pasifler
-                            </option>
-
-                            <option value="All">
-                                Tümü
-                            </option>
-                        </select>
-                    </div>
+                    <ActiveFilterSelect
+                        id="task-active-filter"
+                        label="Görev Aktifliği"
+                        className="task-toolbar-filter"
+                        value={activeFilter}
+                        onChange={handleActiveFilterChange}
+                    />
                 )}
             </SearchToolbar>
 

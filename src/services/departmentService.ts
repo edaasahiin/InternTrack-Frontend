@@ -10,15 +10,9 @@ import type {
 } from "../interfaces/common";
 
 const departmentService = {
-    getAll(): Promise<Department[]> {
+    getAll(includeInactive = false): Promise<Department[]> {
         return apiService.get<Department[]>(
-            "/departments"
-        );
-    },
-
-    getAllIncludingInactive(): Promise<Department[]> {
-        return apiService.get<Department[]>(
-            "/departments/all"
+            includeInactive ? "/departments/all" : "/departments"
         );
     },
 

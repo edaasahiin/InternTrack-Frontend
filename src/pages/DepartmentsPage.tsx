@@ -11,6 +11,7 @@ import LoadingMessage from "../components/LoadingMessage";
 
 import Modal from "../components/common/Modal";
 import SearchToolbar from "../components/common/SearchToolbar";
+import ActiveFilterSelect from "../components/common/ActiveFilterSelect";
 
 import departmentService from "../services/departmentService";
 
@@ -153,11 +154,7 @@ function DepartmentsPage() {
                 );
 
             const data =
-                includeInactive
-                    ? await departmentService
-                        .getAllIncludingInactive()
-                    : await departmentService
-                        .getAll();
+                await departmentService.getAll(includeInactive);
 
             setDepartments(
                 data ?? []
@@ -511,43 +508,15 @@ function DepartmentsPage() {
                 onSearchChange={
                     setSearchText
                 }
-                showAddButton={
-                    false
-                }
             >
                 {isAdmin && (
-                    <div className="department-toolbar-filter">
-                        <label
-                            htmlFor="department-active-filter"
-                        >
-                            Departman Aktifliği
-                        </label>
-
-                        <select
-                            id="department-active-filter"
-                            value={
-                                activeFilter
-                            }
-                            onChange={(event) =>
-                                handleActiveFilterChange(
-                                    event.target
-                                        .value as ActiveFilter
-                                )
-                            }
-                        >
-                            <option value="Active">
-                                Aktifler
-                            </option>
-
-                            <option value="Inactive">
-                                Pasifler
-                            </option>
-
-                            <option value="All">
-                                Tümü
-                            </option>
-                        </select>
-                    </div>
+                    <ActiveFilterSelect
+                        id="department-active-filter"
+                        label="Departman Aktifliği"
+                        className="department-toolbar-filter"
+                        value={activeFilter}
+                        onChange={handleActiveFilterChange}
+                    />
                 )}
             </SearchToolbar>
 

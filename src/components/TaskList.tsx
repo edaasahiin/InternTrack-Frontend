@@ -1,3 +1,4 @@
+import ActiveStatusBadge from "./common/ActiveStatusBadge";
 import Table from "./common/Table";
 
 import type {
@@ -118,17 +119,7 @@ function TaskList({
                 header: "Görev Aktifliği",
 
                 render: (task) => (
-                    <span
-                        className={
-                            task.isActive
-                                ? "task-active-badge"
-                                : "task-inactive-badge"
-                        }
-                    >
-                        {task.isActive
-                            ? "Aktif"
-                            : "Pasif"}
-                    </span>
+                    <ActiveStatusBadge isActive={task.isActive} />
                 )
             },
 

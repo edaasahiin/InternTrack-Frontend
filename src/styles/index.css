@@ -1122,20 +1122,6 @@ form button[type="button"]:hover {
         rgba(15, 23, 42, 0.08);
 }
 
-.search-toolbar-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    gap: 16px;
-
-    margin-bottom: 14px;
-}
-
-.search-toolbar-add-button {
-    flex: none;
-}
-
 .search-toolbar-controls {
     display: flex;
     align-items: flex-end;
@@ -2007,15 +1993,6 @@ form button[type="button"]:hover {
         padding: 18px;
     }
 
-    .search-toolbar-header {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .search-toolbar-add-button {
-        width: 100%;
-    }
-
     .search-toolbar-controls {
         flex-direction: column;
     }
@@ -2576,31 +2553,6 @@ form button[type="button"]:hover {
 
     .intern-profile-summary-main {
         align-items: flex-start;
-    }
-
-    .intern-profile-edit-button {
-        width: 100%;
-    }
-
-    .intern-detail-section-heading {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .intern-detail-add-task-button {
-        width: 100%;
-    }
-
-    .intern-detail-edit-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .intern-detail-edit-footer {
-        flex-direction: column-reverse;
-    }
-
-    .intern-detail-edit-footer button {
-        width: 100%;
     }
 }
 
