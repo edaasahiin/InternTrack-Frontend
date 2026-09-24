@@ -2,14 +2,7 @@ import axios, {
     type InternalAxiosRequestConfig
 } from "axios";
 
-const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL;
-
-if (!API_BASE_URL) {
-    throw new Error(
-        "VITE_API_BASE_URL is not configured."
-    );
-}
+import { API_BASE_URL } from "./apiConfig";
 
 const AUTH_ENDPOINTS_WITHOUT_REFRESH = [
     "/auth/login",
@@ -172,11 +165,8 @@ axiosClient.interceptors.response.use(
                 originalRequest
             );
         } catch (refreshError) {
-            return Promise.reject(
-                createApiError(
-                    refreshError
-                )
-            );
+            // The refresh request already passed through this interceptor.
+            return Promise.reject(refreshError);
         }
     }
 );

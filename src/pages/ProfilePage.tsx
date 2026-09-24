@@ -87,6 +87,9 @@ function ProfilePage() {
             await updateAvatar(avatar);
 
             setShowAvatarOptions(false);
+        } catch (error) {
+            setIsProfileError(true);
+            setProfileMessage(getErrorMessage(error));
         } finally {
             setIsUpdatingAvatar(false);
         }

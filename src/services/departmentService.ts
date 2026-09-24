@@ -12,7 +12,7 @@ import type {
 const departmentService = {
     getAll(includeInactive = false): Promise<Department[]> {
         return apiService.get<Department[]>(
-            includeInactive ? "/departments/all" : "/departments"
+            includeInactive ? "/departments/get-all" : "/departments"
         );
     },
 
@@ -36,7 +36,7 @@ const departmentService = {
             MessageResponse,
             CreateDepartmentDto
         >(
-            `/departments/${id}`,
+            `/departments/update-by-id/${id}`,
             department
         );
     },

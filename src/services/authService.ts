@@ -1,4 +1,5 @@
 import apiService from "../api/apiService";
+import { API_BASE_URL } from "../api/apiConfig";
 
 import type {
     AuthUser,
@@ -8,9 +9,6 @@ import type {
     UpdateAvatarDto,
     UpdateProfileDto
 } from "../interfaces/auth";
-
-const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL;
 
 const authService = {
     getCurrentUser(): Promise<AuthUser> {
